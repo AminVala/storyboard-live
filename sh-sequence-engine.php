@@ -1,13 +1,16 @@
 <?php
 /**
  * Plugin Name: استوری برد زنده | StoryBoard Live
- * Description: روایت‌های تصویری زنده، روان و ماندگار؛ همگام با اسکرول.
+ * Description: روایتهای تصویری زنده، روان و ماندگار؛ همگام با اسکرول.
  * Version: 0.7.1
  * Author: امین اخیار
  * Text Domain: sh-sequence-engine
  * Domain Path: /languages
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Requires at least: 6.4
+ * Requires PHP: 7.4
+ * Tested up to: 6.8
  *
  * @package StoryBoardLive
  */
