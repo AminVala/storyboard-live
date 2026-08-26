@@ -1,9 +1,11 @@
 <?php
 /**
- * Plugin Name: استوری برد زنده | StoryBoard Live
- * Description: روایتهای تصویری زنده، روان و ماندگار؛ همگام با اسکرول.
+ * Plugin Name: StoryBoard Live — Scroll-Driven Visual Storytelling
+ * Plugin URI:  https://wordpress.org/plugins/storyboard-live/
+ * Description: Create scroll-driven visual stories from a single confirmed image — with live HTML overlays, cinematic camera animation, and smooth theme-header reveal. No frame exports, no custom JavaScript.
  * Version: 0.7.1
- * Author: امین اخیار
+ * Author: Amin Akhyar
+ * Author URI:  https://github.com/AminVala
  * Text Domain: sh-sequence-engine
  * Domain Path: /languages
  * License: GPL-2.0-or-later
@@ -17,12 +19,12 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SHSEQ_VERSION', '0.7.1' );
+define( 'SHSEQ_VERSION',        '0.7.1' );
 define( 'SHSEQ_SCHEMA_VERSION', 1 );
-define( 'SHSEQ_FILE', __FILE__ );
-define( 'SHSEQ_DIR', plugin_dir_path( __FILE__ ) );
-define( 'SHSEQ_URL', plugin_dir_url( __FILE__ ) );
-define( 'SHSEQ_BASENAME', plugin_basename( __FILE__ ) );
+define( 'SHSEQ_FILE',           __FILE__ );
+define( 'SHSEQ_DIR',            plugin_dir_path( __FILE__ ) );
+define( 'SHSEQ_URL',            plugin_dir_url( __FILE__ ) );
+define( 'SHSEQ_BASENAME',       plugin_basename( __FILE__ ) );
 
 $shseq_autoloader = SHSEQ_DIR . 'vendor/autoload.php';
 
@@ -35,7 +37,11 @@ if ( ! file_exists( $shseq_autoloader ) ) {
 			}
 
 			echo '<div class="notice notice-error"><p>';
-			echo esc_html( 'استوری برد زنده | StoryBoard Live is incomplete: vendor/autoload.php is missing. Build the plugin package with Composer before activation.' );
+			printf(
+				/* translators: %s: composer install command */
+				esc_html__( 'StoryBoard Live is incomplete: vendor/autoload.php is missing. Run %s in the plugin directory or reinstall from WordPress.org.', 'sh-sequence-engine' ),
+				'<code>composer install</code>'
+			);
 			echo '</p></div>';
 		}
 	);
