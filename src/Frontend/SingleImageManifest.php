@@ -80,6 +80,10 @@ final class SingleImageManifest {
 		$header  = isset( $structure['siteHeader'] ) && is_array( $structure['siteHeader'] ) ? $structure['siteHeader'] : array();
 		$handoff = isset( $structure['handoff'] ) && is_array( $structure['handoff'] ) ? $structure['handoff'] : array();
 
+		// SECURITY FIX [SEC-002]: Remove internal attachment_id from public JSON manifest.
+		// The WordPress attachment ID is an internal DB integer that leaks the media
+		// library structure to unauthenticated visitors. It is not needed by the JS
+		// runtime engine and its exposure helps enumerate media files.
 		return array(
 			'schema'         => self::MANIFEST_SCHEMA,
 			'schemaVersion'  => self::MANIFEST_SCHEMA_VERSION,
@@ -90,7 +94,7 @@ final class SingleImageManifest {
 			'referenceFrame' => max( 1, min( $reference, $total ) ),
 			'goldenFrame'    => max( 1, min( $golden, $total ) ),
 			'image'          => array(
-				'id'     => $attachment_id,
+				// 'id' removed — internal DB identifier must not appear in public output.
 				'url'    => esc_url_raw( (string) $image_url ),
 				'width'  => $image_w,
 				'height' => $image_h,
