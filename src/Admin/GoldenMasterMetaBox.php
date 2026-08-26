@@ -96,7 +96,12 @@ final class GoldenMasterMetaBox {
 				$locked        = 'desktop' !== $variant && ! $desktop_ready;
 				$thumb         = $attachment_id ? wp_get_attachment_image_url( $attachment_id, 'medium' ) : '';
 				?>
-				<fieldset class="shseq-master-variant<?php echo $locked ? ' is-locked' : ''; ?>" data-shseq-variant="<?php echo esc_attr( $variant ); ?>">
+				<fieldset
+					class="shseq-master-variant<?php echo $locked ? ' is-locked' : ''; ?>"
+					data-shseq-variant="<?php echo esc_attr( $variant ); ?>"
+					data-shseq-picker-title="<?php echo esc_attr__( 'Select Golden Master', 'sh-sequence-engine' ); ?>"
+					data-shseq-picker-button="<?php echo esc_attr__( 'Use this image', 'sh-sequence-engine' ); ?>"
+				>
 					<legend>
 						<?php echo esc_html( $this->variant_label( $variant ) ); ?>
 						<?php if ( $confirmed && $attachment_id ) : ?>
@@ -108,7 +113,7 @@ final class GoldenMasterMetaBox {
 						<p class="shseq-master-lock"><?php echo esc_html__( 'Confirm the desktop Golden Master first. The same structure is then applied here.', 'sh-sequence-engine' ); ?></p>
 					<?php endif; ?>
 
-					<div class="shseq-master-preview" data-shseq-master-preview>
+					<div class="shseq-master-preview" data-shseq-master-preview data-shseq-empty="<?php echo esc_attr__( 'No image selected', 'sh-sequence-engine' ); ?>">
 						<?php if ( $thumb ) : ?>
 							<img src="<?php echo esc_url( $thumb ); ?>" alt="">
 						<?php else : ?>
