@@ -32,6 +32,7 @@ final class AdminMenu {
 	 * Constructor.
 	 *
 	 * @param DashboardPage $dashboard_page Dashboard page renderer.
+	 * @param TemplatesPage $templates_page Ready templates renderer.
 	 */
 	public function __construct( DashboardPage $dashboard_page, TemplatesPage $templates_page ) {
 		$this->dashboard_page = $dashboard_page;
