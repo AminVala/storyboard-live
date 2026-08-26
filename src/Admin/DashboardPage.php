@@ -50,7 +50,7 @@ final class DashboardPage {
 		<div class="wrap shseq-admin">
 			<header class="shseq-hero">
 				<div>
-					<h1><?php echo esc_html( 'استوری برد زنده | StoryBoard Live' ); ?></h1>
+					<h1><?php echo esc_html__( 'استوری برد زنده | StoryBoard Live', 'sh-sequence-engine' ); ?></h1>
 					<p class="shseq-byline">
 						<?php
 						echo esc_html(
