@@ -1,0 +1,453 @@
+/**
+ * StoryBoard Live — Runtime Frontend CSS
+ * UI Redesign v2.0
+ *
+ * Fixes applied:
+ * V1: Skip link visible on focus, high contrast, minimum 44px target
+ * V2: Progress bar with aria-valuenow/min/max + label
+ * V3: Scroll cue has animated arrow + proper contrast
+ * V4: Skeleton/loading state before Canvas wakes up
+ * V5: Smooth handoff transition instead of hard cut
+ * V6: "Back to top" anchor added after handoff zone
+ *
+ * @package StoryBoardLive
+ */
+
+/* ─── Runtime Container ─────────────────────────────────────── */
+.shseq-runtime {
+	position: relative;
+}
+
+.shseq-single {
+	position: relative;
+}
+
+.shseq-runtime__scrollspace,
+.shseq-single__scrollspace {
+	height: calc(var(--shseq-scroll-vh, 420) * 1vh);
+}
+
+.shseq-runtime__sticky,
+.shseq-single__sticky {
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	overflow: hidden;
+}
+
+
+/* ─── V1: Skip Link — visible on focus ──────────────────────── */
+/*
+ * Old: the skip link existed in markup but had no focus style.
+ * Fix: give it a highly-visible focus indicator and ensure it
+ *      appears ABOVE all runtime layers when focused.
+ */
+.shseq-runtime__skip,
+.shseq-single__skip {
+	position: absolute;
+	top: var(--sp-4, 16px);
+	left: var(--sp-4, 16px);
+	z-index: 200; /* above canvas and overlay */
+
+	/* Hidden until focused */
+	transform: translateY(-100%);
+	opacity: 0;
+	pointer-events: none;
+	transition: transform .15s, opacity .15s;
+
+	/* Visual */
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 10px 18px;
+	min-height: 44px;         /* WCAG 2.5.8 minimum touch target */
+	border-radius: 8px;
+	background: #000;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none;
+	box-shadow: 0 4px 12px rgba(0,0,0,.4);
+}
+
+.shseq-runtime__skip:focus,
+.shseq-runtime__skip:focus-visible,
+.shseq-single__skip:focus,
+.shseq-single__skip:focus-visible {
+	transform: translateY(0);
+	opacity: 1;
+	pointer-events: auto;
+	outline: 3px solid #fff;
+	outline-offset: 3px;
+}
+
+
+/* ─── Image / Canvas Layer ──────────────────────────────────── */
+.shseq-runtime__poster-wrap,
+.shseq-single__stage {
+	position: absolute;
+	inset: 0;
+}
+
+.shseq-runtime__poster,
+.shseq-single__image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	display: block;
+}
+
+.shseq-runtime__canvas {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+/* V4: Loading skeleton shown until the canvas first paints */
+.shseq-runtime__poster-wrap::after,
+.shseq-single__stage::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		90deg,
+		rgba(0,0,0,.06) 0%,
+		rgba(0,0,0,.02) 40%,
+		rgba(0,0,0,.06) 100%
+	);
+	background-size: 200% 100%;
+	animation: shseq-shimmer 1.6s infinite linear;
+	transition: opacity .4s;
+	pointer-events: none;
+}
+
+/* Once JS marks the canvas as ready, fade the shimmer out */
+.shseq-runtime__poster-wrap.is-ready::after,
+.shseq-single__stage.is-ready::after {
+	opacity: 0;
+}
+
+@keyframes shseq-shimmer {
+	0%   { background-position: 200% 0; }
+	100% { background-position: -200% 0; }
+}
+
+
+/* ─── Live Overlay Layer ────────────────────────────────────── */
+.shseq-runtime__live,
+.shseq-single__live {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	padding: clamp(20px, 4vw, 60px) clamp(20px, 6vw, 80px);
+	background: linear-gradient(
+		to top,
+		rgba(0,0,0,.65) 0%,
+		rgba(0,0,0,.3) 45%,
+		transparent 100%
+	);
+	color: #fff;
+	pointer-events: none; /* Let scroll pass through until overlays appear */
+}
+
+/* Overlay text elements — individually animated by JS */
+[data-shseq-overlay] {
+	opacity: 0;
+	transform: translateY(12px);
+	transition: opacity .5s ease, transform .5s ease;
+	pointer-events: none;
+}
+
+[data-shseq-overlay].is-visible {
+	opacity: 1;
+	transform: none;
+	pointer-events: auto;
+}
+
+.shseq-runtime__eyebrow {
+	margin: 0 0 10px;
+	font-size: clamp(11px, 1.1vw, 13px);
+	font-weight: 700;
+	letter-spacing: .08em;
+	text-transform: uppercase;
+	color: rgba(255,255,255,.75);
+}
+
+.shseq-runtime__live h2,
+.shseq-single__live h2,
+.shseq-single__overlay--title {
+	margin: 0 0 12px;
+	font-size: clamp(24px, 4vw, 52px);
+	font-weight: 760;
+	line-height: 1.1;
+	letter-spacing: -.02em;
+	text-shadow: 0 1px 4px rgba(0,0,0,.3);
+}
+
+.shseq-runtime__live p,
+.shseq-single__live p,
+.shseq-single__overlay--subtitle {
+	max-width: 56ch;
+	margin: 0 0 20px;
+	font-size: clamp(14px, 1.4vw, 17px);
+	line-height: 1.65;
+	color: rgba(255,255,255,.88);
+}
+
+/* CTA button inside overlay */
+.shseq-runtime__actions,
+.shseq-single__overlay--actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.shseq-runtime__cta,
+.shseq-single__overlay--a {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 48px;           /* V1/V6: minimum touch target */
+	padding: 0 28px;
+	border: 2px solid rgba(255,255,255,.9);
+	border-radius: 999px;
+	background: rgba(255,255,255,.12);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	color: #fff;
+	font-size: 15px;
+	font-weight: 650;
+	text-decoration: none;
+	transition: background .2s, border-color .2s;
+}
+
+.shseq-runtime__cta:hover,
+.shseq-single__overlay--a:hover {
+	background: rgba(255,255,255,.22);
+	border-color: #fff;
+	color: #fff;
+	text-decoration: none;
+}
+
+.shseq-runtime__cta:focus-visible,
+.shseq-single__overlay--a:focus-visible {
+	outline: 3px solid rgba(255,255,255,.8);
+	outline-offset: 3px;
+}
+
+
+/* ─── V3: Scroll Cue — animated arrow ───────────────────────── */
+.shseq-runtime__scroll-cue,
+.shseq-single__scroll-cue {
+	position: absolute;
+	bottom: clamp(20px, 4vh, 36px);
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	color: rgba(255,255,255,.9);
+	font-size: 11px;
+	font-weight: 660;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+	pointer-events: none;
+
+	/* V3: Ensure contrast — text sits on the gradient overlay */
+	text-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+
+/* Animated chevron */
+.shseq-runtime__scroll-cue::after,
+.shseq-single__scroll-cue::after {
+	content: '';
+	display: block;
+	width: 20px;
+	height: 12px;
+	border-left: 2px solid rgba(255,255,255,.85);
+	border-bottom: 2px solid rgba(255,255,255,.85);
+	transform: rotate(-45deg) translateY(-2px);
+	animation: shseq-bounce 1.6s ease-in-out infinite;
+}
+
+@keyframes shseq-bounce {
+	0%, 100% { transform: rotate(-45deg) translateY(-2px); opacity: .7; }
+	50%       { transform: rotate(-45deg) translateY(4px);  opacity: 1;  }
+}
+
+/* Hide cue once user has scrolled past 5% */
+.shseq-runtime__scroll-cue.is-scrolled,
+.shseq-single__scroll-cue.is-scrolled {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity .4s;
+}
+
+
+/* ─── V2: Progress Bar — accessible ─────────────────────────── */
+/*
+ * The div gets role="progressbar" aria-valuemin="0" aria-valuemax="100"
+ * aria-valuenow="{pct}" aria-label="{label}" set by JS.
+ */
+.shseq-runtime__progress,
+.shseq-single__progress {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: rgba(255,255,255,.15);
+	overflow: hidden;
+}
+
+.shseq-runtime__progress::after,
+.shseq-single__progress::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: var(--shseq-progress, 0%);
+	background: rgba(255,255,255,.85);
+	transition: width .1s linear;
+}
+
+/* High-contrast mode */
+@media (forced-colors: active) {
+	.shseq-runtime__progress::after,
+	.shseq-single__progress::after {
+		background: Highlight;
+	}
+}
+
+
+/* ─── V5: Handoff Zone — smooth transition ───────────────────── */
+/*
+ * Old: hard cut from sticky → normal flow.
+ * Fix: a tall gradient fade-in zone so the transition is gradual.
+ */
+.shseq-runtime-demo-after,
+.shseq-single-after {
+	position: relative;
+	z-index: 0;
+
+	/* V5: smooth transition */
+	margin-top: 0;
+	padding-top: clamp(60px, 10vh, 120px);
+	background: linear-gradient(
+		to bottom,
+		rgba(255,255,255,0) 0%,
+		rgba(255,255,255,1) clamp(60px, 10vh, 120px)
+	);
+}
+
+/* Accessibility: focusable anchor for skip link */
+.shseq-runtime-demo-after:focus,
+.shseq-single-after:focus {
+	outline: none; /* visual focus is on the content, not the zone */
+}
+
+.shseq-runtime-demo-after strong,
+.shseq-runtime-demo-after span {
+	display: block;
+	padding-inline: clamp(20px, 6vw, 80px);
+}
+
+.shseq-runtime-demo-after strong {
+	font-size: 16px;
+	font-weight: 700;
+	margin-bottom: 8px;
+}
+
+.shseq-runtime-demo-after span {
+	color: #667085;
+	font-size: 14px;
+	max-width: 55ch;
+}
+
+
+/* ─── V6: Back-to-top after handoff ─────────────────────────── */
+/*
+ * After a long scroll story, users need a clear way back up.
+ * This is injected by JS after handoff completes.
+ */
+.shseq-back-top {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-top: 20px;
+	padding-inline: clamp(20px, 6vw, 80px);
+	background: none;
+	border: none;
+	color: #2563eb;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.shseq-back-top:hover {
+	text-decoration: underline;
+}
+
+.shseq-back-top:focus-visible {
+	outline: 3px solid rgba(37,99,235,.4);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+
+/* ─── Noscript fallback ─────────────────────────────────────── */
+.shseq-runtime__noscript-poster,
+.shseq-single__noscript {
+	width: 100%;
+	display: block;
+}
+
+
+/* ─── Reduced motion ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+	[data-shseq-overlay] {
+		transition: opacity .2s;
+		transform: none;
+	}
+
+	.shseq-runtime__scroll-cue::after,
+	.shseq-single__scroll-cue::after {
+		animation: none;
+	}
+
+	.shseq-runtime__poster-wrap::after,
+	.shseq-single__stage::after {
+		animation: none;
+		background: rgba(0,0,0,.04);
+	}
+}
+
+
+/* ─── High-contrast ─────────────────────────────────────────── */
+@media (forced-colors: active) {
+	.shseq-runtime__cta,
+	.shseq-single__overlay--a {
+		border: 2px solid ButtonText;
+		color: ButtonText;
+		background: ButtonFace;
+	}
+
+	.shseq-runtime__live,
+	.shseq-single__live {
+		background: none;
+	}
+
+	.shseq-runtime__scroll-cue,
+	.shseq-single__scroll-cue {
+		color: CanvasText;
+		text-shadow: none;
+	}
+}
