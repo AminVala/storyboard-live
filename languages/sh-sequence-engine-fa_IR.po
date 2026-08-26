@@ -1,0 +1,458 @@
+
+msgid ""
+msgstr ""
+"Project-Id-Version: استوری برد زنده | StoryBoard Live 0.6.5\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-08-13 12:22+0000\n"
+"PO-Revision-Date: 2026-08-13 15:05+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: fa_IR\n"
+"Language-Team: fa_IR <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+msgid "(Untitled)"
+msgstr "(بدون عنوان)"
+
+msgid "A calmer interface, a faster first impression"
+msgstr "رابطی آرام‌تر، شروعی سریع‌تر"
+
+msgid "Add New"
+msgstr "افزودن"
+
+msgid "Add New Sequence"
+msgstr "افزودن سکانس جدید"
+
+msgid "All"
+msgstr "همه"
+
+msgid "All Sequences"
+msgstr "همه سکانس‌ها"
+
+msgid "Brands"
+msgstr "برندها"
+
+msgid "Bring the story to life with every scroll"
+msgstr "با هر اسکرول، داستان را زنده کن"
+
+msgid "Build your next visual story"
+msgstr "داستان تصویری بعدی خود را بسازید"
+
+msgid "Categories"
+msgstr "دسته‌بندی‌ها"
+
+msgid "Continue to live content"
+msgstr "ادامه به محتوای زنده"
+
+msgid "Create Sequence"
+msgstr "ساخت سکانس"
+
+msgid "Create a private sequence entity now; the interactive editor arrives in a later milestone."
+msgstr "اکنون ساختار سکانس را ایجاد کنید؛ ویرایشگر تعاملی در یکی از مراحل بعدی اضافه می‌شود."
+
+msgid "Create your first visual story to verify the plugin foundation."
+msgstr "اولین داستان تصویری را برای بررسی پایه افزونه ایجاد کنید."
+
+#, python-format
+msgid "Created by %s"
+msgstr "تولید شده توسط %s"
+
+msgid "Dashboard"
+msgstr "پیشخوان"
+
+msgid "Demo navigation"
+msgstr "ناوبری آزمایشی"
+
+msgid "Desktop, tablet and mobile now use dedicated runtime variants"
+msgstr "دسکتاپ، تبلت و موبایل اکنون نسخه‌های اجرایی مستقل دارند"
+
+msgid "Desktop, tablet and mobile use independent frame variants while the real theme header remains the only site header."
+msgstr "دسکتاپ، تبلت و موبایل از فریم‌های مستقل استفاده می‌کنند و هدر واقعی قالب همچنان تنها هدر سایت است."
+
+msgid "Desktop, tablet and mobile use independent runtime policies while the real theme header remains the only site header."
+msgstr "دسکتاپ، تبلت و موبایل سیاست اجرایی متناسب با نمایشگر خود را دارند و هدر واقعی قالب همچنان تنها هدر سایت است."
+
+msgid "Drafts"
+msgstr "پیش‌نویس‌ها"
+
+msgid "Edit"
+msgstr "ویرایش"
+
+msgid "Edit Sequence"
+msgstr "ویرایش سکانس"
+
+msgid "Frames move with the visitor and hand off cleanly to the real page content and the real theme header."
+msgstr "فریم‌ها همراه حرکت کاربر پیش می‌روند و در پایان بدون پرش به محتوای واقعی صفحه و هدر واقعی قالب تحویل می‌شوند."
+
+msgid "Interactive visual storytelling for the web"
+msgstr "داستان‌پردازی تصویری تعاملی برای وب"
+
+msgid "Late-stage live header reveal is ready for validation"
+msgstr "نمایش دیرهنگام هدر زنده آماده بررسی است"
+
+msgid "Live HTML arrives near the golden frame"
+msgstr "اچ‌تی‌ام‌ال زنده نزدیک فریم طلایی ظاهر می‌شود"
+
+msgid ""
+"Live HTML overlays now follow a strict frame timeline; the site header is revealed only near the golden final frame "
+"and stays live through handoff."
+msgstr ""
+"لایه‌های زنده اچ‌تی‌ام‌ال اکنون از خط زمانی دقیق فریم‌ها پیروی می‌کنند؛ هدر سایت فقط نزدیک فریم طلایی نهایی ظاهر "
+"می‌شود و در زمان تحویل زنده باقی می‌ماند."
+
+msgid "Live HTML remains unchanged"
+msgstr "اچ‌تی‌ام‌ال زنده بدون تغییر باقی می‌ماند"
+
+msgid "Live page continues here."
+msgstr "صفحه زنده از اینجا ادامه پیدا می‌کند."
+
+msgid "M2 Production Runtime Core"
+msgstr "هسته اجرایی Production در M2"
+
+msgid "M2 runtime core"
+msgstr "هسته اجرایی M2"
+
+msgid "M4 Resilience Layer"
+msgstr "لایه پایداری M4"
+
+msgid "M4 resilience layer"
+msgstr "لایه پایداری M4"
+
+msgid "M5 Golden Handoff"
+msgstr "تحویل طلایی M5"
+
+msgid "M6 Live Overlay Timeline"
+msgstr "خط زمانی لایه‌های زنده M6"
+
+msgid "M6 Overlay Timeline"
+msgstr "خط زمانی لایه‌های زنده M6"
+
+msgid "M6.1 Theme Header"
+msgstr "هدر واقعی قالب M6.1"
+
+msgid "M6.1 Theme Header Integration"
+msgstr "یکپارچه‌سازی هدر قالب M6.1"
+
+msgid "M6.1 Theme Header Timeline"
+msgstr "خط زمانی هدر واقعی قالب M6.1"
+
+msgid "M6.2 Responsive Variant Hardening"
+msgstr "سخت‌سازی نسخه‌های واکنش‌گرا M6.2"
+
+msgid "M6.3 Mobile UX and Package Optimization"
+msgstr "بهینه‌سازی تجربه موبایل و حجم بسته M6.3"
+
+msgid "M6.4 Experience Foundation and Lighthouse Hardening"
+msgstr "زیرساخت تجربه کاربری و سخت‌سازی لایت‌هاوس M6.4"
+
+msgid ""
+"Mobile and tablet use shorter scroll paths and touch-friendly layouts while the approved desktop behavior stays "
+"unchanged."
+msgstr ""
+"موبایل و تبلت مسیر اسکرول کوتاه‌تر و چیدمان سازگار با لمس دارند، در حالی که رفتار تأییدشده دسکتاپ بدون تغییر باقی "
+"می‌ماند."
+
+msgid "Network-wide activation is not supported in this version. Activate استوری برد زنده | StoryBoard Live per site."
+msgstr "فعال‌سازی شبکه‌ای در این نسخه پشتیبانی نمی‌شود. افزونه را برای هر سایت به‌صورت جداگانه فعال کنید."
+
+msgid "New Sequence"
+msgstr "سکانس جدید"
+
+msgid "No sequences found in Trash."
+msgstr "سکانسی در زباله‌دان پیدا نشد."
+
+msgid "No sequences found."
+msgstr "سکانسی پیدا نشد."
+
+msgid "No sequences have been created yet."
+msgstr "هنوز سکانسی ساخته نشده است."
+
+msgid "One story, a dedicated composition for every screen"
+msgstr "یک داستان، با ترکیب‌بندی اختصاصی برای هر نمایشگر"
+
+msgid "Only visual ownership moves from Canvas to the pixel-matched golden poster."
+msgstr "فقط مالکیت تصویر از بوم به پوستر طلایی کاملاً همسان منتقل می‌شود."
+
+msgid "Pixel-matched Golden Handoff is ready for validation"
+msgstr "تحویل طلایی کاملاً همسان آماده بررسی است"
+
+msgid "Poster, fallback, and reduced-motion policies are ready for validation"
+msgstr "سیاست‌های پوستر، حالت جایگزین و کاهش حرکت برای اعتبارسنجی آماده‌اند"
+
+msgid "Production runtime core is ready for validation"
+msgstr "هسته اجرایی Production برای اعتبارسنجی آماده است"
+
+msgid "Published"
+msgstr "منتشرشده"
+
+msgid "Recent Sequences"
+msgstr "سکانس‌های اخیر"
+
+msgid "Resize or rotate the device to verify responsive variant switching without creating a second header."
+msgstr "اندازه پنجره را تغییر دهید یا دستگاه را بچرخانید تا تغییر نسخه واکنش‌گرا بدون ساخت هدر دوم بررسی شود."
+
+msgid "Responsive StoryBoard Live Runtime"
+msgstr "هسته واکنش‌گرای استوری برد زنده"
+
+msgid "Responsive runtime, without duplicated demo assets"
+msgstr "اجرای واکنش‌گرا، بدون تکرار فایل‌های نمایشی"
+
+msgid "Scroll back upward to verify that the header and live overlays reverse with the sequence."
+msgstr "به بالا اسکرول کنید تا بررسی شود هدر و لایه‌های زنده همراه با سکانس به‌صورت معکوس برمی‌گردند."
+
+msgid "Scroll back upward to verify that the sequence reverses after handoff."
+msgstr "برای بررسی بازگشت سکانس پس از تحویل، دوباره به بالا اسکرول کنید."
+
+msgid "Scroll to continue"
+msgstr "برای ادامه اسکرول کنید"
+
+msgid "Search Sequences"
+msgstr "جستجوی سکانس‌ها"
+
+msgid "Sequence"
+msgstr "سکانس"
+
+msgid "Sequence Revisions"
+msgstr "بازبینی‌های سکانس"
+
+msgid "Sequence published."
+msgstr "سکانس منتشر شد."
+
+msgid "Sequence reverted to draft."
+msgstr "سکانس به پیش‌نویس بازگردانده شد."
+
+msgid "Sequence status"
+msgstr "وضعیت سکانس‌ها"
+
+msgid "Sequence updated."
+msgstr "سکانس به‌روزرسانی شد."
+
+msgid "Sequences"
+msgstr "سکانس‌ها"
+
+msgid "Shahre Honar"
+msgstr "شهر هنر"
+
+msgid "Shahre Honar home"
+msgstr "صفحه اصلی شهر هنر"
+
+msgid "Shop"
+msgstr "فروشگاه"
+
+msgid "Skip visual story"
+msgstr "پرش از داستان تصویری"
+
+msgid "StoryBoard Live"
+msgstr "استوری برد زنده | StoryBoard Live"
+
+msgid ""
+"The 30-frame demo now runs through a real manifest, frame scheduler, direction-aware loader, memory-budget cache, and"
+" runtime state machine."
+msgstr ""
+"نمونه ۳۰ فریمی اکنون با مانیفست واقعی، زمان‌بند فریم، بارگذار آگاه از جهت حرکت، کش مبتنی بر بودجه حافظه و ماشین حالت "
+"اجرایی کار می‌کند."
+
+msgid "The existing theme header is revealed near the final frame and remains the same live header through Golden Handoff."
+msgstr "هدر موجود قالب نزدیک فریم نهایی ظاهر می‌شود و در تمام تحویل طلایی همان هدر زنده باقی می‌ماند."
+
+msgid ""
+"The final sequence frame now hands visual ownership to the exact golden poster while live HTML remains untouched; "
+"reverse scrolling restores the Canvas sequence."
+msgstr ""
+"فریم نهایی سکانس اکنون مالکیت تصویر را به پوستر طلایی دقیقاً همسان می‌سپارد، در حالی که اچ‌تی‌ام‌ال زنده دست‌نخورده "
+"می‌ماند؛ اسکرول معکوس سکانس بوم را بازمی‌گرداند."
+
+msgid "The header is revealed only near the final frame and remains live through Golden Handoff."
+msgstr "هدر فقط نزدیک فریم نهایی ظاهر می‌شود و در تمام تحویل طلایی به‌صورت زنده باقی می‌ماند."
+
+msgid "The live page continues here."
+msgstr "محتوای زنده صفحه از اینجا ادامه پیدا می‌کند."
+
+msgid ""
+"The plugin no longer creates a header. It reveals the existing theme or Elementor header near the golden frame and "
+"preserves that same live header through handoff."
+msgstr ""
+"افزونه دیگر هدر جداگانه‌ای نمی‌سازد؛ هدر موجود قالب یا المنتور را نزدیک فریم طلایی نمایش می‌دهد و همان هدر زنده را در"
+" تمام فرایند تحویل حفظ می‌کند."
+
+msgid "The real theme header is now bound to the sequence"
+msgstr "هدر واقعی قالب اکنون به سکانس متصل است"
+
+msgid ""
+"The real theme or Elementor header remains the only header, while each viewport receives an independent frame "
+"composition and runtime policy."
+msgstr ""
+"هدر واقعی قالب یا المنتور تنها هدر سایت باقی می‌ماند و هر اندازه نمایش، ترکیب فریم و سیاست اجرایی مستقل خود را دریافت"
+" می‌کند."
+
+msgid ""
+"The runtime now fails safely to a golden poster, removes long scroll behavior when reduced motion is requested, and "
+"tears down interactive resources when fallback mode is entered."
+msgstr ""
+"هسته اجرایی اکنون هنگام خطا به‌صورت امن به پوستر نهایی بازمی‌گردد، در حالت کاهش حرکت اسکرول طولانی را حذف می‌کند و "
+"هنگام ورود به حالت جایگزین منابع تعاملی را آزاد می‌کند."
+
+msgid ""
+"The runtime now reserves layout from first paint, prioritizes the LCP poster, and uses a responsive editorial "
+"interface without changing the approved desktop story behavior."
+msgstr ""
+"هسته اجرا از نخستین نمایش فضای لازم را رزرو می‌کند، پوستر اصلی را در اولویت می‌گذارد و رابط واکنش‌گرای منسجمی ارائه "
+"می‌دهد، بدون تغییر رفتار تأییدشده داستان در دسکتاپ."
+
+msgid "The story ends without replacing the real site header."
+msgstr "داستان بدون جایگزین‌کردن هدر واقعی سایت پایان می‌یابد."
+
+msgid "The story hands off without replacing the real site header or semantic content."
+msgstr "داستان بدون جایگزین‌کردن هدر واقعی سایت یا محتوای معنایی تحویل داده می‌شود."
+
+#, python-format
+msgid "Version %s"
+msgstr "نسخه %s"
+
+msgid "View Sequence"
+msgstr "مشاهده سکانس"
+
+msgid "View all"
+msgstr "مشاهده همه"
+
+msgid "Visual storytelling | Exclusive to Shahre Honar"
+msgstr "داستان‌پردازی تصویری | اختصاصی شهر هنر"
+
+msgid "You do not have permission to access this page."
+msgstr "شما اجازه دسترسی به این صفحه را ندارید."
+
+msgid "استوری برد زنده | StoryBoard Live"
+msgstr "استوری برد زنده | StoryBoard Live"
+
+msgid "استوری برد زنده | StoryBoard Live Dashboard"
+msgstr "پیشخوان استوری برد زنده | StoryBoard Live"
+
+msgid "استوری برد زنده | StoryBoard Live M2 runtime demo"
+msgstr "نمونه هسته اجرایی M2 افزونه استوری برد زنده | StoryBoard Live"
+
+msgid "استوری برد زنده | StoryBoard Live M4 resilience demo"
+msgstr "نمونه لایه پایداری M4 افزونه استوری برد زنده | StoryBoard Live"
+
+msgid "استوری برد زنده | StoryBoard Live M5 Golden Handoff demo"
+msgstr "نمونه تحویل طلایی M5 افزونه استوری برد زنده | StoryBoard Live"
+
+
+msgid "M6.5 Intent-Driven Runtime and Lighthouse Hardening"
+msgstr "سخت‌سازی لایت‌هاوس و اجرای مبتنی بر تعامل M6.5"
+
+msgid "A lighter first load, without weakening the story"
+msgstr "بارگذاری اولیه سبک‌تر، بدون تضعیف روایت"
+
+msgid "The visual story now keeps its poster and semantic content in the first load while the heavier Canvas runtime waits for real interaction intent; the responsive story contract and real theme header remain intact."
+msgstr "روایت تصویری در بارگذاری اولیه فقط پوستر و محتوای معنایی را نگه می‌دارد و هسته سنگین‌تر Canvas تا زمان تعامل واقعی کاربر منتظر می‌ماند؛ قرارداد واکنش‌گرا و هدر واقعی قالب بدون تغییر باقی می‌مانند."
+
+msgid "Ready Templates"
+msgstr "قالب‌های آماده"
+
+msgid "Choose a production-ready structure, create an editable draft, then adapt its scenes, beats and handoff settings to your project."
+msgstr "یک ساختار آماده تولید انتخاب کنید، یک پیش‌نویس قابل ویرایش بسازید و سپس صحنه‌ها، ضرب‌آهنگ‌ها و تنظیمات تحویل آن را برای پروژه خود تغییر دهید."
+
+msgid "Frames"
+msgstr "فریم"
+
+msgid "Beats"
+msgstr "ضرب‌آهنگ"
+
+msgid "Scenes"
+msgstr "صحنه"
+
+msgid "Master frame"
+msgstr "فریم مرجع"
+
+msgid "Use this template"
+msgstr "استفاده از این قالب"
+
+msgid "You do not have permission to create sequences."
+msgstr "شما اجازه ساخت سکانس را ندارید."
+
+msgid "The template request could not be verified."
+msgstr "درخواست قالب قابل تأیید نبود."
+
+msgid "Template draft created."
+msgstr "پیش‌نویس قالب ساخته شد."
+
+msgid "The selected template was not found."
+msgstr "قالب انتخاب‌شده پیدا نشد."
+
+msgid "The sequence draft could not be created."
+msgstr "پیش‌نویس سکانس ساخته نشد."
+
+msgid "Story Structure"
+msgstr "ساختار داستان"
+
+msgid "This sequence does not have a template structure yet. Create one from Ready Templates to start from a complete production sheet."
+msgstr "این سکانس هنوز ساختار قالب ندارد. برای شروع از یک شیت تولید کامل، آن را از بخش قالب‌های آماده بسازید."
+
+msgid "This draft is a copy of the selected ready template. Editing these fields changes this Sequence only; the built-in template remains immutable."
+msgstr "این پیش‌نویس یک نسخه مستقل از قالب آماده انتخاب‌شده است. ویرایش این فیلدها فقط همین سکانس را تغییر می‌دهد و قالب اصلی دست‌نخورده باقی می‌ماند."
+
+msgid "Production frame contract"
+msgstr "قرارداد فریم‌های تولید"
+
+msgid "Total frames"
+msgstr "تعداد کل فریم‌ها"
+
+msgid "Master reference frame"
+msgstr "فریم مرجع اصلی"
+
+msgid "Golden handoff frame"
+msgstr "فریم تحویل طلایی"
+
+msgid "Title"
+msgstr "عنوان"
+
+msgid "Start"
+msgstr "شروع"
+
+msgid "End"
+msgstr "پایان"
+
+msgid "12-beat scroll timeline"
+msgstr "خط زمانی ۱۲ ضرب‌آهنگ اسکرول"
+
+msgid "Beat"
+msgstr "ضرب‌آهنگ"
+
+msgid "Scroll %"
+msgstr "درصد اسکرول"
+
+msgid "Scene"
+msgstr "صحنه"
+
+msgid "Reference keyframes"
+msgstr "کی‌فریم‌های مرجع"
+
+msgid "Theme header and golden handoff"
+msgstr "هدر قالب و تحویل طلایی"
+
+msgid "Header reveal starts"
+msgstr "شروع نمایش هدر"
+
+msgid "Header becomes interactive"
+msgstr "فعال‌شدن هدر"
+
+msgid "Header reveal completes"
+msgstr "تکمیل نمایش هدر"
+
+msgid "Handoff frame"
+msgstr "فریم تحویل"
+
+msgid "Ready template copied. You can now edit this sequence structure without changing the original template."
+msgstr "قالب آماده کپی شد. اکنون می‌توانید ساختار این سکانس را بدون تغییر قالب اصلی ویرایش کنید."
+
+msgid "Start from a complete production sheet"
+msgstr "از یک شیت تولید کامل شروع کنید"
+
+msgid "Choose a built-in structure, copy it into a new draft, and edit its scenes, beats, keyframes, real theme-header reveal, and golden handoff."
+msgstr "یک ساختار آماده را انتخاب کنید، آن را در یک پیش‌نویس جدید کپی کنید و صحنه‌ها، ضرب‌آهنگ‌ها، کی‌فریم‌ها، نمایش هدر واقعی قالب و تحویل طلایی را ویرایش کنید."
+
+msgid "Browse Ready Templates"
+msgstr "مشاهده قالب‌های آماده"
