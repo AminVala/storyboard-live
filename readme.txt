@@ -1,7 +1,7 @@
 === استوری برد زنده | StoryBoard Live ===
 Contributors: aminakhyar
 Tags: scroll, sequence, storytelling, canvas, rtl
-Stable tag: 0.7.0
+Stable tag: 0.7.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,6 +12,12 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 استوری برد زنده | StoryBoard Live افزونه‌ای سبک برای روایت تصویری همگام با اسکرول است؛ با هدر واقعی قالب، تحویل طلایی بدون پرش و تجربه واکنش‌گرای سازگار با لمس.
 
 == Changelog ==
+
+= 0.7.1 =
+* Fixed the real theme-header reveal in the single-image Golden Master runtime: the engine now progressively reveals the actual theme/Elementor header element near the end of the story instead of only setting an unused CSS variable.
+* Fixed a dangling aria-labelledby reference: the section now references the heading only when an h1/h2 overlay is actually rendered, and falls back to aria-label otherwise.
+* Fixed a dead siteHeader.enabled condition so the header reveal can genuinely be disabled from the manifest.
+* The Golden Master media picker title/button are now translatable, and the preview restores its "No image selected" placeholder after removing an image.
 
 = 0.7.0 =
 * Added the single-image Golden Master workflow: the administrator uploads one confirmed final image (frame 120) and the plugin applies the Storyboard Production Sheet rules to it — cinematic scroll-driven entry transform up to the locked master frame, HTML overlay reveals at their frame thresholds, real theme-header reveal, and a reversible golden handoff.
