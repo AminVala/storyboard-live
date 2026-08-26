@@ -123,6 +123,9 @@ final class LiveContentMetaBox {
 	/**
 	 * Save overlay content safely.
 	 *
+	 * Only overlay keys that exist in the current Story Structure are accepted.
+	 * Any extra keys submitted (e.g. from a tampered form) are silently dropped.
+	 *
 	 * @param int      $post_id Post id.
 	 * @param \WP_Post $post    Post object.
 	 */
@@ -144,12 +147,16 @@ final class LiveContentMetaBox {
 		$allowed = $this->allowed_tags();
 		$result  = array();
 
+		// Only accept keys that are defined in the current Story Structure to
+		// prevent arbitrary data being stored from a tampered form submission.
+		$valid_keys = array_column( $this->overlay_slots( $post_id ), 'key' );
+
 		foreach ( $input as $key => $value ) {
 			if ( ! is_array( $value ) ) {
 				continue;
 			}
 			$key = sanitize_key( $key );
-			if ( '' === $key ) {
+			if ( '' === $key || ! in_array( $key, $valid_keys, true ) ) {
 				continue;
 			}
 			$tag = isset( $value['tag'] ) ? sanitize_key( $value['tag'] ) : 'p';
