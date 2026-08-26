@@ -1,113 +1,203 @@
-=== استوری برد زنده | StoryBoard Live ===
+=== StoryBoard Live — Scroll-Driven Visual Storytelling ===
 Contributors: aminakhyar
-Tags: scroll, sequence, storytelling, canvas, rtl
+Tags: scroll, animation, storytelling, parallax, visual
+Requires at least: 6.4
+Tested up to: 6.8
 Stable tag: 0.7.1
+Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-روایت‌های تصویری زنده، روان و ماندگار؛ همگام با اسکرول.
+Create scroll-driven visual stories from a single confirmed image. No frames to export, no JavaScript to write.
 
 == Description ==
 
-استوری برد زنده | StoryBoard Live افزونه‌ای سبک برای روایت تصویری همگام با اسکرول است؛ با هدر واقعی قالب، تحویل طلایی بدون پرش و تجربه واکنش‌گرای سازگار با لمس.
+**StoryBoard Live** turns one confirmed "Golden Master" image into a full scroll-driven visual experience — with live HTML overlays, a cinematic camera animation, and a smooth theme-header reveal — all without baking text or logos into your image.
+
+= How it works =
+
+1. Choose a ready-made Production Sheet template (or start from scratch).
+2. Upload your final image as the Golden Master.
+3. Confirm it — then add your live text, headings, and CTA links.
+4. Embed with `[storyboard_live id="YOUR_ID"]`.
+
+That's it. The plugin handles the scroll timing, overlay reveals, and the handoff to your real site content.
+
+= Key features =
+
+* **Single-image workflow** — No frame sequences to export. Upload one final image and the plugin derives the entire animation from it.
+* **Live HTML overlays** — Text, headings, and call-to-action buttons are always real HTML, never baked into the image. Screen readers can read them. Search engines can index them.
+* **Cinematic camera animation** — A smooth scale + opacity entry transform plays up to the locked "master frame", then freezes — matching the Production Sheet rule that the hero is locked at the reference frame.
+* **Real theme-header reveal** — Your existing WordPress or Elementor header slides in naturally near the end of the story. No duplicate headers, no hidden navigation.
+* **Golden Handoff** — The story hands off cleanly to your real page content without a hard cut.
+* **Responsive** — Desktop, tablet, and mobile variants with independent Golden Master images and confirmation gates.
+* **Reduced-motion aware** — Visitors who prefer reduced motion see the final Golden Master image instead of the animation.
+* **RTL ready** — Full right-to-left layout support.
+* **No external requests** — No telemetry, no CDN calls, no remote APIs. All assets are local.
+
+= Production Sheet templates =
+
+The plugin ships with a built-in **Creative Studio Production Sheet** template:
+
+* 120 frames, 12 beats, 4 scenes
+* 5 reference keyframes (A → E)
+* 6 HTML overlay slots (story-mark, eyebrow, title, subtitle, actions, trust)
+* Real theme-header reveal starting at frame 109
+* Reversible golden handoff at frame 120
+
+= Shortcodes =
+
+* `[storyboard_live id="123"]` — Embed a published sequence by its ID.
+* `[storyboard_live id="123" variant="tablet"]` — Request a specific responsive variant.
+* `[storyboard_live_demo]` — Embed the bundled demo sequence (for testing).
+
+= For developers =
+
+StoryBoard Live is built with clean, namespaced PHP (PSR-4 autoloading), no global state, and no jQuery dependency. All admin and frontend assets are scoped to their pages — nothing loads globally.
+
+The plugin uses custom post type capabilities, so you can grant or restrict access per role from **StoryBoard Live → Settings → Access**.
+
+= Privacy =
+
+This plugin does not collect, store, or transmit any personal data about site visitors. No cookies are set by the plugin. No external requests are made.
+
+== Installation ==
+
+= Automatic installation (recommended) =
+
+1. Go to **Plugins → Add New** in your WordPress admin.
+2. Search for **StoryBoard Live**.
+3. Click **Install Now**, then **Activate**.
+
+= Manual installation =
+
+1. Download the plugin ZIP from WordPress.org.
+2. Go to **Plugins → Add New → Upload Plugin**.
+3. Select the ZIP file and click **Install Now**.
+4. Click **Activate Plugin**.
+
+= After activation =
+
+1. Go to **StoryBoard Live** in the left-hand admin menu.
+2. Click **Start from a ready template** to create your first sequence from the built-in Creative Studio Production Sheet.
+3. Upload a Golden Master image (your final hero image) and confirm it.
+4. Add your overlay text in the **Live overlay content** meta box.
+5. Embed the sequence on any page or post with `[storyboard_live id="YOUR_ID"]`.
+
+= Requirements =
+
+* WordPress 6.4 or later
+* PHP 7.4 or later
+* A Composer-built package (the `vendor/autoload.php` file must be present). If you installed from WordPress.org, this is already included. If you cloned from GitHub, run `composer install` first.
+
+== Frequently Asked Questions ==
+
+= Do I need to export video or image frames? =
+
+No. StoryBoard Live works from a single confirmed image — your Golden Master. The plugin derives the scroll-driven animation from the Production Sheet structure you define.
+
+= What is a Golden Master? =
+
+The Golden Master is your final, fully-composed hero image (typically the last frame of the story). It must be free of baked text, logos, and UI elements — those are added as live HTML overlays by the plugin.
+
+= Can I use my own image? =
+
+Yes. Any image in the WordPress Media Library can be used as a Golden Master. For best results, use a landscape image at 1920×1080 px for desktop, with a separate portrait version for mobile.
+
+= What happens on mobile? =
+
+If you confirm separate tablet and mobile Golden Masters, each variant uses its own image. If you only confirm the desktop master, all variants fall back to it — and an admin notice tells you which variants are using the fallback.
+
+= Does it work with Elementor? =
+
+Yes. The shortcode `[storyboard_live id="123"]` can be placed inside any Elementor text or shortcode widget. The plugin also detects Elementor page builder data to correctly load assets only on pages that contain a sequence.
+
+= Does it work with the Block Editor (Gutenberg)? =
+
+Yes. Add a **Shortcode** block and paste `[storyboard_live id="123"]`.
+
+= Can I add the sequence to a Full Site Editing (FSE) template? =
+
+Yes, using a Shortcode block in the Site Editor. Note that in FSE contexts, the shortcode must be placed inside a block that renders the `do_shortcode()` output.
+
+= What if JavaScript is disabled? =
+
+The plugin renders a static fallback image (`<noscript>`) so the page is never blank. The Skip Story link and all overlay text remain accessible via keyboard.
+
+= Is it WCAG 2.1 AA accessible? =
+
+The plugin follows WordPress accessibility standards:
+* Skip Story link visible on focus.
+* Progress bar with `role="progressbar"` and `aria-valuenow`.
+* All overlay text uses semantic HTML (h1–h3, p, a).
+* `aria-labelledby` or `aria-label` on the story section.
+* Reduced-motion mode shows a static image for users who prefer it.
+
+= Can multiple sequences appear on the same page? =
+
+Each shortcode instance gets a unique ID, so multiple sequences can coexist on one page without conflicts.
+
+= How do I preview a sequence before publishing it? =
+
+In the sequence editor, click the **Preview** button (next to the shortcode) to open a full-screen preview at a unique signed URL. The preview respects draft/pending status, so you don't need to publish first.
+
+= Can I duplicate a sequence? =
+
+Yes. In **Sequences → All Sequences**, hover over any sequence and click **Duplicate**. The copy inherits the structure and overlay content, but confirmations are reset — you must re-confirm each Golden Master.
+
+= Can editors (not just admins) manage sequences? =
+
+By default, only Administrators can create and edit sequences. Go to **StoryBoard Live → Settings → Access** to grant the Editor role the same permissions.
+
+= Does it work on WordPress Multisite? =
+
+The plugin must be activated per site. Network-wide (global) activation is not supported in this version. Each site on the network activates and manages its own sequences independently.
+
+= Where can I get support? =
+
+Post in the WordPress.org support forum for this plugin. Please include your WordPress version, PHP version, active theme, and a description of the issue.
+
+== Screenshots ==
+
+1. **Dashboard** — Onboarding card for new users; stats and recent sequences for returning users.
+2. **Ready Templates** — Choose a built-in Production Sheet to create an editable draft in one click.
+3. **Story Structure editor** — Edit scenes, beats, keyframes, overlay timeline, and header/handoff timing.
+4. **Golden Master meta box** — Upload and confirm your final image per responsive variant.
+5. **Live overlay content** — Enter live text, headings, and CTAs that appear as real HTML on top of your image.
+6. **Settings page** — Control access, scroll defaults, CDN base URL, and data options.
+7. **Frontend — desktop** — The sequence in action: scroll-driven camera animation with live overlay reveals.
+8. **Frontend — mobile** — The same sequence on a mobile viewport with the portrait Golden Master.
 
 == Changelog ==
 
 = 0.7.1 =
-* Fixed the real theme-header reveal in the single-image Golden Master runtime: the engine now progressively reveals the actual theme/Elementor header element near the end of the story instead of only setting an unused CSS variable.
-* Fixed a dangling aria-labelledby reference: the section now references the heading only when an h1/h2 overlay is actually rendered, and falls back to aria-label otherwise.
-* Fixed a dead siteHeader.enabled condition so the header reveal can genuinely be disabled from the manifest.
-* The Golden Master media picker title/button are now translatable, and the preview restores its "No image selected" placeholder after removing an image.
+* Fixed the real theme-header reveal in the single-image Golden Master runtime.
+* Fixed a dangling aria-labelledby reference when no heading overlay is rendered.
+* Fixed a dead siteHeader.enabled condition in the manifest.
+* Made the Golden Master media picker title/button translatable.
 
 = 0.7.0 =
-* Added the single-image Golden Master workflow: the administrator uploads one confirmed final image (frame 120) and the plugin applies the Storyboard Production Sheet rules to it — cinematic scroll-driven entry transform up to the locked master frame, HTML overlay reveals at their frame thresholds, real theme-header reveal, and a reversible golden handoff.
-* Added a Golden Master meta box with a desktop-first confirm gate: tablet and mobile masters unlock only after the desktop master is confirmed, and unconfirmed variants safely fall back to the confirmed desktop image.
-* Added a Live overlay content editor so every text/heading/CTA stays a live HTML overlay, never baked into the image.
-* Added the [storyboard_live id=".." variant=".."] shortcode and an on-demand single-image runtime engine that respects prefers-reduced-motion.
+* Added the single-image Golden Master workflow.
+* Added a desktop-first Golden Master confirm gate.
+* Added the Live overlay content editor.
+* Added the [storyboard_live] shortcode and single-image runtime engine.
 
 = 0.6.7.1 =
-* Added the first Ready Templates workflow without starting M7.
-* Added a built-in Creative Studio Production Sheet template based on a 120-frame, 12-beat, four-scene reference-preserving structure.
-* Selecting a ready template now creates an independent editable Sequence draft instead of mutating the built-in template.
-* Added a no-JavaScript Story Structure editor for scenes, beats, keyframes, real theme-header reveal, and golden handoff fields.
-* Kept template content brand-neutral and local for WordPress.org readiness.
-
+* Added Ready Templates with the Creative Studio Production Sheet.
+* Added a no-JavaScript Story Structure editor.
 
 = 0.6.7 =
-* Added a dedicated portrait demo frame set instead of cropping the desktop sequence at runtime.
-* Hardened real theme-header discovery and final-stage reveal without generating a duplicate header.
-* Replaced fixed WordPress admin-bar offsets with a runtime-measured offset.
-* Added mobile composition rules that keep the visual scene and live-content panel within one viewport composition.
-* Updated the bundled demo contract for public WordPress.org use with generic creative-studio content.
-* Manifest schema 9 adds explicit desktop/mobile frame sets and final-stage header progress thresholds.
+* Added a dedicated portrait demo frame set.
+* Hardened real theme-header discovery and reveal.
+* Added mobile composition rules.
 
-= 0.6.6 =
-* Refined mobile and tablet hero geometry so the live content shell sits within a tighter, more user-friendly viewport rhythm on tall screens.
-* Added responsive bootstrap scroll-length caps so non-desktop viewports no longer inherit desktop-first spacing before the full runtime loads.
-* Replaced project-specific dashboard branding with generic StoryBoard Live product branding suitable for WordPress.org distribution.
+See `changelog.txt` for the full version history.
 
-= 0.6.5 =
-* Fixed the M6.4 preflight timing bug by printing the capability/header preflight directly at the start of wp_head.
-* Deferred the heavy Canvas runtime until real wheel, touch, pointer, keyboard, focus, or restored-scroll intent.
-* Added progressive static behavior for no-JavaScript, reduced-motion, and runtime-load failures.
-* Added visibility-safe header preflight so a visually hidden real theme header is not keyboard-focusable before runtime attachment.
-* Compacted the manifest by sharing one frame-set URL collection across responsive variants.
-* Deduplicated identical responsive poster source markup and removed forced asynchronous LCP image decoding.
-* Memoized and simplified runtime page detection to reduce repeated shortcode parsing during the HTML response.
-* Switched the production runtime, bootstrap, preflight, and inline CSS paths to minified build assets.
-* Added versioned demo frame URLs for safe cache busting when long-lived server cache headers are configured.
-* Preserved the approved desktop scroll length, independent mobile/tablet policies, Golden Handoff, RTL, theme-font inheritance, and the real theme/Elementor header.
+== Upgrade Notice ==
 
-= 0.6.4 =
-* Rebuilt the responsive demo presentation around a calm editorial UI foundation with safe mobile composition.
-* Replaced baked-text demo frames with text-free, crop-safe WebP frames.
-* Reserved sequence geometry before first layout to address the measured desktop layout shift.
-* Added media-aware entry/golden poster preload hints after Lighthouse identified the poster as the LCP element.
-* Reduced initial sequence contention to the target frame plus one warm frame and lowered concurrent frame loading.
-* Cached scroll geometry so ordinary scroll ticks no longer request sequence layout measurements.
-* Inlined the small page-scoped runtime stylesheet to remove its extra render-blocking network request.
-* Kept the real theme or Elementor header as the only site header.
-* Preserved reduced-motion, fallback, reverse scroll, Golden Handoff, RTL, and theme-font inheritance.
-* Documented Lighthouse findings that belong to the site/server separately from plugin-owned runtime issues.
+= 0.7.1 =
+Fixes the theme-header reveal and a dangling ARIA reference. Recommended for all users.
 
-= 0.6.3 =
-* Removed duplicated responsive demo frame sets and returned the package close to the M6.1 footprint.
-* Kept one approved demo sequence while preserving responsive runtime policies for future production assets.
-* Refined tablet, mobile portrait, and mobile landscape layouts for shorter scrolling and touch-friendly controls.
-* Made Skip Story visible on compact touch layouts and moved it inside the sticky story viewport.
-* Removed the public debug HUD from demo markup.
-* Stopped reacting to VisualViewport address-bar resize noise to reduce mobile canvas churn.
-* Updated the WordPress plugin-list description.
+== Privacy Policy ==
 
-
-= 0.6.2 =
-* Removed all plugin-generated demo header markup and styles.
-* Added a real theme-header adapter for Elementor Theme Builder and Hello Elementor header output.
-* Added a fail-open head preflight to prevent header flash without leaving navigation hidden if runtime initialization fails.
-* Added exact accessibility restoration for the real header and its focusable descendants.
-* Added safe header timeline configuration to manifest schema v5 without arbitrary selectors.
-* Added header pinning only when the original theme header is not already fixed/sticky.
-* Added WordPress admin-bar offsets while the real header is runtime-pinned.
-* Preserved reverse-scroll behavior, reduced-motion, fallback, and Golden Handoff with the same live theme header.
-
-= 0.6.0 =
-* Added manifest schema v3 with an explicit Golden Handoff contract.
-* Added HANDOFF and COMPLETE runtime states.
-* Handoff now begins only after the configured final frame is actually rendered.
-* Golden poster is required to use the exact handoff-frame asset in the M6 contract.
-* Added reversible handoff for upward scrolling.
-* Added release of decoded frame cache after successful handoff.
-* Moved scroll calculations and frame planning into requestAnimationFrame.
-* Added stricter manifest validation and safer runtime initialization fallback.
-* Added near-viewport activation and loader pausing when the document is hidden or the sequence is off-screen.
-* Added stale-request cancellation without counting cancellation as a frame failure.
-* Hardened ImageBitmap cleanup during cancelled requests.
-* Added final-frame failure fallback instead of leaving the runtime hanging at the end.
-* Preserved live HTML during JavaScript-disabled, fallback, reduced-motion, and Golden Handoff modes.
-* Corrected the dashboard heading and branding copy used in earlier milestone builds.
-
-= 0.4.0 =
-* Added golden-poster fallback policy, no-JavaScript fallback, reduced-motion static mode, and dynamic motion-preference handling.
-
-= 0.3.0 =
-* Added manifest-driven runtime core, scheduler, direction-aware loading, decoded-memory budget cache, and runtime state machine.
+StoryBoard Live does not collect, store, or transmit any personal data. It sets no cookies and makes no external network requests on behalf of site visitors or administrators. All plugin assets are served locally.
