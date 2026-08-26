@@ -1,0 +1,11 @@
+/*
+ * RTL-only corrections. Most layout uses CSS logical properties and needs no
+ * mirroring override.
+ */
+.shseq-admin {
+	direction: rtl;
+}
+
+.shseq-badge {
+	letter-spacing: 0;
+}
