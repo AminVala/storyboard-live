@@ -47,9 +47,18 @@ final class SchemaManager {
 	 * M0 has no migration steps yet; this method intentionally establishes the
 	 * upgrade pipeline before later milestones add persistent structures.
 	 *
+	 * A static flag prevents redundant DB reads on pages that fire admin_init
+	 * multiple times within a single request.
+	 *
 	 * @return void
 	 */
 	public function maybe_upgrade() {
+		static $checked = false;
+		if ( $checked ) {
+			return;
+		}
+		$checked = true;
+
 		$stored_version = (int) get_option( self::OPTION_NAME, 0 );
 
 		if ( $stored_version >= SHSEQ_SCHEMA_VERSION ) {
