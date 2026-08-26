@@ -58,10 +58,10 @@ final class TemplatesPage {
 							<h2><?php echo esc_html( $template['name'] ); ?></h2>
 							<p><?php echo esc_html( $template['description'] ); ?></p>
 							<ul class="shseq-template-facts">
-								<li><strong>120</strong><span><?php echo esc_html__( 'Frames', 'sh-sequence-engine' ); ?></span></li>
-								<li><strong>12</strong><span><?php echo esc_html__( 'Beats', 'sh-sequence-engine' ); ?></span></li>
-								<li><strong>4</strong><span><?php echo esc_html__( 'Scenes', 'sh-sequence-engine' ); ?></span></li>
-								<li><strong>70</strong><span><?php echo esc_html__( 'Master frame', 'sh-sequence-engine' ); ?></span></li>
+								<li><strong><?php echo esc_html( (string) $template['structure']['totalFrames'] ); ?></strong><span><?php echo esc_html__( 'Frames', 'sh-sequence-engine' ); ?></span></li>
+								<li><strong><?php echo esc_html( (string) count( $template['structure']['beats'] ) ); ?></strong><span><?php echo esc_html__( 'Beats', 'sh-sequence-engine' ); ?></span></li>
+								<li><strong><?php echo esc_html( (string) count( $template['structure']['scenes'] ) ); ?></strong><span><?php echo esc_html__( 'Scenes', 'sh-sequence-engine' ); ?></span></li>
+								<li><strong><?php echo esc_html( (string) $template['structure']['referenceFrame'] ); ?></strong><span><?php echo esc_html__( 'Master frame', 'sh-sequence-engine' ); ?></span></li>
 							</ul>
 							<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 								<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>">
@@ -160,15 +160,21 @@ final class TemplatesPage {
 	/**
 	 * Render a generic, brand-neutral production-sheet miniature.
 	 *
+	 * Stats (frames, beats, scenes, master frame) are read from the template's
+	 * actual structure data so the card remains accurate as templates evolve.
+	 *
 	 * @param array<string,mixed> $template Template definition.
 	 */
 	private function render_production_sheet_preview( $template ) {
-		$structure = $template['structure'];
+		$structure    = $template['structure'];
+		$total_frames = (int) $structure['totalFrames'];
+		$beat_count   = count( $structure['beats'] );
+		$scene_count  = count( $structure['scenes'] );
 		?>
 		<div class="shseq-sheet-preview" aria-hidden="true">
 			<div class="shseq-sheet-preview__top">
 				<span>STORYBOARD PRODUCTION SHEET</span>
-				<small>120 FRAMES · 12 BEATS · 4 SCENES</small>
+				<small><?php echo esc_html( $total_frames . ' FRAMES · ' . $beat_count . ' BEATS · ' . $scene_count . ' SCENES' ); ?></small>
 			</div>
 			<div class="shseq-sheet-preview__grid">
 				<div class="shseq-sheet-preview__rules">
