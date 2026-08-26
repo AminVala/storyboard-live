@@ -71,6 +71,15 @@ final class SingleImageShortcode {
 			return '';
 		}
 
+		// SECURITY FIX [SEC-001]: IDOR — Prevent unauthorized access to draft/private sequences.
+		// Only published sequences are rendered to visitors. Editors with explicit
+		// edit_post capability may preview unpublished sequences in admin context.
+		// Without this check, any subscriber could embed [storyboard_live id="X"]
+		// to expose Golden Master image URLs and overlay text of unpublished content.
+		if ( 'publish' !== $post->post_status && ! current_user_can( 'edit_post', $post_id ) ) {
+			return '';
+		}
+
 		$instance_id = wp_unique_id( 'shseq-single-' );
 		$manifest    = $this->manifest->build( $post_id, (string) $atts['variant'], $instance_id );
 
