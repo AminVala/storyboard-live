@@ -92,7 +92,17 @@ final class TemplatesPage {
 
 		$template = $this->catalog->get( $template_id );
 		if ( ! $template ) {
+			// SECURITY FIX [SEC-006]: Add explicit return after redirect_with_notice().
+			// redirect_with_notice() calls wp_safe_redirect() + exit, so execution
+			// never reaches the next line in practice. However, the missing return
+			// means static analysis tools (and human reviewers) cannot statically
+			// verify that the code path terminates. A future refactor that removes
+			// the exit from redirect_with_notice() would silently introduce a logic
+			// bug where code after the call continues running. Adding an explicit
+			// return enforces the contract at the call site regardless of the
+			// implementation of the callee.
 			$this->redirect_with_notice( 'template-not-found' );
+			return; // Defensive: redirect_with_notice() exits, but be explicit.
 		}
 
 		$post_id = wp_insert_post(
@@ -107,6 +117,7 @@ final class TemplatesPage {
 
 		if ( is_wp_error( $post_id ) ) {
 			$this->redirect_with_notice( 'create-failed' );
+			return; // Defensive.
 		}
 
 		update_post_meta( $post_id, '_shseq_template_id', sanitize_key( $template['id'] ) );
@@ -116,6 +127,7 @@ final class TemplatesPage {
 		$edit_url = get_edit_post_link( $post_id, 'raw' );
 		if ( ! $edit_url ) {
 			$this->redirect_with_notice( 'created' );
+			return; // Defensive.
 		}
 
 		wp_safe_redirect( add_query_arg( 'shseq_template_created', '1', $edit_url ) );
@@ -159,9 +171,6 @@ final class TemplatesPage {
 
 	/**
 	 * Render a generic, brand-neutral production-sheet miniature.
-	 *
-	 * Stats (frames, beats, scenes, master frame) are read from the template's
-	 * actual structure data so the card remains accurate as templates evolve.
 	 *
 	 * @param array<string,mixed> $template Template definition.
 	 */
