@@ -21,7 +21,7 @@ use ShahreHonar\SequenceEngine\Admin\SequenceStructureMetaBox;
  */
 final class SingleImageManifest {
 
-	const MANIFEST_SCHEMA = 'shseq.single.manifest';
+	const MANIFEST_SCHEMA         = 'shseq.single.manifest';
 	const MANIFEST_SCHEMA_VERSION = 10;
 
 	/**
@@ -67,6 +67,12 @@ final class SingleImageManifest {
 		$image_w    = $image_meta ? (int) $image_meta[1] : 0;
 		$image_h    = $image_meta ? (int) $image_meta[2] : 0;
 		$image_alt  = trim( (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) );
+
+		// Accessibility: fall back to the sequence title when no alt text is set
+		// in the media library. The Golden Master is content, not decoration.
+		if ( '' === $image_alt ) {
+			$image_alt = get_the_title( $post_id );
+		}
 
 		$srcset = wp_get_attachment_image_srcset( $attachment_id, 'full' );
 		$sizes  = wp_get_attachment_image_sizes( $attachment_id, 'full' );
