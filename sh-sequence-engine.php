@@ -2,7 +2,7 @@
 /**
  * Plugin Name: استوری برد زنده | StoryBoard Live
  * Description: روایت‌های تصویری زنده، روان و ماندگار؛ همگام با اسکرول.
- * Version: 0.7.0
+ * Version: 0.7.1
  * Author: امین اخیار
  * Text Domain: sh-sequence-engine
  * Domain Path: /languages
@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SHSEQ_VERSION', '0.7.0' );
+define( 'SHSEQ_VERSION', '0.7.1' );
 define( 'SHSEQ_SCHEMA_VERSION', 1 );
 define( 'SHSEQ_FILE', __FILE__ );
 define( 'SHSEQ_DIR', plugin_dir_path( __FILE__ ) );
