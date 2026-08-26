@@ -22,14 +22,23 @@ final class RuntimeManifest {
 	/**
 	 * Build versioned frame URLs for a given path pattern.
 	 *
+	 * SECURITY FIX [SEC-003]: Use a static fingerprint derived from SHSEQ_VERSION
+	 * instead of embedding the raw version string directly in every URL.
+	 * Exposing the exact plugin version in hundreds of public asset URLs lets
+	 * attackers instantly target known CVEs for that version without any
+	 * reconnaissance. A short hash retains cache-busting while hiding the version.
+	 *
 	 * @param string $prefix  sprintf-compatible path with one integer placeholder.
 	 * @param int    $count   Number of frames.
 	 * @return string[]
 	 */
 	private function build_frame_urls( $prefix, $count ) {
-		$urls = array();
+		// Use a short hash of the version so asset URLs still bust caches on
+		// upgrades but do not advertise the exact version to the outside world.
+		$cache_key = substr( md5( SHSEQ_VERSION ), 0, 8 );
+		$urls      = array();
 		for ( $frame = 1; $frame <= $count; $frame++ ) {
-			$urls[] = esc_url_raw( add_query_arg( 'ver', SHSEQ_VERSION, SHSEQ_URL . sprintf( $prefix, $frame ) ) );
+			$urls[] = esc_url_raw( add_query_arg( 'v', $cache_key, SHSEQ_URL . sprintf( $prefix, $frame ) ) );
 		}
 		return $urls;
 	}
@@ -117,7 +126,10 @@ final class RuntimeManifest {
 			'schema'        => 'shseq.runtime.manifest',
 			'schemaVersion' => self::MANIFEST_SCHEMA_VERSION,
 			'instanceId'    => sanitize_key( $instance_id ),
-			'runtimeVersion' => SHSEQ_VERSION,
+			// SECURITY FIX [SEC-003]: 'runtimeVersion' key removed from public manifest.
+			// Exposing the exact plugin version in the page source enables trivial
+			// version fingerprinting by automated scanners. The schemaVersion integer
+			// is sufficient for the JS runtime to verify compatibility.
 			'frameSets'     => $frame_sets,
 			'responsive'    => array( 'defaultVariant' => 'desktop', 'switchDebounceMs' => 160 ),
 			'variants'      => $variants,
