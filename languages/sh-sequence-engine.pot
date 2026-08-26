@@ -1,0 +1,373 @@
+# Translations template for استوری برد زنده | StoryBoard Live.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the استوری برد زنده | StoryBoard Live project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: استوری برد زنده | StoryBoard Live 0.6.5\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-08-13 15:05+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+msgid "(Untitled)"
+msgstr ""
+
+msgid "A calmer interface, a faster first impression"
+msgstr ""
+
+msgid "Add New"
+msgstr ""
+
+msgid "Add New Sequence"
+msgstr ""
+
+msgid "All"
+msgstr ""
+
+msgid "All Sequences"
+msgstr ""
+
+msgid "Brands"
+msgstr ""
+
+msgid "Bring the story to life with every scroll"
+msgstr ""
+
+msgid "Build your next visual story"
+msgstr ""
+
+msgid "Categories"
+msgstr ""
+
+msgid "Continue to live content"
+msgstr ""
+
+msgid "Create Sequence"
+msgstr ""
+
+msgid "Create a private sequence entity now; the interactive editor arrives in a later milestone."
+msgstr ""
+
+msgid "Create your first visual story to verify the plugin foundation."
+msgstr ""
+
+#, python-format
+msgid "Created by %s"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "Demo navigation"
+msgstr ""
+
+msgid "Desktop, tablet and mobile now use dedicated runtime variants"
+msgstr ""
+
+msgid "Desktop, tablet and mobile use independent frame variants while the real theme header remains the only site header."
+msgstr ""
+
+msgid "Desktop, tablet and mobile use independent runtime policies while the real theme header remains the only site header."
+msgstr ""
+
+msgid "Drafts"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Edit Sequence"
+msgstr ""
+
+msgid "Frames move with the visitor and hand off cleanly to the real page content and the real theme header."
+msgstr ""
+
+msgid "Interactive visual storytelling for the web"
+msgstr ""
+
+msgid "Late-stage live header reveal is ready for validation"
+msgstr ""
+
+msgid "Live HTML arrives near the golden frame"
+msgstr ""
+
+msgid ""
+"Live HTML overlays now follow a strict frame timeline; the site header is revealed only near the golden final frame "
+"and stays live through handoff."
+msgstr ""
+
+msgid "Live HTML remains unchanged"
+msgstr ""
+
+msgid "Live page continues here."
+msgstr ""
+
+msgid "M2 Production Runtime Core"
+msgstr ""
+
+msgid "M2 runtime core"
+msgstr ""
+
+msgid "M4 Resilience Layer"
+msgstr ""
+
+msgid "M4 resilience layer"
+msgstr ""
+
+msgid "M5 Golden Handoff"
+msgstr ""
+
+msgid "M6 Live Overlay Timeline"
+msgstr ""
+
+msgid "M6 Overlay Timeline"
+msgstr ""
+
+msgid "M6.1 Theme Header"
+msgstr ""
+
+msgid "M6.1 Theme Header Integration"
+msgstr ""
+
+msgid "M6.1 Theme Header Timeline"
+msgstr ""
+
+msgid "M6.2 Responsive Variant Hardening"
+msgstr ""
+
+msgid "M6.3 Mobile UX and Package Optimization"
+msgstr ""
+
+msgid "M6.4 Experience Foundation and Lighthouse Hardening"
+msgstr ""
+
+msgid ""
+"Mobile and tablet use shorter scroll paths and touch-friendly layouts while the approved desktop behavior stays "
+"unchanged."
+msgstr ""
+
+msgid "Network-wide activation is not supported in this version. Activate استوری برد زنده | StoryBoard Live per site."
+msgstr ""
+
+msgid "New Sequence"
+msgstr ""
+
+msgid "No sequences found in Trash."
+msgstr ""
+
+msgid "No sequences found."
+msgstr ""
+
+msgid "No sequences have been created yet."
+msgstr ""
+
+msgid "One story, a dedicated composition for every screen"
+msgstr ""
+
+msgid "Only visual ownership moves from Canvas to the pixel-matched golden poster."
+msgstr ""
+
+msgid "Pixel-matched Golden Handoff is ready for validation"
+msgstr ""
+
+msgid "Poster, fallback, and reduced-motion policies are ready for validation"
+msgstr ""
+
+msgid "Production runtime core is ready for validation"
+msgstr ""
+
+msgid "Published"
+msgstr ""
+
+msgid "Recent Sequences"
+msgstr ""
+
+msgid "Resize or rotate the device to verify responsive variant switching without creating a second header."
+msgstr ""
+
+msgid "Responsive StoryBoard Live Runtime"
+msgstr ""
+
+msgid "Responsive runtime, without duplicated demo assets"
+msgstr ""
+
+msgid "Scroll back upward to verify that the header and live overlays reverse with the sequence."
+msgstr ""
+
+msgid "Scroll back upward to verify that the sequence reverses after handoff."
+msgstr ""
+
+msgid "Scroll to continue"
+msgstr ""
+
+msgid "Search Sequences"
+msgstr ""
+
+msgid "Sequence"
+msgstr ""
+
+msgid "Sequence Revisions"
+msgstr ""
+
+msgid "Sequence published."
+msgstr ""
+
+msgid "Sequence reverted to draft."
+msgstr ""
+
+msgid "Sequence status"
+msgstr ""
+
+msgid "Sequence updated."
+msgstr ""
+
+msgid "Sequences"
+msgstr ""
+
+msgid "Shahre Honar"
+msgstr ""
+
+msgid "Shahre Honar home"
+msgstr ""
+
+msgid "Shop"
+msgstr ""
+
+msgid "Skip visual story"
+msgstr ""
+
+msgid "StoryBoard Live"
+msgstr ""
+
+msgid ""
+"The 30-frame demo now runs through a real manifest, frame scheduler, direction-aware loader, memory-budget cache, and"
+" runtime state machine."
+msgstr ""
+
+msgid "The existing theme header is revealed near the final frame and remains the same live header through Golden Handoff."
+msgstr ""
+
+msgid ""
+"The final sequence frame now hands visual ownership to the exact golden poster while live HTML remains untouched; "
+"reverse scrolling restores the Canvas sequence."
+msgstr ""
+
+msgid "The header is revealed only near the final frame and remains live through Golden Handoff."
+msgstr ""
+
+msgid "The live page continues here."
+msgstr ""
+
+msgid ""
+"The plugin no longer creates a header. It reveals the existing theme or Elementor header near the golden frame and "
+"preserves that same live header through handoff."
+msgstr ""
+
+msgid "The real theme header is now bound to the sequence"
+msgstr ""
+
+msgid ""
+"The real theme or Elementor header remains the only header, while each viewport receives an independent frame "
+"composition and runtime policy."
+msgstr ""
+
+msgid ""
+"The runtime now fails safely to a golden poster, removes long scroll behavior when reduced motion is requested, and "
+"tears down interactive resources when fallback mode is entered."
+msgstr ""
+
+msgid ""
+"The runtime now reserves layout from first paint, prioritizes the LCP poster, and uses a responsive editorial "
+"interface without changing the approved desktop story behavior."
+msgstr ""
+
+msgid "The story ends without replacing the real site header."
+msgstr ""
+
+msgid "The story hands off without replacing the real site header or semantic content."
+msgstr ""
+
+#, python-format
+msgid "Version %s"
+msgstr ""
+
+msgid "View Sequence"
+msgstr ""
+
+msgid "View all"
+msgstr ""
+
+msgid "Visual storytelling | Exclusive to Shahre Honar"
+msgstr ""
+
+msgid "You do not have permission to access this page."
+msgstr ""
+
+msgid "استوری برد زنده | StoryBoard Live"
+msgstr ""
+
+msgid "استوری برد زنده | StoryBoard Live Dashboard"
+msgstr ""
+
+msgid "استوری برد زنده | StoryBoard Live M2 runtime demo"
+msgstr ""
+
+msgid "استوری برد زنده | StoryBoard Live M4 resilience demo"
+msgstr ""
+
+msgid "استوری برد زنده | StoryBoard Live M5 Golden Handoff demo"
+msgstr ""
+
+
+msgid "M6.5 Intent-Driven Runtime and Lighthouse Hardening"
+msgstr ""
+
+msgid "A lighter first load, without weakening the story"
+msgstr ""
+
+msgid "The visual story now keeps its poster and semantic content in the first load while the heavier Canvas runtime waits for real interaction intent; the responsive story contract and real theme header remain intact."
+msgstr ""
+
+msgid "Ready Templates"
+msgstr ""
+
+msgid "Choose a production-ready structure, create an editable draft, then adapt its scenes, beats and handoff settings to your project."
+msgstr ""
+
+msgid "Frames"
+msgstr ""
+
+msgid "Beats"
+msgstr ""
+
+msgid "Scenes"
+msgstr ""
+
+msgid "Master frame"
+msgstr ""
+
+msgid "Use this template"
+msgstr ""
+
+msgid "Story Structure"
+msgstr ""
+
+msgid "Production frame contract"
+msgstr ""
+
+msgid "12-beat scroll timeline"
+msgstr ""
+
+msgid "Reference keyframes"
+msgstr ""
+
+msgid "Theme header and golden handoff"
+msgstr ""
