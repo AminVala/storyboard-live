@@ -1,0 +1,75 @@
+== Full Changelog ==
+
+= 0.7.1 — 2026-08-xx =
+* Fixed the real theme-header reveal in the single-image Golden Master runtime: the engine now progressively reveals the actual theme/Elementor header element near the end of the story instead of only setting an unused CSS variable.
+* Fixed a dangling aria-labelledby reference: the section now references the heading only when an h1/h2 overlay is actually rendered, and falls back to aria-label otherwise.
+* Fixed a dead siteHeader.enabled condition so the header reveal can genuinely be disabled from the manifest.
+* The Golden Master media picker title/button are now translatable, and the preview restores its "No image selected" placeholder after removing an image.
+* Security: fixed IDOR — shortcode now enforces post_status=publish for non-editors (SEC-001).
+* Security: removed internal attachment ID from public JSON manifest (SEC-002).
+* Security: replaced raw version in asset URLs with a short hash (SEC-003).
+* Security: added uninstall.php to clean up capabilities and data on delete (SEC-004).
+* Security: render_created_notice() now restricted to the Sequence editor screen (SEC-005).
+* Security: added explicit return after redirect_with_notice() calls (SEC-006).
+
+= 0.7.0 — 2026-xx-xx =
+* Added the single-image Golden Master workflow: the administrator uploads one confirmed final image (frame 120) and the plugin applies the Storyboard Production Sheet rules to it.
+* Added a Golden Master meta box with a desktop-first confirm gate: tablet and mobile masters unlock only after the desktop master is confirmed.
+* Added a Live overlay content editor so every text/heading/CTA stays a live HTML overlay, never baked into the image.
+* Added the [storyboard_live id=".."] shortcode and an on-demand single-image runtime engine that respects prefers-reduced-motion.
+
+= 0.6.7.1 — 2026-xx-xx =
+* Added the first Ready Templates workflow.
+* Added a built-in Creative Studio Production Sheet template based on a 120-frame, 12-beat, four-scene reference-preserving structure.
+* Selecting a ready template now creates an independent editable Sequence draft instead of mutating the built-in template.
+* Added a no-JavaScript Story Structure editor for scenes, beats, keyframes, real theme-header reveal, and golden handoff fields.
+
+= 0.6.7 — 2026-xx-xx =
+* Added a dedicated portrait demo frame set instead of cropping the desktop sequence at runtime.
+* Hardened real theme-header discovery and final-stage reveal without generating a duplicate header.
+* Replaced fixed WordPress admin-bar offsets with a runtime-measured offset.
+* Added mobile composition rules that keep the visual scene and live-content panel within one viewport composition.
+* Updated the bundled demo contract for public WordPress.org use with generic creative-studio content.
+
+= 0.6.6 — 2026-xx-xx =
+* Refined mobile and tablet hero geometry.
+* Added responsive bootstrap scroll-length caps.
+* Replaced project-specific dashboard branding with generic StoryBoard Live product branding.
+
+= 0.6.5 — 2026-xx-xx =
+* Fixed the M6.4 preflight timing bug.
+* Deferred the heavy Canvas runtime until real interaction intent.
+* Added progressive static behavior for no-JavaScript, reduced-motion, and runtime-load failures.
+* Memoized runtime page detection.
+* Switched to minified build assets.
+
+= 0.6.4 — 2026-xx-xx =
+* Rebuilt responsive demo presentation.
+* Replaced baked-text demo frames with text-free WebP frames.
+* Reserved sequence geometry before first layout.
+* Added media-aware entry/golden poster preload hints.
+* Inlined the page-scoped runtime stylesheet.
+
+= 0.6.3 — 2026-xx-xx =
+* Removed duplicated responsive demo frame sets.
+* Refined tablet, mobile portrait, and mobile landscape layouts.
+* Made Skip Story visible on compact touch layouts.
+* Removed the public debug HUD from demo markup.
+
+= 0.6.2 — 2026-xx-xx =
+* Removed all plugin-generated demo header markup and styles.
+* Added a real theme-header adapter for Elementor Theme Builder.
+* Added a fail-open head preflight.
+* Added exact accessibility restoration for the real header.
+
+= 0.6.0 — 2026-xx-xx =
+* Added manifest schema v3 with an explicit Golden Handoff contract.
+* Added HANDOFF and COMPLETE runtime states.
+* Added reversible handoff for upward scrolling.
+* Moved scroll calculations into requestAnimationFrame.
+
+= 0.4.0 =
+* Added golden-poster fallback policy, no-JavaScript fallback, reduced-motion static mode.
+
+= 0.3.0 =
+* Added manifest-driven runtime core, scheduler, direction-aware loading, decoded-memory budget cache.
