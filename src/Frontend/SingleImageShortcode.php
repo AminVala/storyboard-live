@@ -28,6 +28,9 @@ final class SingleImageShortcode {
 	/** @var SingleImageAssets */
 	private $assets;
 
+	/** @var bool Whether the last overlay render assigned the heading id. */
+	private $heading_assigned = false;
+
 	/**
 	 * @param SingleImageManifest $manifest Manifest builder.
 	 * @param SingleImageAssets   $assets   Assets loader.
@@ -86,6 +89,13 @@ final class SingleImageShortcode {
 		$after_id   = $instance_id . '-after';
 		$scroll_vh  = (int) $manifest['scrollLengthVh'];
 
+		// Render overlays first so we know whether a heading id was actually
+		// emitted; only then reference it with aria-labelledby to avoid a
+		// dangling reference to a non-existent element.
+		$this->heading_assigned = false;
+		$overlays_html          = $this->render_overlays( $manifest['overlays'], $content, $heading_id, $after_id );
+		$label_attr             = $this->heading_assigned ? ' aria-labelledby="' . esc_attr( $heading_id ) . '"' : ' aria-label="' . esc_attr( get_the_title( $post_id ) ) . '"';
+
 		ob_start();
 		?>
 		<section
@@ -94,7 +104,7 @@ final class SingleImageShortcode {
 			data-shseq-single
 			data-shseq-variant="<?php echo esc_attr( $manifest['variant'] ); ?>"
 			style="--shseq-scroll-vh: <?php echo esc_attr( (string) $scroll_vh ); ?>vh;"
-			aria-labelledby="<?php echo esc_attr( $heading_id ); ?>"
+			<?php echo $label_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>
 		>
 			<div class="shseq-single__scrollspace">
 				<div class="shseq-single__sticky">
@@ -117,7 +127,7 @@ final class SingleImageShortcode {
 					</div>
 
 					<div class="shseq-single__live" data-shseq-live-content>
-						<?php echo $this->render_overlays( $manifest['overlays'], $content, $heading_id, $after_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped inside render_overlays(). ?>
+						<?php echo $overlays_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped inside render_overlays(). ?>
 					</div>
 
 					<div class="shseq-single__scroll-cue" aria-hidden="true"><?php echo esc_html__( 'Scroll to continue', 'sh-sequence-engine' ); ?></div>
@@ -184,7 +194,13 @@ final class SingleImageShortcode {
 				$tag = 'p';
 			}
 
-			$id_attr = ( 'h1' === $tag || 'h2' === $tag ) ? sprintf( ' id="%s"', esc_attr( $heading_id ) ) : '';
+			$is_heading = ( 'h1' === $tag || 'h2' === $tag );
+			// Assign the heading id to the first h1/h2 only, so aria-labelledby
+			// points at exactly one existing element.
+			$id_attr = ( $is_heading && ! $this->heading_assigned ) ? sprintf( ' id="%s"', esc_attr( $heading_id ) ) : '';
+			if ( '' !== $id_attr ) {
+				$this->heading_assigned = true;
+			}
 			$html   .= sprintf( '<%1$s%2$s%3$s>%4$s</%1$s>', $tag, $id_attr, $attrs, esc_html( $text ) );
 		}
 		return $html;
