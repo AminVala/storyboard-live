@@ -105,7 +105,7 @@ final class SingleImageManifest {
 			'beats'          => $this->normalize_beats( isset( $structure['beats'] ) ? $structure['beats'] : array() ),
 			'overlays'       => $this->normalize_overlays( isset( $structure['overlays'] ) ? $structure['overlays'] : array() ),
 			'siteHeader'     => array(
-				'enabled'          => ! empty( $header['enabled'] ) ? true : true,
+				'enabled'          => ! array_key_exists( 'enabled', $header ) || ! empty( $header['enabled'] ),
 				'startFrame'       => isset( $header['startFrame'] ) ? (int) $header['startFrame'] : (int) round( $total * 0.9 ),
 				'interactiveFrame' => isset( $header['interactiveFrame'] ) ? (int) $header['interactiveFrame'] : (int) round( $total * 0.96 ),
 				'completeFrame'    => isset( $header['completeFrame'] ) ? (int) $header['completeFrame'] : $total,
