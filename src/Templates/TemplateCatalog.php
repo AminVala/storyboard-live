@@ -98,6 +98,7 @@ final class TemplateCatalog {
 				),
 				'variants'       => array(
 					'desktop' => array( 'frames' => 120, 'width' => 1920, 'height' => 1080, 'format' => 'WEBP/AVIF' ),
+					'tablet'  => array( 'frames' => 120, 'width' => 1280, 'height' => 800, 'format' => 'WEBP/AVIF' ),
 					'mobile'  => array( 'frames' => 60, 'width' => 1080, 'height' => 1920, 'format' => 'WEBP/AVIF' ),
 				),
 				'productionRules' => array(
