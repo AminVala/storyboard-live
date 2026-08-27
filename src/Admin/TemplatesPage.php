@@ -1,218 +1,137 @@
 <?php
-/**
- * Ready templates admin page.
- *
- * @package StoryBoardLive
- */
-
 namespace ShahreHonar\SequenceEngine\Admin;
 
 use ShahreHonar\SequenceEngine\Content\SequencePostType;
 use ShahreHonar\SequenceEngine\Templates\TemplateCatalog;
 
-/**
- * Displays built-in templates and creates editable Sequence drafts from them.
- */
 final class TemplatesPage {
 
 	const PAGE_SLUG = 'shseq-templates';
 	const ACTION    = 'shseq_use_template';
 
-	/** @var TemplateCatalog */
 	private $catalog;
 
-	/** @param TemplateCatalog $catalog Template catalog. */
 	public function __construct( TemplateCatalog $catalog ) {
 		$this->catalog = $catalog;
 	}
 
-	/** Register admin-post handler. */
 	public function register_hooks() {
 		add_action( 'admin_post_' . self::ACTION, array( $this, 'handle_use_template' ) );
 	}
 
-	/** Render page. */
 	public function render() {
 		if ( ! current_user_can( 'edit_shseq_sequences' ) ) {
-			wp_die( esc_html__( 'You do not have permission to access this page.', 'sh-sequence-engine' ) );
+			wp_die( esc_html__( 'Permission denied.', 'sh-sequence-engine' ) );
 		}
-
 		$templates = $this->catalog->all();
 		?>
-		<div class="wrap shseq-admin shseq-templates-page">
-			<header class="shseq-hero">
+		<div class="wrap shseq-admin shseq-templates">
+			<div class="shseq-tpl-header">
 				<div>
-					<h1><?php echo esc_html__( 'Ready Templates', 'sh-sequence-engine' ); ?></h1>
-					<p class="shseq-byline"><?php echo esc_html__( 'Choose a production-ready structure, create an editable draft, then adapt its scenes, beats and handoff settings to your project.', 'sh-sequence-engine' ); ?></p>
+					<h1><?php esc_html_e( 'Ready Templates', 'sh-sequence-engine' ); ?></h1>
+					<p class="description"><?php esc_html_e( 'Pick a template to pre-fill the wizard with a production structure — scenes, beats, overlay slots and frame contract. You upload the frames.', 'sh-sequence-engine' ); ?></p>
 				</div>
-			</header>
-
-			<?php $this->render_notice(); ?>
-
-			<div class="shseq-template-grid">
-				<?php foreach ( $templates as $template ) : ?>
-					<article class="shseq-template-card">
-						<?php $this->render_production_sheet_preview( $template ); ?>
-						<div class="shseq-template-card__body">
-							<span class="shseq-kicker"><?php echo esc_html( $template['category'] ); ?></span>
-							<h2><?php echo esc_html( $template['name'] ); ?></h2>
-							<p><?php echo esc_html( $template['description'] ); ?></p>
-							<ul class="shseq-template-facts">
-								<li><strong><?php echo esc_html( (string) $template['structure']['totalFrames'] ); ?></strong><span><?php echo esc_html__( 'Frames', 'sh-sequence-engine' ); ?></span></li>
-								<li><strong><?php echo esc_html( (string) count( $template['structure']['beats'] ) ); ?></strong><span><?php echo esc_html__( 'Beats', 'sh-sequence-engine' ); ?></span></li>
-								<li><strong><?php echo esc_html( (string) count( $template['structure']['scenes'] ) ); ?></strong><span><?php echo esc_html__( 'Scenes', 'sh-sequence-engine' ); ?></span></li>
-								<li><strong><?php echo esc_html( (string) $template['structure']['referenceFrame'] ); ?></strong><span><?php echo esc_html__( 'Master frame', 'sh-sequence-engine' ); ?></span></li>
-							</ul>
-							<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-								<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>">
-								<input type="hidden" name="template_id" value="<?php echo esc_attr( $template['id'] ); ?>">
-								<?php wp_nonce_field( self::ACTION . ':' . $template['id'], '_shseq_template_nonce' ); ?>
-								<button type="submit" class="button button-primary button-hero"><?php echo esc_html__( 'Use this template', 'sh-sequence-engine' ); ?></button>
-							</form>
-						</div>
-					</article>
-				<?php endforeach; ?>
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=' . SequenceWizard::PAGE_SLUG ) ); ?>" class="button button-primary">
+					<?php esc_html_e( '+ Blank sequence', 'sh-sequence-engine' ); ?>
+				</a>
 			</div>
+
+			<?php if ( ! empty( $templates ) ) : ?>
+			<div class="shseq-tpl-grid">
+				<?php foreach ( $templates as $tpl ) : $this->render_card( $tpl ); endforeach; ?>
+			</div>
+			<?php else : ?>
+				<p><?php esc_html_e( 'No templates found.', 'sh-sequence-engine' ); ?></p>
+			<?php endif; ?>
 		</div>
+		<?php $this->render_styles(); ?>
 		<?php
 	}
 
-	/** Create an editable draft from a selected template. */
-	public function handle_use_template() {
-		if ( ! current_user_can( 'create_shseq_sequences' ) && ! current_user_can( 'edit_shseq_sequences' ) ) {
-			wp_die( esc_html__( 'You do not have permission to create sequences.', 'sh-sequence-engine' ) );
-		}
+	private function render_card( array $tpl ) {
+		$struct   = $tpl['structure'];
+		$frames   = isset( $struct['totalFrames'] ) ? (int) $struct['totalFrames'] : 0;
+		$scenes   = isset( $struct['scenes'] ) && is_array( $struct['scenes'] ) ? count( $struct['scenes'] ) : 0;
+		$beats    = isset( $struct['beats']  ) && is_array( $struct['beats']  ) ? count( $struct['beats']  ) : 0;
+		$overlays = isset( $struct['overlays'] ) && is_array( $struct['overlays'] ) ? $struct['overlays'] : array();
 
-		$template_id = isset( $_POST['template_id'] ) ? sanitize_key( wp_unslash( $_POST['template_id'] ) ) : '';
-		$nonce       = isset( $_POST['_shseq_template_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_shseq_template_nonce'] ) ) : '';
-
-		if ( ! $template_id || ! wp_verify_nonce( $nonce, self::ACTION . ':' . $template_id ) ) {
-			wp_die( esc_html__( 'The template request could not be verified.', 'sh-sequence-engine' ) );
-		}
-
-		$template = $this->catalog->get( $template_id );
-		if ( ! $template ) {
-			// SECURITY FIX [SEC-006]: Add explicit return after redirect_with_notice().
-			// redirect_with_notice() calls wp_safe_redirect() + exit, so execution
-			// never reaches the next line in practice. However, the missing return
-			// means static analysis tools (and human reviewers) cannot statically
-			// verify that the code path terminates. A future refactor that removes
-			// the exit from redirect_with_notice() would silently introduce a logic
-			// bug where code after the call continues running. Adding an explicit
-			// return enforces the contract at the call site regardless of the
-			// implementation of the callee.
-			$this->redirect_with_notice( 'template-not-found' );
-			return; // Defensive: redirect_with_notice() exits, but be explicit.
-		}
-
-		$post_id = wp_insert_post(
-			array(
-				'post_type'   => SequencePostType::POST_TYPE,
-				'post_status' => 'draft',
-				'post_title'  => sanitize_text_field( $template['name'] ),
-				'post_author' => get_current_user_id(),
-			),
-			true
-		);
-
-		if ( is_wp_error( $post_id ) ) {
-			$this->redirect_with_notice( 'create-failed' );
-			return; // Defensive.
-		}
-
-		update_post_meta( $post_id, '_shseq_template_id', sanitize_key( $template['id'] ) );
-		update_post_meta( $post_id, '_shseq_template_version', absint( $template['version'] ) );
-		update_post_meta( $post_id, '_shseq_structure', $template['structure'] );
-
-		$edit_url = get_edit_post_link( $post_id, 'raw' );
-		if ( ! $edit_url ) {
-			$this->redirect_with_notice( 'created' );
-			return; // Defensive.
-		}
-
-		wp_safe_redirect( add_query_arg( 'shseq_template_created', '1', $edit_url ) );
-		exit;
-	}
-
-	/** Render simple status notice. */
-	private function render_notice() {
-		$notice = isset( $_GET['shseq_notice'] ) ? sanitize_key( wp_unslash( $_GET['shseq_notice'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only status flag.
-		if ( ! $notice ) {
-			return;
-		}
-
-		$messages = array(
-			'created'            => __( 'Template draft created.', 'sh-sequence-engine' ),
-			'template-not-found' => __( 'The selected template was not found.', 'sh-sequence-engine' ),
-			'create-failed'      => __( 'The sequence draft could not be created.', 'sh-sequence-engine' ),
-		);
-
-		if ( ! isset( $messages[ $notice ] ) ) {
-			return;
-		}
-
-		$class = 'created' === $notice ? 'notice notice-success' : 'notice notice-error';
-		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $messages[ $notice ] ) );
-	}
-
-	/** Redirect back to templates with a small status code. */
-	private function redirect_with_notice( $notice ) {
-		wp_safe_redirect(
-			add_query_arg(
-				array(
-					'page'         => self::PAGE_SLUG,
-					'shseq_notice' => sanitize_key( $notice ),
-				),
-				admin_url( 'admin.php' )
-			)
-		);
-		exit;
-	}
-
-	/**
-	 * Render a generic, brand-neutral production-sheet miniature.
-	 *
-	 * @param array<string,mixed> $template Template definition.
-	 */
-	private function render_production_sheet_preview( $template ) {
-		$structure    = $template['structure'];
-		$total_frames = (int) $structure['totalFrames'];
-		$beat_count   = count( $structure['beats'] );
-		$scene_count  = count( $structure['scenes'] );
+		$wizard_url = add_query_arg( array(
+			'page'        => SequenceWizard::PAGE_SLUG,
+			'step'        => 1,
+			'template_id' => $tpl['id'],
+		), admin_url( 'admin.php' ) );
 		?>
-		<div class="shseq-sheet-preview" aria-hidden="true">
-			<div class="shseq-sheet-preview__top">
-				<span>STORYBOARD PRODUCTION SHEET</span>
-				<small><?php echo esc_html( $total_frames . ' FRAMES · ' . $beat_count . ' BEATS · ' . $scene_count . ' SCENES' ); ?></small>
-			</div>
-			<div class="shseq-sheet-preview__grid">
-				<div class="shseq-sheet-preview__rules">
-					<strong>RED LINES</strong>
-					<i></i><i></i><i></i><i></i><i></i>
-				</div>
-				<div class="shseq-sheet-preview__master">
-					<span>REFERENCE D — FRAME <?php echo esc_html( (string) $structure['referenceFrame'] ); ?></span>
-					<div class="shseq-sheet-preview__studio">
-						<b></b><b></b><b></b><b></b><b></b>
-					</div>
-				</div>
-				<div class="shseq-sheet-preview__side">
-					<div>GOLDEN MASTER<br><strong>FRAME <?php echo esc_html( (string) $structure['goldenFrame'] ); ?></strong></div>
-					<div>LAYERS<br><em>09</em></div>
-					<div>HANDOFF<br><em>READY</em></div>
+		<article class="shseq-tpl-card">
+			<div class="shseq-tpl-card__preview" aria-hidden="true">
+				<div class="shseq-tpl-card__mock">
+					<span class="shseq-tpl-card__slot--h"></span>
+					<span class="shseq-tpl-card__slot--p"></span>
+					<span class="shseq-tpl-card__slot--cta"></span>
 				</div>
 			</div>
-			<div class="shseq-sheet-preview__timeline">
-				<?php foreach ( array_slice( $structure['beats'], 0, 12 ) as $beat ) : ?>
-					<span style="--w:<?php echo esc_attr( (string) max( 1, $beat['endFrame'] - $beat['startFrame'] + 1 ) ); ?>"></span>
-				<?php endforeach; ?>
+			<div class="shseq-tpl-card__body">
+				<span class="shseq-tpl-category"><?php echo esc_html( $tpl['category'] ?? '' ); ?></span>
+				<h2 class="shseq-tpl-name"><?php echo esc_html( $tpl['name'] ); ?></h2>
+				<p class="shseq-tpl-desc"><?php echo esc_html( $tpl['description'] ); ?></p>
+				<div class="shseq-tpl-badges">
+					<span class="shseq-tpl-badge"><?php echo esc_html( $frames ); ?> <?php esc_html_e( 'frames', 'sh-sequence-engine' ); ?></span>
+					<span class="shseq-tpl-badge"><?php echo esc_html( $scenes ); ?> <?php esc_html_e( 'scenes', 'sh-sequence-engine' ); ?></span>
+					<span class="shseq-tpl-badge"><?php echo esc_html( $beats ); ?> <?php esc_html_e( 'beats', 'sh-sequence-engine' ); ?></span>
+				</div>
+				<?php if ( ! empty( $overlays ) ) : ?>
+				<p class="shseq-tpl-slots-label"><?php esc_html_e( 'Overlay slots:', 'sh-sequence-engine' ); ?>
+					<?php foreach ( $overlays as $slot ) :
+						$name = is_array( $slot ) ? ( $slot['slot'] ?? $slot['type'] ?? '?' ) : (string) $slot;
+						?><code class="shseq-slot-tag"><?php echo esc_html( $name ); ?></code><?php
+					endforeach; ?>
+				</p>
+				<?php endif; ?>
+				<div class="shseq-tpl-card__actions">
+					<a href="<?php echo esc_url( $wizard_url ); ?>" class="button button-primary">
+						<?php esc_html_e( 'Use this template', 'sh-sequence-engine' ); ?> &rarr;
+					</a>
+				</div>
 			</div>
-			<div class="shseq-sheet-preview__frames">
-				<?php foreach ( $structure['keyframes'] as $keyframe ) : ?>
-					<div><strong><?php echo esc_html( $keyframe['key'] ); ?></strong><span><?php echo esc_html( sprintf( '%03d', $keyframe['frame'] ) ); ?></span></div>
-				<?php endforeach; ?>
-			</div>
-		</div>
+		</article>
 		<?php
+	}
+
+	public function handle_use_template() {
+		if ( ! current_user_can( 'edit_shseq_sequences' ) ) {
+			wp_die( esc_html__( 'Permission denied.', 'sh-sequence-engine' ) );
+		}
+		check_admin_referer( 'shseq_use_template' );
+		$template_id = isset( $_POST['template_id'] ) ? sanitize_key( wp_unslash( $_POST['template_id'] ) ) : '';
+		wp_safe_redirect( add_query_arg( array(
+			'page'        => SequenceWizard::PAGE_SLUG,
+			'step'        => 1,
+			'template_id' => $template_id,
+		), admin_url( 'admin.php' ) ) );
+		exit;
+	}
+
+	private function render_styles() {
+		echo '<style>
+.shseq-templates *{box-sizing:border-box}
+.shseq-tpl-header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:20px 0 16px;border-bottom:1px solid #dcdcde;margin-bottom:24px}
+.shseq-tpl-header h1{margin:0 0 6px}
+.shseq-tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.shseq-tpl-card{background:#fff;border:1px solid #c3c4c7;border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.shseq-tpl-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.shseq-tpl-card__preview{background:linear-gradient(135deg,#1d2327 0%,#3c434a 100%);padding:24px 20px 20px;min-height:90px;display:flex;align-items:flex-end}
+.shseq-tpl-card__mock{display:flex;flex-direction:column;gap:6px;width:100%}
+.shseq-tpl-card__slot--h{display:block;height:12px;width:70%;border-radius:3px;background:rgba(255,255,255,.5)}
+.shseq-tpl-card__slot--p{display:block;height:8px;width:90%;border-radius:3px;background:rgba(255,255,255,.25)}
+.shseq-tpl-card__slot--cta{display:block;height:28px;width:38%;border-radius:4px;background:rgba(255,255,255,.85);margin-top:4px}
+.shseq-tpl-card__body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
+.shseq-tpl-category{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0a4b78}
+.shseq-tpl-name{margin:0;font-size:16px;font-weight:700;color:#1d2327}
+.shseq-tpl-desc{margin:0;font-size:13px;color:#50575e;line-height:1.5}
+.shseq-tpl-badges{display:flex;flex-wrap:wrap;gap:5px}
+.shseq-tpl-badge{display:inline-block;padding:2px 8px;background:#f0f0f1;border-radius:99px;font-size:11px;color:#3c434a}
+.shseq-tpl-slots-label{font-size:12px;color:#50575e;margin:0}
+.shseq-slot-tag{background:#e0f0ff;color:#0a4b78;padding:1px 5px;border-radius:3px;font-size:11px;margin:0 2px}
+.shseq-tpl-card__actions{margin-top:auto;padding-top:12px}
+</style>';
 	}
 }
