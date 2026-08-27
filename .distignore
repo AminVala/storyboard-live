@@ -1,0 +1,79 @@
+# Files and directories excluded from the distribution zip.
+# rsync reads this during build.sh.
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Development tools
+.distignore
+build.sh
+phpcs.xml
+phpunit.xml
+phpunit.xml.dist
+.phpcs.xml
+.phpcs.xml.dist
+phpstan.neon
+phpstan.neon.dist
+psalm.xml
+rector.php
+.editorconfig
+.eslintrc
+.eslintrc.js
+.eslintrc.json
+.stylelintrc
+.stylelintrc.json
+prettier.config.js
+.prettierrc
+.browserslistrc
+
+# Node / frontend build artifacts (source only — compiled assets are kept)
+node_modules
+package.json
+package-lock.json
+yarn.lock
+webpack.config.js
+babel.config.js
+.babelrc
+Gruntfile.js
+gulpfile.js
+
+# Composer dev files
+composer.json
+composer.lock
+
+# Tests
+tests
+test
+spec
+.phpunit.result.cache
+
+# CI
+.github
+.travis.yml
+.circleci
+Jenkinsfile
+
+# IDE
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local dev
+.env
+.env.*
+*.log
+
+# n8n workspace
+src/sprint1
+src/sprint2
+src/sprint3
+src/sprint4
+src/fixes
+src/workflows
