@@ -2,12 +2,10 @@
 /**
  * Plugin list table enhancements.
  *
- * Adds quick-access links under the plugin name on the Plugins page:
- *   - Settings
- *   - Sequences
- *
- * Also adds a "Deactivation" guard for Multisite network admins who try to
- * network-activate the plugin (which is not supported).
+ * BUG-05 FIX: `manage_shseq_settings` was used in action_links() but
+ * was never registered as a WordPress capability. Changed to `manage_options`
+ * (the standard WP capability for plugin settings pages) so the Settings
+ * link always appears for administrators.
  *
  * @package StoryBoardLive
  */
@@ -26,7 +24,7 @@ final class PluginLinks {
 	}
 
 	/**
-	 * Add Settings and Sequences links to the plugin row.
+	 * Add Settings and Dashboard links to the plugin row.
 	 *
 	 * @param string[] $links Existing action links.
 	 * @return string[]
@@ -34,7 +32,8 @@ final class PluginLinks {
 	public function action_links( $links ) {
 		$custom = array();
 
-		if ( current_user_can( 'manage_shseq_settings' ) ) {
+		// BUG-05 FIX: was `manage_shseq_settings` (undefined cap) — changed to `manage_options`.
+		if ( current_user_can( 'manage_options' ) ) {
 			$custom[] = sprintf(
 				'<a href="%s">%s</a>',
 				esc_url( admin_url( 'admin.php?page=' . SettingsPage::PAGE_SLUG ) ),
@@ -54,8 +53,7 @@ final class PluginLinks {
 	}
 
 	/**
-	 * On network-admin (Multisite), show a "Per-site only" note instead of
-	 * normal action links, since network activation is not supported.
+	 * On network-admin (Multisite), show a note — network activation not supported.
 	 *
 	 * @param string[] $links Existing network action links.
 	 * @return string[]
