@@ -1,17 +1,14 @@
 <?php
 /**
- * Main plugin composition root — Sprint 2 update.
+ * Main plugin composition root — Sprint 3 update.
  *
- * New in Sprint 2:
- *   - FrameSequenceManifest  (real frame-by-frame manifest)
- *   - FrameSequenceAssets    (conditional CSS/JS enqueuer)
- *   - FrameSequenceShortcode ([storyboard_live id="X"])
- *   - FrameSequenceBlock     (Gutenberg block shseq/frame-sequence)
+ * New in Sprint 3:
+ *   - OpenAIProvider     (DALL·E 3 Start Frame generation)
+ *   - ReplicateProvider  (FILM/RIFE frame interpolation)
+ *   - FrameGenerationJob (Action Scheduler async pipeline)
+ *   - SettingsPage       (updated with BYOK API key fields + test buttons)
  *
- * Sprint 1 additions remain:
- *   - ContentStepsMetaBox, FrameUploadMetaBox, LicenseManager quota gate,
- *     AdminBar, PluginLinks, FallbackNotice, SettingsPage, SequencePreview,
- *     SequenceDuplicator all wired.
+ * Sprint 1 & 2 services remain wired as before.
  *
  * @package StoryBoardLive
  */
@@ -33,6 +30,8 @@ use ShahreHonar\SequenceEngine\Admin\SequencePreview;
 use ShahreHonar\SequenceEngine\Admin\SequenceStructureMetaBox;
 use ShahreHonar\SequenceEngine\Admin\SettingsPage;
 use ShahreHonar\SequenceEngine\Admin\TemplatesPage;
+use ShahreHonar\SequenceEngine\AI\OpenAIProvider;
+use ShahreHonar\SequenceEngine\AI\ReplicateProvider;
 use ShahreHonar\SequenceEngine\Blocks\FrameSequenceBlock;
 use ShahreHonar\SequenceEngine\Content\RevisionPostType;
 use ShahreHonar\SequenceEngine\Content\SequencePostType;
@@ -42,6 +41,7 @@ use ShahreHonar\SequenceEngine\Frontend\FrameSequenceAssets;
 use ShahreHonar\SequenceEngine\Frontend\FrameSequenceManifest;
 use ShahreHonar\SequenceEngine\Frontend\FrameSequenceShortcode;
 use ShahreHonar\SequenceEngine\I18n\I18n;
+use ShahreHonar\SequenceEngine\Jobs\FrameGenerationJob;
 use ShahreHonar\SequenceEngine\License\LicenseManager;
 use ShahreHonar\SequenceEngine\Templates\TemplateCatalog;
 
@@ -57,9 +57,7 @@ final class Plugin {
 	 */
 	public function boot() {
 
-		// ----------------------------------------------------------------
-		// Core — always runs.
-		// ----------------------------------------------------------------
+		// ── Core ─────────────────────────────────────────────────────────
 
 		$i18n = new I18n();
 		$i18n->register_hooks();
@@ -73,9 +71,14 @@ final class Plugin {
 		$revision_post_type = new RevisionPostType();
 		$revision_post_type->register_hooks();
 
-		// ----------------------------------------------------------------
-		// Sprint 2: Real frame-sequence engine (shortcode + block).
-		// ----------------------------------------------------------------
+		// ── Sprint 3: AI pipeline (runs on front + admin for AS callbacks) ─
+
+		$openai    = new OpenAIProvider();
+		$replicate = new ReplicateProvider();
+		$gen_job   = new FrameGenerationJob( $openai, $replicate );
+		$gen_job->register_hooks();
+
+		// ── Sprint 2: Frame sequence frontend ────────────────────────────
 
 		$frame_assets    = new FrameSequenceAssets();
 		$frame_manifest  = new FrameSequenceManifest();
@@ -86,24 +89,11 @@ final class Plugin {
 		$frame_shortcode->register_hooks();
 		$frame_block->register_hooks();
 
-		// ----------------------------------------------------------------
-		// Legacy single-image runtime — kept for backward compat.
-		// Will be deprecated and removed in M7 once all sequences migrate.
-		// ----------------------------------------------------------------
-
-		// (Old Runtime* and SingleImage* classes intentionally kept booted
-		// until the migration path is established in Sprint 3 / M7.)
-
-		// ----------------------------------------------------------------
-		// Demo placeholder — shown on frontend when no frames are ready.
-		// ----------------------------------------------------------------
-
+		// Demo placeholder.
 		$demo = new DemoPlaceholder();
 		$demo->register_hooks();
 
-		// ----------------------------------------------------------------
-		// Admin only.
-		// ----------------------------------------------------------------
+		// ── Admin only ───────────────────────────────────────────────────
 
 		if ( ! is_admin() ) {
 			return;
@@ -117,7 +107,7 @@ final class Plugin {
 		$frame_upload_box  = new FrameUploadMetaBox();
 		$golden_validation = new GoldenMasterValidation();
 		$dashboard_page    = new DashboardPage();
-		$settings_page     = new SettingsPage();
+		$settings_page     = new SettingsPage(); // ← Sprint 3 updated version
 		$admin_menu        = new AdminMenu( $dashboard_page, $templates_page );
 		$admin_assets      = new AdminAssets();
 		$admin_bar         = new AdminBar();
@@ -141,7 +131,7 @@ final class Plugin {
 		$seq_duplicator->register_hooks();
 		$settings_page->register_hooks();
 
-		// Sprint 1: Free plan quota gate.
+		// Free plan quota gate.
 		$this->register_quota_gate();
 	}
 
