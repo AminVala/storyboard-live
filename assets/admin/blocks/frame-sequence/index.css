@@ -1,0 +1,35 @@
+/**
+ * StoryBoard Live — Block editor styles
+ * Sprint 2
+ */
+
+.shseq-block-editor-placeholder,
+.shseq-block-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  background: #1a1a1a;
+  color: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.shseq-block-editor-placeholder p,
+.shseq-block-placeholder p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.shseq-block-editor-placeholder p:first-child,
+.shseq-block-placeholder p:first-child {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.shseq-block-placeholder__hint {
+  opacity: 0.65;
+}
