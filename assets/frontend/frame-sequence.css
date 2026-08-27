@@ -1,0 +1,200 @@
+/**
+ * StoryBoard Live — Frame Sequence CSS
+ * Sprint 2
+ *
+ * Layout:
+ *   .shseq-frame-sequence   Outer wrapper — defines scroll height via --shseq-height.
+ *   .shseq-stage            Sticky fullscreen canvas holder.
+ *   .shseq-canvas           The rendering surface.
+ *   .shseq-overlays         Positioned over the canvas.
+ *   .shseq-overlay          One content step (hidden by default, JS adds --visible).
+ *   .shseq-placeholder      Shown when no frames are ready yet.
+ */
+
+/* ── Outer wrapper ──────────────────────────────────────────────────────── */
+
+.shseq-frame-sequence {
+  /* Total scroll height — set via --shseq-height inline style */
+  height: var(--shseq-height, 420vh);
+  position: relative;
+  overflow: hidden;
+  contain: layout style;
+}
+
+/* ── Sticky stage (pinned canvas) ─────────────────────────────────────── */
+
+.shseq-stage {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+  z-index: 0;
+}
+
+.shseq-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Overlay container ───────────────────────────────────────────────── */
+
+.shseq-overlays {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Individual content step ─────────────────────────────────────────── */
+
+.shseq-overlay {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #fff;
+  padding: 1.5rem 2rem;
+  max-width: min(640px, 90vw);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.shseq-overlay--visible {
+  pointer-events: auto;
+}
+
+/* Heading */
+.shseq-overlay__heading {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+  color: inherit;
+}
+
+/* Paragraph */
+.shseq-overlay__paragraph {
+  margin: 0 0 0.75rem;
+  font-size: clamp(0.95rem, 2vw, 1.25rem);
+  line-height: 1.55;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  color: inherit;
+}
+
+/* Badge / price */
+.shseq-overlay__badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 100px;
+  padding: 0.2em 0.85em;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: inherit;
+}
+
+/* CTA button */
+.shseq-overlay__cta {
+  display: inline-block;
+  padding: 0.7em 2em;
+  background: #fff;
+  color: #111;
+  text-decoration: none;
+  border-radius: 100px;
+  font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.shseq-overlay__cta:hover,
+.shseq-overlay__cta:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Logo / icon */
+.shseq-overlay__logo {
+  display: block;
+  max-height: 48px;
+  max-width: 160px;
+  margin: 0 auto 0.75rem;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+/* ── Noscript fallback ────────────────────────────────────────────────── */
+
+.shseq-noscript-fallback {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+}
+
+/* ── Placeholder (no frames yet) ─────────────────────────────────────── */
+
+.shseq-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 60vh;
+  background: #111;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1rem;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .shseq-overlay {
+    transition: none;
+  }
+  .shseq-frame-sequence {
+    /* Collapse scroll zone — static image only */
+    height: 100vh;
+  }
+  .shseq-overlays {
+    /* Stack all overlays vertically */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-bottom: 10%;
+  }
+  .shseq-overlay {
+    position: static;
+    transform: none;
+  }
+}
+
+/* ── Print ───────────────────────────────────────────────────────────── */
+
+@media print {
+  .shseq-stage,
+  .shseq-overlays {
+    display: none;
+  }
+  .shseq-noscript-fallback {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+}
