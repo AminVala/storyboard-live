@@ -1,20 +1,38 @@
 {
-  "name": "shahrehonar/storyboard-live",
-  "description": "روایت تصویری زنده و همگام با اسکرول برای وردپرس.",
+  "name": "aminvala/storyboard-live",
+  "description": "Scroll-driven frame sequence hero animation for WordPress",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "authors": [
     {
-      "name": "امین اخیار"
+      "name": "Amin Vala",
+      "homepage": "https://github.com/AminVala"
     }
   ],
+  "require": {
+    "php": ">=8.0"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^3.9",
+    "wp-coding-standards/wpcs": "^3.1",
+    "phpunit/phpunit": "^10.5",
+    "brain/monkey": "^2.6",
+    "phpstan/phpstan": "^1.12"
+  },
   "autoload": {
     "psr-4": {
       "ShahreHonar\\SequenceEngine\\": "src/"
     }
   },
+  "scripts": {
+    "phpcs": "phpcs --standard=WordPress src/ sh-sequence-engine.php",
+    "phpcbf": "phpcbf --standard=WordPress src/ sh-sequence-engine.php",
+    "phpstan": "phpstan analyse src/ --level=6",
+    "test": "phpunit"
+  },
   "config": {
-    "optimize-autoloader": true,
-    "sort-packages": true
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }
