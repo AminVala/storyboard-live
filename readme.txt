@@ -1,203 +1,154 @@
-=== StoryBoard Live — Scroll-Driven Visual Storytelling ===
-Contributors: aminakhyar
-Tags: scroll, animation, storytelling, parallax, visual
-Requires at least: 6.4
-Tested up to: 6.8
-Stable tag: 0.7.1
-Requires PHP: 7.4
+=== StoryBoard Live ===
+Contributors: aminvala
+Tags: scroll animation, hero, frame sequence, parallax, scroll storytelling
+Requires at least: 6.2
+Tested up to: 6.7
+Requires PHP: 8.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Create scroll-driven visual stories from a single confirmed image. No frames to export, no JavaScript to write.
+Turn any page hero into a cinematic frame-sequence animation that plays as the visitor scrolls — no video, no JavaScript bloat.
 
 == Description ==
 
-**StoryBoard Live** turns one confirmed "Golden Master" image into a full scroll-driven visual experience — with live HTML overlays, a cinematic camera animation, and a smooth theme-header reveal — all without baking text or logos into your image.
+**StoryBoard Live** lets you replace the static hero image on any WordPress page with a scroll-driven frame sequence — exactly like the effect used by Apple's product pages, scrollsequence.com, and high-converting landing pages.
+
+Upload a set of WebP images (your "frames") and the plugin handles everything else:
+
+* The hero is pinned while the visitor scrolls
+* Frames advance frame-by-frame in sync with the scroll position
+* Text and CTA overlays fade in at exactly the right frame
+* Works with any theme via shortcode or Gutenberg block
+
+**No jQuery. No external CDN. No video file to encode.**
 
 = How it works =
 
-1. Choose a ready-made Production Sheet template (or start from scratch).
-2. Upload your final image as the Golden Master.
-3. Confirm it — then add your live text, headings, and CTA links.
-4. Embed with `[storyboard_live id="YOUR_ID"]`.
+1. Create a new **Sequence** in the admin
+2. Upload your WebP frames (24–36 recommended)
+3. Set the Golden Master (the final frame — your design target)
+4. Add overlay content steps (headline, CTA, badge text)
+5. Paste `[storyboard_live id="123"]` or use the block
 
-That's it. The plugin handles the scroll timing, overlay reveals, and the handoff to your real site content.
+The plugin validates every upload against the Golden Master automatically, so your frames always arrive at the exact final composition.
 
-= Key features =
+= Pro: AI-Assisted Frame Generation =
 
-* **Single-image workflow** — No frame sequences to export. Upload one final image and the plugin derives the entire animation from it.
-* **Live HTML overlays** — Text, headings, and call-to-action buttons are always real HTML, never baked into the image. Screen readers can read them. Search engines can index them.
-* **Cinematic camera animation** — A smooth scale + opacity entry transform plays up to the locked "master frame", then freezes — matching the Production Sheet rule that the hero is locked at the reference frame.
-* **Real theme-header reveal** — Your existing WordPress or Elementor header slides in naturally near the end of the story. No duplicate headers, no hidden navigation.
-* **Golden Handoff** — The story hands off cleanly to your real page content without a hard cut.
-* **Responsive** — Desktop, tablet, and mobile variants with independent Golden Master images and confirmation gates.
-* **Reduced-motion aware** — Visitors who prefer reduced motion see the final Golden Master image instead of the animation.
-* **RTL ready** — Full right-to-left layout support.
-* **No external requests** — No telemetry, no CDN calls, no remote APIs. All assets are local.
+On the Pro plan, you do not need to pre-render frames. Just:
 
-= Production Sheet templates =
+1. Upload your Golden Master (End Frame)
+2. Write a short text prompt describing the opening scene
+3. Click **Generate** — the plugin creates the Start Frame with DALL·E 3 and interpolates all 24–36 frames with the FILM model via Replicate
+4. Generation runs in the background (Action Scheduler) — you are notified when frames are ready
 
-The plugin ships with a built-in **Creative Studio Production Sheet** template:
+BYOK (Bring Your Own Key): your OpenAI and Replicate API keys are stored on your server and never pass through our infrastructure. A privacy notice is shown on the Settings page.
 
-* 120 frames, 12 beats, 4 scenes
-* 5 reference keyframes (A → E)
-* 6 HTML overlay slots (story-mark, eyebrow, title, subtitle, actions, trust)
-* Real theme-header reveal starting at frame 109
-* Reversible golden handoff at frame 120
+= Templates =
 
-= Shortcodes =
+Three built-in overlay templates are included:
 
-* `[storyboard_live id="123"]` — Embed a published sequence by its ID.
-* `[storyboard_live id="123" variant="tablet"]` — Request a specific responsive variant.
-* `[storyboard_live_demo]` — Embed the bundled demo sequence (for testing).
+* **Creative Studio** — headline · subtitle · CTA
+* **Art Store Hero** — eyebrow · main-title · subtitle · dual CTA · trust badges
+* **Minimal Portfolio** — single title · tagline
 
-= For developers =
+= Shortcode =
 
-StoryBoard Live is built with clean, namespaced PHP (PSR-4 autoloading), no global state, and no jQuery dependency. All admin and frontend assets are scoped to their pages — nothing loads globally.
+`[storyboard_live id="123"]`
 
-The plugin uses custom post type capabilities, so you can grant or restrict access per role from **StoryBoard Live → Settings → Access**.
+Optionally: `scroll_length="300"` (vh units, default 200), `mobile="false"` to show static on mobile.
+
+= Block =
+
+Search for **StoryBoard Live** in the Gutenberg inserter. The block exposes the same options as the shortcode.
+
+= System Requirements =
+
+* WordPress 6.2 or later
+* PHP 8.0 or later
+* WebP-capable server (GD or Imagick)
+* For AI generation (Pro): [Action Scheduler](https://wordpress.org/plugins/action-scheduler/) plugin (or WooCommerce)
 
 = Privacy =
 
-This plugin does not collect, store, or transmit any personal data about site visitors. No cookies are set by the plugin. No external requests are made.
+This plugin does not collect visitor data. The Pro AI generation feature sends images and prompts to OpenAI and Replicate under the administrator's own API accounts. See the Settings page for the full disclosure notice.
 
 == Installation ==
 
-= Automatic installation (recommended) =
-
-1. Go to **Plugins → Add New** in your WordPress admin.
-2. Search for **StoryBoard Live**.
-3. Click **Install Now**, then **Activate**.
-
-= Manual installation =
-
-1. Download the plugin ZIP from WordPress.org.
-2. Go to **Plugins → Add New → Upload Plugin**.
-3. Select the ZIP file and click **Install Now**.
-4. Click **Activate Plugin**.
-
-= After activation =
-
-1. Go to **StoryBoard Live** in the left-hand admin menu.
-2. Click **Start from a ready template** to create your first sequence from the built-in Creative Studio Production Sheet.
-3. Upload a Golden Master image (your final hero image) and confirm it.
-4. Add your overlay text in the **Live overlay content** meta box.
-5. Embed the sequence on any page or post with `[storyboard_live id="YOUR_ID"]`.
-
-= Requirements =
-
-* WordPress 6.4 or later
-* PHP 7.4 or later
-* A Composer-built package (the `vendor/autoload.php` file must be present). If you installed from WordPress.org, this is already included. If you cloned from GitHub, run `composer install` first.
+1. Upload the `storyboard-live` folder to the `/wp-content/plugins/` directory, or install it through the WordPress plugin screen.
+2. Activate the plugin through the **Plugins** screen.
+3. Navigate to **StoryBoard Live → Dashboard** to get started.
+4. (Pro only) Go to **StoryBoard Live → Settings** and enter your OpenAI and Replicate API keys.
 
 == Frequently Asked Questions ==
 
-= Do I need to export video or image frames? =
+= What image format should I use for frames? =
 
-No. StoryBoard Live works from a single confirmed image — your Golden Master. The plugin derives the scroll-driven animation from the Production Sheet structure you define.
+WebP is strongly recommended — it gives the best balance of quality and file size. JPEG and PNG are also accepted but produce larger payloads. Aim for frames under 100 KB each.
 
-= What is a Golden Master? =
+= How many frames do I need? =
 
-The Golden Master is your final, fully-composed hero image (typically the last frame of the story). It must be free of baked text, logos, and UI elements — those are added as live HTML overlays by the plugin.
+24 frames produce a smooth 2-second animation. 36 frames give a more cinematic result. The Free plan supports up to 24 frames; Pro supports 36.
 
-= Can I use my own image? =
+= Does this work with page builders? =
 
-Yes. Any image in the WordPress Media Library can be used as a Golden Master. For best results, use a landscape image at 1920×1080 px for desktop, with a separate portrait version for mobile.
+Yes. Use the `[storyboard_live id="123"]` shortcode inside any page builder text/shortcode element. Native Elementor and Divi widget support is planned for a future release.
 
-= What happens on mobile? =
+= Does the animation work on mobile? =
 
-If you confirm separate tablet and mobile Golden Masters, each variant uses its own image. If you only confirm the desktop master, all variants fall back to it — and an admin notice tells you which variants are using the fallback.
+Yes, by default. You can disable it on mobile from **Settings → Mobile animation** — the last frame (your Golden Master) is shown as a static image instead.
 
-= Does it work with Elementor? =
+= Do I need WooCommerce for AI generation? =
 
-Yes. The shortcode `[storyboard_live id="123"]` can be placed inside any Elementor text or shortcode widget. The plugin also detects Elementor page builder data to correctly load assets only on pages that contain a sequence.
+Not necessarily. You need the **Action Scheduler** plugin, which is bundled with WooCommerce but also available as a standalone plugin. The Free plan manual frame upload does not require Action Scheduler at all.
 
-= Does it work with the Block Editor (Gutenberg)? =
+= Will my API keys leave my server? =
 
-Yes. Add a **Shortcode** block and paste `[storyboard_live id="123"]`.
-
-= Can I add the sequence to a Full Site Editing (FSE) template? =
-
-Yes, using a Shortcode block in the Site Editor. Note that in FSE contexts, the shortcode must be placed inside a block that renders the `do_shortcode()` output.
-
-= What if JavaScript is disabled? =
-
-The plugin renders a static fallback image (`<noscript>`) so the page is never blank. The Skip Story link and all overlay text remain accessible via keyboard.
-
-= Is it WCAG 2.1 AA accessible? =
-
-The plugin follows WordPress accessibility standards:
-* Skip Story link visible on focus.
-* Progress bar with `role="progressbar"` and `aria-valuenow`.
-* All overlay text uses semantic HTML (h1–h3, p, a).
-* `aria-labelledby` or `aria-label` on the story section.
-* Reduced-motion mode shows a static image for users who prefer it.
-
-= Can multiple sequences appear on the same page? =
-
-Each shortcode instance gets a unique ID, so multiple sequences can coexist on one page without conflicts.
-
-= How do I preview a sequence before publishing it? =
-
-In the sequence editor, click the **Preview** button (next to the shortcode) to open a full-screen preview at a unique signed URL. The preview respects draft/pending status, so you don't need to publish first.
+No. Your OpenAI and Replicate API keys are stored in your WordPress database and are called directly from your server to the provider's API. StoryBoard Live's infrastructure never sees your keys.
 
 = Can I duplicate a sequence? =
 
-Yes. In **Sequences → All Sequences**, hover over any sequence and click **Duplicate**. The copy inherits the structure and overlay content, but confirmations are reset — you must re-confirm each Golden Master.
+Yes. Use the **Duplicate** row action on the Sequences list screen. Frames are shared (not copied) to keep storage usage low.
 
-= Can editors (not just admins) manage sequences? =
+= What happens if a frame fails the Golden Master validation? =
 
-By default, only Administrators can create and edit sequences. Go to **StoryBoard Live → Settings → Access** to grant the Editor role the same permissions.
+The plugin shows a warning in the media upload area and flags the frame with a yellow border on the upload grid. You can still save and publish — the validation is advisory, not blocking.
 
-= Does it work on WordPress Multisite? =
+= Is there a preview mode? =
 
-The plugin must be activated per site. Network-wide (global) activation is not supported in this version. Each site on the network activates and manages its own sequences independently.
-
-= Where can I get support? =
-
-Post in the WordPress.org support forum for this plugin. Please include your WordPress version, PHP version, active theme, and a description of the issue.
+Yes. Use the **Preview** link in the Sequence editor. Preview pages are protected by a short-lived token and are not indexable.
 
 == Screenshots ==
 
-1. **Dashboard** — Onboarding card for new users; stats and recent sequences for returning users.
-2. **Ready Templates** — Choose a built-in Production Sheet to create an editable draft in one click.
-3. **Story Structure editor** — Edit scenes, beats, keyframes, overlay timeline, and header/handoff timing.
-4. **Golden Master meta box** — Upload and confirm your final image per responsive variant.
-5. **Live overlay content** — Enter live text, headings, and CTAs that appear as real HTML on top of your image.
-6. **Settings page** — Control access, scroll defaults, CDN base URL, and data options.
-7. **Frontend — desktop** — The sequence in action: scroll-driven camera animation with live overlay reveals.
-8. **Frontend — mobile** — The same sequence on a mobile viewport with the portrait Golden Master.
+1. Dashboard — sequences at a glance with frame count, status and quick actions
+2. Sequence editor — Golden Master upload, frame upload grid, overlay content steps
+3. Template selector — choose a built-in overlay template as a starting point
+4. Settings — API keys for AI generation with live Test Connection buttons
+5. Frontend — Art Store Hero template mid-scroll with dual CTA visible
+6. Frontend mobile — static Golden Master shown on a 375px screen
+7. Gutenberg block — StoryBoard Live block with sidebar controls
+8. AI generation progress — three-stage progress bar in the meta box
 
 == Changelog ==
 
-= 0.7.1 =
-* Fixed the real theme-header reveal in the single-image Golden Master runtime.
-* Fixed a dangling aria-labelledby reference when no heading overlay is rendered.
-* Fixed a dead siteHeader.enabled condition in the manifest.
-* Made the Golden Master media picker title/button translatable.
-
-= 0.7.0 =
-* Added the single-image Golden Master workflow.
-* Added a desktop-first Golden Master confirm gate.
-* Added the Live overlay content editor.
-* Added the [storyboard_live] shortcode and single-image runtime engine.
-
-= 0.6.7.1 =
-* Added Ready Templates with the Creative Studio Production Sheet.
-* Added a no-JavaScript Story Structure editor.
-
-= 0.6.7 =
-* Added a dedicated portrait demo frame set.
-* Hardened real theme-header discovery and reveal.
-* Added mobile composition rules.
-
-See `changelog.txt` for the full version history.
+= 1.0.0 =
+* Initial release
+* Frame sequence engine (24–36 WebP frames, scroll-pinned hero)
+* Golden Master validation system
+* Overlay content steps (headline, CTA, trust badges)
+* Three built-in templates (Creative Studio, Art Store Hero, Minimal Portfolio)
+* Gutenberg block + shortcode
+* Sequence preview with nonce-protected URLs
+* Sequence duplicator
+* Admin bar quick-access on preview pages
+* Pro: AI-assisted frame generation (OpenAI DALL·E 3 + Replicate FILM)
+* Pro: Background generation via Action Scheduler with progress tracking
+* BYOK API key management with live Test Connection
+* Security: IDOR protection, capability checks, nonce verification throughout
+* Accessibility: ARIA roles, keyboard navigation, reduced-motion support
+* i18n-ready (text domain: sh-sequence-engine)
 
 == Upgrade Notice ==
 
-= 0.7.1 =
-Fixes the theme-header reveal and a dangling ARIA reference. Recommended for all users.
-
-== Privacy Policy ==
-
-StoryBoard Live does not collect, store, or transmit any personal data. It sets no cookies and makes no external network requests on behalf of site visitors or administrators. All plugin assets are served locally.
+= 1.0.0 =
+Initial release — no upgrade steps required.
