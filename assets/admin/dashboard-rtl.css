@@ -1,11 +1,13 @@
-/*
- * RTL-only corrections. Most layout uses CSS logical properties and needs no
- * mirroring override.
- */
-.shseq-admin {
-	direction: rtl;
-}
+/* StoryBoard Live — Admin Dashboard RTL Overrides */
 
-.shseq-badge {
-	letter-spacing: 0;
-}
+/* ── RTL layout adjustments ─────────────────────────────────────────────── */
+.shseq-hero               { direction: rtl; text-align: right; }
+.shseq-primary-action     { direction: rtl; flex-direction: row-reverse; }
+.shseq-template-callout   { direction: rtl; flex-direction: row-reverse; }
+.shseq-runtime-card       { direction: rtl; }
+.shseq-stats              { direction: rtl; }
+.shseq-recent__header     { direction: rtl; }
+.shseq-sequence-list li   { direction: rtl; }
+
+.shseq-master-badge       { margin-left: 0; margin-right: 6px; }
+.shseq-master-actions     { flex-direction: row-reverse; }
