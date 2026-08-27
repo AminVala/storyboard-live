@@ -1,458 +1,759 @@
-
+# Persian (fa_IR) translation for StoryBoard Live
+# Copyright (C) 2026 Amin Vala
+# This file is distributed under the GPL v2 or later.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: استوری برد زنده | StoryBoard Live 0.6.5\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-13 12:22+0000\n"
-"PO-Revision-Date: 2026-08-13 15:05+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Project-Id-Version: StoryBoard Live 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/AminVala/storyboard-live/issues\n"
+"POT-Creation-Date: 2026-08-27T14:47+03:30\n"
+"PO-Revision-Date: 2026-08-27T14:47+03:30\n"
+"Last-Translator: Amin Vala <Amindeablo@gmail.com>\n"
+"Language-Team: Persian\n"
 "Language: fa_IR\n"
-"Language-Team: fa_IR <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Manual\n"
+"X-Domain: sh-sequence-engine\n"
 
-msgid "(Untitled)"
-msgstr "(بدون عنوان)"
+# ── Plugin name / menu ────────────────────────────────────────────────────
 
-msgid "A calmer interface, a faster first impression"
-msgstr "رابطی آرام‌تر، شروعی سریع‌تر"
+msgid "StoryBoard Live"
+msgstr "استوری‌بورد زنده"
 
-msgid "Add New"
-msgstr "افزودن"
-
-msgid "Add New Sequence"
-msgstr "افزودن سکانس جدید"
-
-msgid "All"
-msgstr "همه"
-
-msgid "All Sequences"
-msgstr "همه سکانس‌ها"
-
-msgid "Brands"
-msgstr "برندها"
-
-msgid "Bring the story to life with every scroll"
-msgstr "با هر اسکرول، داستان را زنده کن"
-
-msgid "Build your next visual story"
-msgstr "داستان تصویری بعدی خود را بسازید"
-
-msgid "Categories"
-msgstr "دسته‌بندی‌ها"
-
-msgid "Continue to live content"
-msgstr "ادامه به محتوای زنده"
-
-msgid "Create Sequence"
-msgstr "ساخت سکانس"
-
-msgid "Create a private sequence entity now; the interactive editor arrives in a later milestone."
-msgstr "اکنون ساختار سکانس را ایجاد کنید؛ ویرایشگر تعاملی در یکی از مراحل بعدی اضافه می‌شود."
-
-msgid "Create your first visual story to verify the plugin foundation."
-msgstr "اولین داستان تصویری را برای بررسی پایه افزونه ایجاد کنید."
-
-#, python-format
-msgid "Created by %s"
-msgstr "تولید شده توسط %s"
+msgid "استوری برد زنده | StoryBoard Live"
+msgstr "استوری‌بورد زنده"
 
 msgid "Dashboard"
 msgstr "پیشخوان"
 
-msgid "Demo navigation"
-msgstr "ناوبری آزمایشی"
-
-msgid "Desktop, tablet and mobile now use dedicated runtime variants"
-msgstr "دسکتاپ، تبلت و موبایل اکنون نسخه‌های اجرایی مستقل دارند"
-
-msgid "Desktop, tablet and mobile use independent frame variants while the real theme header remains the only site header."
-msgstr "دسکتاپ، تبلت و موبایل از فریم‌های مستقل استفاده می‌کنند و هدر واقعی قالب همچنان تنها هدر سایت است."
-
-msgid "Desktop, tablet and mobile use independent runtime policies while the real theme header remains the only site header."
-msgstr "دسکتاپ، تبلت و موبایل سیاست اجرایی متناسب با نمایشگر خود را دارند و هدر واقعی قالب همچنان تنها هدر سایت است."
-
-msgid "Drafts"
-msgstr "پیش‌نویس‌ها"
-
-msgid "Edit"
-msgstr "ویرایش"
-
-msgid "Edit Sequence"
-msgstr "ویرایش سکانس"
-
-msgid "Frames move with the visitor and hand off cleanly to the real page content and the real theme header."
-msgstr "فریم‌ها همراه حرکت کاربر پیش می‌روند و در پایان بدون پرش به محتوای واقعی صفحه و هدر واقعی قالب تحویل می‌شوند."
-
-msgid "Interactive visual storytelling for the web"
-msgstr "داستان‌پردازی تصویری تعاملی برای وب"
-
-msgid "Late-stage live header reveal is ready for validation"
-msgstr "نمایش دیرهنگام هدر زنده آماده بررسی است"
-
-msgid "Live HTML arrives near the golden frame"
-msgstr "اچ‌تی‌ام‌ال زنده نزدیک فریم طلایی ظاهر می‌شود"
-
-msgid ""
-"Live HTML overlays now follow a strict frame timeline; the site header is revealed only near the golden final frame "
-"and stays live through handoff."
-msgstr ""
-"لایه‌های زنده اچ‌تی‌ام‌ال اکنون از خط زمانی دقیق فریم‌ها پیروی می‌کنند؛ هدر سایت فقط نزدیک فریم طلایی نهایی ظاهر "
-"می‌شود و در زمان تحویل زنده باقی می‌ماند."
-
-msgid "Live HTML remains unchanged"
-msgstr "اچ‌تی‌ام‌ال زنده بدون تغییر باقی می‌ماند"
-
-msgid "Live page continues here."
-msgstr "صفحه زنده از اینجا ادامه پیدا می‌کند."
-
-msgid "M2 Production Runtime Core"
-msgstr "هسته اجرایی Production در M2"
-
-msgid "M2 runtime core"
-msgstr "هسته اجرایی M2"
-
-msgid "M4 Resilience Layer"
-msgstr "لایه پایداری M4"
-
-msgid "M4 resilience layer"
-msgstr "لایه پایداری M4"
-
-msgid "M5 Golden Handoff"
-msgstr "تحویل طلایی M5"
-
-msgid "M6 Live Overlay Timeline"
-msgstr "خط زمانی لایه‌های زنده M6"
-
-msgid "M6 Overlay Timeline"
-msgstr "خط زمانی لایه‌های زنده M6"
-
-msgid "M6.1 Theme Header"
-msgstr "هدر واقعی قالب M6.1"
-
-msgid "M6.1 Theme Header Integration"
-msgstr "یکپارچه‌سازی هدر قالب M6.1"
-
-msgid "M6.1 Theme Header Timeline"
-msgstr "خط زمانی هدر واقعی قالب M6.1"
-
-msgid "M6.2 Responsive Variant Hardening"
-msgstr "سخت‌سازی نسخه‌های واکنش‌گرا M6.2"
-
-msgid "M6.3 Mobile UX and Package Optimization"
-msgstr "بهینه‌سازی تجربه موبایل و حجم بسته M6.3"
-
-msgid "M6.4 Experience Foundation and Lighthouse Hardening"
-msgstr "زیرساخت تجربه کاربری و سخت‌سازی لایت‌هاوس M6.4"
-
-msgid ""
-"Mobile and tablet use shorter scroll paths and touch-friendly layouts while the approved desktop behavior stays "
-"unchanged."
-msgstr ""
-"موبایل و تبلت مسیر اسکرول کوتاه‌تر و چیدمان سازگار با لمس دارند، در حالی که رفتار تأییدشده دسکتاپ بدون تغییر باقی "
-"می‌ماند."
-
-msgid "Network-wide activation is not supported in this version. Activate استوری برد زنده | StoryBoard Live per site."
-msgstr "فعال‌سازی شبکه‌ای در این نسخه پشتیبانی نمی‌شود. افزونه را برای هر سایت به‌صورت جداگانه فعال کنید."
-
-msgid "New Sequence"
-msgstr "سکانس جدید"
-
-msgid "No sequences found in Trash."
-msgstr "سکانسی در زباله‌دان پیدا نشد."
-
-msgid "No sequences found."
-msgstr "سکانسی پیدا نشد."
-
-msgid "No sequences have been created yet."
-msgstr "هنوز سکانسی ساخته نشده است."
-
-msgid "One story, a dedicated composition for every screen"
-msgstr "یک داستان، با ترکیب‌بندی اختصاصی برای هر نمایشگر"
-
-msgid "Only visual ownership moves from Canvas to the pixel-matched golden poster."
-msgstr "فقط مالکیت تصویر از بوم به پوستر طلایی کاملاً همسان منتقل می‌شود."
-
-msgid "Pixel-matched Golden Handoff is ready for validation"
-msgstr "تحویل طلایی کاملاً همسان آماده بررسی است"
-
-msgid "Poster, fallback, and reduced-motion policies are ready for validation"
-msgstr "سیاست‌های پوستر، حالت جایگزین و کاهش حرکت برای اعتبارسنجی آماده‌اند"
-
-msgid "Production runtime core is ready for validation"
-msgstr "هسته اجرایی Production برای اعتبارسنجی آماده است"
-
-msgid "Published"
-msgstr "منتشرشده"
-
-msgid "Recent Sequences"
-msgstr "سکانس‌های اخیر"
-
-msgid "Resize or rotate the device to verify responsive variant switching without creating a second header."
-msgstr "اندازه پنجره را تغییر دهید یا دستگاه را بچرخانید تا تغییر نسخه واکنش‌گرا بدون ساخت هدر دوم بررسی شود."
-
-msgid "Responsive StoryBoard Live Runtime"
-msgstr "هسته واکنش‌گرای استوری برد زنده"
-
-msgid "Responsive runtime, without duplicated demo assets"
-msgstr "اجرای واکنش‌گرا، بدون تکرار فایل‌های نمایشی"
-
-msgid "Scroll back upward to verify that the header and live overlays reverse with the sequence."
-msgstr "به بالا اسکرول کنید تا بررسی شود هدر و لایه‌های زنده همراه با سکانس به‌صورت معکوس برمی‌گردند."
-
-msgid "Scroll back upward to verify that the sequence reverses after handoff."
-msgstr "برای بررسی بازگشت سکانس پس از تحویل، دوباره به بالا اسکرول کنید."
-
-msgid "Scroll to continue"
-msgstr "برای ادامه اسکرول کنید"
-
-msgid "Search Sequences"
-msgstr "جستجوی سکانس‌ها"
-
-msgid "Sequence"
-msgstr "سکانس"
-
-msgid "Sequence Revisions"
-msgstr "بازبینی‌های سکانس"
-
-msgid "Sequence published."
-msgstr "سکانس منتشر شد."
-
-msgid "Sequence reverted to draft."
-msgstr "سکانس به پیش‌نویس بازگردانده شد."
-
-msgid "Sequence status"
-msgstr "وضعیت سکانس‌ها"
-
-msgid "Sequence updated."
-msgstr "سکانس به‌روزرسانی شد."
-
-msgid "Sequences"
-msgstr "سکانس‌ها"
-
-msgid "Shahre Honar"
-msgstr "شهر هنر"
-
-msgid "Shahre Honar home"
-msgstr "صفحه اصلی شهر هنر"
-
-msgid "Shop"
-msgstr "فروشگاه"
-
-msgid "Skip visual story"
-msgstr "پرش از داستان تصویری"
-
-msgid "StoryBoard Live"
-msgstr "استوری برد زنده | StoryBoard Live"
-
-msgid ""
-"The 30-frame demo now runs through a real manifest, frame scheduler, direction-aware loader, memory-budget cache, and"
-" runtime state machine."
-msgstr ""
-"نمونه ۳۰ فریمی اکنون با مانیفست واقعی، زمان‌بند فریم، بارگذار آگاه از جهت حرکت، کش مبتنی بر بودجه حافظه و ماشین حالت "
-"اجرایی کار می‌کند."
-
-msgid "The existing theme header is revealed near the final frame and remains the same live header through Golden Handoff."
-msgstr "هدر موجود قالب نزدیک فریم نهایی ظاهر می‌شود و در تمام تحویل طلایی همان هدر زنده باقی می‌ماند."
-
-msgid ""
-"The final sequence frame now hands visual ownership to the exact golden poster while live HTML remains untouched; "
-"reverse scrolling restores the Canvas sequence."
-msgstr ""
-"فریم نهایی سکانس اکنون مالکیت تصویر را به پوستر طلایی دقیقاً همسان می‌سپارد، در حالی که اچ‌تی‌ام‌ال زنده دست‌نخورده "
-"می‌ماند؛ اسکرول معکوس سکانس بوم را بازمی‌گرداند."
-
-msgid "The header is revealed only near the final frame and remains live through Golden Handoff."
-msgstr "هدر فقط نزدیک فریم نهایی ظاهر می‌شود و در تمام تحویل طلایی به‌صورت زنده باقی می‌ماند."
-
-msgid "The live page continues here."
-msgstr "محتوای زنده صفحه از اینجا ادامه پیدا می‌کند."
-
-msgid ""
-"The plugin no longer creates a header. It reveals the existing theme or Elementor header near the golden frame and "
-"preserves that same live header through handoff."
-msgstr ""
-"افزونه دیگر هدر جداگانه‌ای نمی‌سازد؛ هدر موجود قالب یا المنتور را نزدیک فریم طلایی نمایش می‌دهد و همان هدر زنده را در"
-" تمام فرایند تحویل حفظ می‌کند."
-
-msgid "The real theme header is now bound to the sequence"
-msgstr "هدر واقعی قالب اکنون به سکانس متصل است"
-
-msgid ""
-"The real theme or Elementor header remains the only header, while each viewport receives an independent frame "
-"composition and runtime policy."
-msgstr ""
-"هدر واقعی قالب یا المنتور تنها هدر سایت باقی می‌ماند و هر اندازه نمایش، ترکیب فریم و سیاست اجرایی مستقل خود را دریافت"
-" می‌کند."
-
-msgid ""
-"The runtime now fails safely to a golden poster, removes long scroll behavior when reduced motion is requested, and "
-"tears down interactive resources when fallback mode is entered."
-msgstr ""
-"هسته اجرایی اکنون هنگام خطا به‌صورت امن به پوستر نهایی بازمی‌گردد، در حالت کاهش حرکت اسکرول طولانی را حذف می‌کند و "
-"هنگام ورود به حالت جایگزین منابع تعاملی را آزاد می‌کند."
-
-msgid ""
-"The runtime now reserves layout from first paint, prioritizes the LCP poster, and uses a responsive editorial "
-"interface without changing the approved desktop story behavior."
-msgstr ""
-"هسته اجرا از نخستین نمایش فضای لازم را رزرو می‌کند، پوستر اصلی را در اولویت می‌گذارد و رابط واکنش‌گرای منسجمی ارائه "
-"می‌دهد، بدون تغییر رفتار تأییدشده داستان در دسکتاپ."
-
-msgid "The story ends without replacing the real site header."
-msgstr "داستان بدون جایگزین‌کردن هدر واقعی سایت پایان می‌یابد."
-
-msgid "The story hands off without replacing the real site header or semantic content."
-msgstr "داستان بدون جایگزین‌کردن هدر واقعی سایت یا محتوای معنایی تحویل داده می‌شود."
-
-#, python-format
-msgid "Version %s"
-msgstr "نسخه %s"
-
-msgid "View Sequence"
-msgstr "مشاهده سکانس"
-
-msgid "View all"
-msgstr "مشاهده همه"
-
-msgid "Visual storytelling | Exclusive to Shahre Honar"
-msgstr "داستان‌پردازی تصویری | اختصاصی شهر هنر"
-
-msgid "You do not have permission to access this page."
-msgstr "شما اجازه دسترسی به این صفحه را ندارید."
-
-msgid "استوری برد زنده | StoryBoard Live"
-msgstr "استوری برد زنده | StoryBoard Live"
-
-msgid "استوری برد زنده | StoryBoard Live Dashboard"
-msgstr "پیشخوان استوری برد زنده | StoryBoard Live"
-
-msgid "استوری برد زنده | StoryBoard Live M2 runtime demo"
-msgstr "نمونه هسته اجرایی M2 افزونه استوری برد زنده | StoryBoard Live"
-
-msgid "استوری برد زنده | StoryBoard Live M4 resilience demo"
-msgstr "نمونه لایه پایداری M4 افزونه استوری برد زنده | StoryBoard Live"
-
-msgid "استوری برد زنده | StoryBoard Live M5 Golden Handoff demo"
-msgstr "نمونه تحویل طلایی M5 افزونه استوری برد زنده | StoryBoard Live"
-
-
-msgid "M6.5 Intent-Driven Runtime and Lighthouse Hardening"
-msgstr "سخت‌سازی لایت‌هاوس و اجرای مبتنی بر تعامل M6.5"
-
-msgid "A lighter first load, without weakening the story"
-msgstr "بارگذاری اولیه سبک‌تر، بدون تضعیف روایت"
-
-msgid "The visual story now keeps its poster and semantic content in the first load while the heavier Canvas runtime waits for real interaction intent; the responsive story contract and real theme header remain intact."
-msgstr "روایت تصویری در بارگذاری اولیه فقط پوستر و محتوای معنایی را نگه می‌دارد و هسته سنگین‌تر Canvas تا زمان تعامل واقعی کاربر منتظر می‌ماند؛ قرارداد واکنش‌گرا و هدر واقعی قالب بدون تغییر باقی می‌مانند."
+msgid "Create New"
+msgstr "ایجاد جدید"
 
 msgid "Ready Templates"
 msgstr "قالب‌های آماده"
 
-msgid "Choose a production-ready structure, create an editable draft, then adapt its scenes, beats and handoff settings to your project."
-msgstr "یک ساختار آماده تولید انتخاب کنید، یک پیش‌نویس قابل ویرایش بسازید و سپس صحنه‌ها، ضرب‌آهنگ‌ها و تنظیمات تحویل آن را برای پروژه خود تغییر دهید."
+msgid "Settings"
+msgstr "تنظیمات"
+
+msgid "All Sequences"
+msgstr "همه سکانس‌ها"
+
+# ── Dashboard page ────────────────────────────────────────────────────────
+
+msgid "Total Sequences"
+msgstr "کل سکانس‌ها"
+
+msgid "Live"
+msgstr "منتشرشده"
+
+msgid "Drafts"
+msgstr "پیش‌نویس‌ها"
+
+msgid "Hero limit"
+msgstr "محدودیت قهرمان"
+
+msgid "Sequences"
+msgstr "سکانس‌ها"
+
+msgid "View all"
+msgstr "مشاهده همه"
+
+msgid "Name"
+msgstr "نام"
+
+msgid "Status"
+msgstr "وضعیت"
 
 msgid "Frames"
+msgstr "فریم‌ها"
+
+msgid "Shortcode"
+msgstr "شورت‌کد"
+
+msgid "Modified"
+msgstr "ویرایش‌شده"
+
+msgid "Actions"
+msgstr "عملیات"
+
+msgid "Wizard"
+msgstr "جادوگر"
+
+msgid "Preview"
+msgstr "پیش‌نمایش"
+
+msgid "Edit"
+msgstr "ویرایش"
+
+msgid "No sequences yet"
+msgstr "هنوز سکانسی ندارید"
+
+msgid "Create your first scroll-driven hero animation in three steps."
+msgstr "اولین انیمیشن قهرمان اسکرول-محور خود را در سه مرحله بسازید."
+
+msgid "Create First Sequence"
+msgstr "ایجاد اولین سکانس"
+
+msgid "Quick actions"
+msgstr "دسترسی سریع"
+
+msgid "New sequence (wizard)"
+msgstr "سکانس جدید (جادوگر)"
+
+msgid "Browse templates"
+msgstr "مرور قالب‌ها"
+
+msgid "Settings & API keys"
+msgstr "تنظیمات و کلیدهای API"
+
+msgid "All sequences"
+msgstr "همه سکانس‌ها"
+
+msgid "Plan"
+msgstr "طرح"
+
+msgid "Embed"
+msgstr "جاسازی"
+
+msgid "Use the shortcode or Gutenberg block:"
+msgstr "از شورت‌کد یا بلوک گوتنبرگ استفاده کنید:"
+
+msgid "Pro"
+msgstr "حرفه‌ای"
+
+msgid "Free"
+msgstr "رایگان"
+
+msgid "PRO"
+msgstr "حرفه‌ای"
+
+msgid "FREE"
+msgstr "رایگان"
+
+msgid "Up to %d heroes, 36 frames, AI generation."
+msgstr "تا %d قهرمان، ۳۶ فریم، تولید هوش مصنوعی."
+
+msgid "%d hero, 24 frames, manual upload."
+msgstr "%d قهرمان، ۲۴ فریم، آپلود دستی."
+
+msgid "Enable Pro in Settings ↗"
+msgstr "فعال‌سازی طرح حرفه‌ای در تنظیمات ↗"
+
+msgid "%1$d / %2$d heroes used"
+msgstr "%1$d از %2$d قهرمان استفاده شده"
+
+msgid "Upgrade ↗"
+msgstr "ارتقا ↗"
+
+msgid "Action Scheduler is not installed — AI frame generation requires it. Install the"
+msgstr "Action Scheduler نصب نیست — تولید فریم هوش مصنوعی به آن نیاز دارد. نصب کنید"
+
+msgid "plugin."
+msgstr "افزونه."
+
+msgid "StoryBoard Live:"
+msgstr "استوری‌بورد زنده:"
+
+# ── Wizard ────────────────────────────────────────────────────────────────
+
+msgid "Create New Sequence"
+msgstr "ایجاد سکانس جدید"
+
+msgid "Edit Sequence: %s"
+msgstr "ویرایش سکانس: %s"
+
+msgid "Full editor →"
+msgstr "ویرایشگر کامل ←"
+
+msgid "Wizard steps"
+msgstr "مراحل جادوگر"
+
+msgid "Name & Template"
+msgstr "نام و قالب"
+
+msgid "Upload Frames"
+msgstr "آپلود فریم‌ها"
+
+msgid "Content Steps"
+msgstr "مراحل محتوا"
+
+msgid "Golden Master"
+msgstr "تصویر پایانی"
+
+msgid "Preview & Publish"
+msgstr "پیش‌نمایش و انتشار"
+
+msgid "Step %d saved."
+msgstr "مرحله %d ذخیره شد."
+
+msgid "Sequence name"
+msgstr "نام سکانس"
+
+msgid "e.g. Homepage Hero"
+msgstr "مثلاً: قهرمان صفحه اصلی"
+
+msgid "Internal name — not shown to visitors."
+msgstr "نام داخلی — برای بازدیدکنندگان نمایش داده نمی‌شود."
+
+msgid "Start from a template (optional)"
+msgstr "شروع از یک قالب (اختیاری)"
+
+msgid "Choose a production-ready structure, or leave blank to start fresh."
+msgstr "یک ساختار آماده انتخاب کنید یا خالی بگذارید و از صفر شروع کنید."
+
+msgid "Blank"
+msgstr "خالی"
+
+msgid "Start with no template."
+msgstr "شروع بدون قالب."
+
+msgid "frames"
 msgstr "فریم"
 
-msgid "Beats"
-msgstr "ضرب‌آهنگ"
-
-msgid "Scenes"
+msgid "scenes"
 msgstr "صحنه"
 
-msgid "Master frame"
-msgstr "فریم مرجع"
+msgid "Save & Continue →"
+msgstr "ذخیره و ادامه ←"
+
+msgid "← Back"
+msgstr "→ بازگشت"
+
+msgid "AI Frame Generation (Pro)"
+msgstr "تولید فریم هوش مصنوعی (حرفه‌ای)"
+
+msgid "Describe the opening scene. The AI will generate the Start Frame (DALL·E 3) and interpolate all frames (Replicate FILM). Your Golden Master becomes the End Frame."
+msgstr "صحنه ابتدایی را توصیف کنید. هوش مصنوعی فریم شروع را می‌سازد (DALL·E 3) و تمام فریم‌ها را درون‌یابی می‌کند (Replicate FILM). تصویر پایانی شما فریم پایان می‌شود."
+
+msgid "Camera far away, product tiny in centre, clean white studio, soft shadows…"
+msgstr "دوربین از دور، محصول کوچک در مرکز، استودیوی سفید تمیز، سایه‌های ملایم…"
+
+msgid "AI generation runs in the background after saving — come back in a few minutes."
+msgstr "تولید هوش مصنوعی پس از ذخیره در پس‌زمینه اجرا می‌شود — چند دقیقه دیگر برگردید."
+
+msgid "— or upload frames manually —"
+msgstr "— یا فریم‌ها را دستی آپلود کنید —"
+
+msgid "Frames (%1$d / %2$d) — WebP recommended"
+msgstr "فریم‌ها (%1$d از %2$d) — WebP توصیه می‌شود"
+
+msgid "+ Add Frames from Media Library"
+msgstr "+ افزودن فریم از کتابخانه رسانه"
+
+msgid "Upload %d WebP images (1280×720 recommended) numbered in order. They play frame-by-frame as the visitor scrolls."
+msgstr "%d تصویر WebP (1280×720 توصیه‌شده) به ترتیب آپلود کنید. با اسکرول بازدیدکننده فریم به فریم پخش می‌شوند."
+
+msgid "Select Frames"
+msgstr "انتخاب فریم‌ها"
+
+msgid "Add frames"
+msgstr "افزودن فریم‌ها"
+
+msgid "Remove"
+msgstr "حذف"
+
+msgid "Content overlays — up to %1$d (%2$s plan). Each step fades in at the scroll %% position you set."
+msgstr "رویه‌های محتوایی — تا %1$d عدد (طرح %2$s). هر مرحله در موقعیت اسکرول %% که تعیین کنید محو می‌شود."
+
+msgid "Step %s"
+msgstr "مرحله %s"
+
+msgid "Step"
+msgstr "مرحله"
+
+msgid "Scroll %%"
+msgstr "اسکرول %%"
+
+msgid "Heading"
+msgstr "عنوان"
+
+msgid "Main headline…"
+msgstr "عنوان اصلی…"
+
+msgid "Paragraph"
+msgstr "پاراگراف"
+
+msgid "Subtext…"
+msgstr "متن فرعی…"
+
+msgid "CTA Text"
+msgstr "متن دکمه"
+
+msgid "Get started"
+msgstr "شروع کنید"
+
+msgid "CTA URL"
+msgstr "لینک دکمه"
+
+msgid "Badge / Price"
+msgstr "نشان / قیمت"
+
+msgid "e.g. &#x1F525; 20% off"
+msgstr "مثلاً: 🔥 ۲۰٪ تخفیف"
+
+msgid "+ Add overlay step"
+msgstr "+ افزودن مرحله رویه"
+
+msgid "Golden Master — End Frame (the final frame of your animation)"
+msgstr "تصویر پایانی — آخرین فریم انیمیشن شما"
+
+msgid "Upload the single confirmed \"last frame\" image for each device size. Desktop must be confirmed first. Tablet and Mobile fall back to Desktop if not set."
+msgstr "تصویر «آخرین فریم» تأییدشده را برای هر سایز دستگاه آپلود کنید. دسکتاپ باید اول تأیید شود. تبلت و موبایل در صورت عدم تنظیم به دسکتاپ بازمی‌گردند."
+
+msgid "Desktop (confirm first)"
+msgstr "دسکتاپ (اول تأیید کنید)"
+
+msgid "Tablet"
+msgstr "تبلت"
+
+msgid "Mobile"
+msgstr "موبایل"
+
+msgid "Confirmed"
+msgstr "تأییدشده"
+
+msgid "(Confirm desktop first)"
+msgstr "(اول دسکتاپ را تأیید کنید)"
+
+msgid "No image selected"
+msgstr "تصویری انتخاب نشده"
+
+msgid "Select image"
+msgstr "انتخاب تصویر"
+
+msgid "Select Golden Master"
+msgstr "انتخاب تصویر پایانی"
+
+msgid "Use this image"
+msgstr "استفاده از این تصویر"
+
+msgid "This Golden Master is final and confirmed"
+msgstr "این تصویر پایانی نهایی و تأییدشده است"
+
+msgid "Ready to publish?"
+msgstr "آماده انتشار هستید؟"
+
+msgid "%d frame uploaded"
+msgstr "%d فریم آپلود شد"
+
+msgid "%d frames uploaded"
+msgstr "%d فریم آپلود شد"
+
+msgid "Desktop Golden Master confirmed"
+msgstr "تصویر پایانی دسکتاپ تأیید شد"
+
+msgid "Sequence is published"
+msgstr "سکانس منتشر شده است"
+
+msgid "👁 Open Preview in new tab"
+msgstr "👁 باز کردن پیش‌نمایش در تب جدید"
+
+msgid "The preview runs at full fidelity — same frames and overlays as the live version, protected by a short-lived token."
+msgstr "پیش‌نمایش با کیفیت کامل اجرا می‌شود — همان فریم‌ها و رویه‌های نسخه زنده، محافظت‌شده با توکن کوتاه‌مدت."
+
+msgid "Embed shortcode"
+msgstr "شورت‌کد جاسازی"
+
+msgid "Paste this into any page or post where you want the hero animation."
+msgstr "این را در هر صفحه یا نوشته‌ای که می‌خواهید انیمیشن قهرمان نمایش داده شود جایگذاری کنید."
+
+msgid "Publish Sequence"
+msgstr "انتشار سکانس"
+
+msgid "Upload at least one frame and confirm the Desktop Golden Master before publishing."
+msgstr "حداقل یک فریم آپلود کنید و تصویر پایانی دسکتاپ را قبل از انتشار تأیید کنید."
+
+msgid "✓ Sequence is live!"
+msgstr "✓ سکانس منتشر شد!"
+
+msgid "All Sequences →"
+msgstr "→ همه سکانس‌ها"
+
+msgid "Permission denied."
+msgstr "دسترسی رد شد."
+
+msgid "Invalid sequence."
+msgstr "سکانس نامعتبر."
+
+# ── Templates page ────────────────────────────────────────────────────────
+
+msgid "Pick a template to pre-fill the wizard with a production structure — scenes, beats, overlay slots and frame contract. You upload the frames."
+msgstr "یک قالب انتخاب کنید تا جادوگر با ساختار تولیدی پر شود — صحنه‌ها، ریتم‌ها، شیارهای رویه و قرارداد فریم. فریم‌ها را خودتان آپلود می‌کنید."
+
+msgid "+ Blank sequence"
+msgstr "+ سکانس خالی"
+
+msgid "No templates found."
+msgstr "قالبی یافت نشد."
+
+msgid "Template applied! Continue in the wizard below."
+msgstr "قالب اعمال شد! در جادوگر زیر ادامه دهید."
 
 msgid "Use this template"
 msgstr "استفاده از این قالب"
 
-msgid "You do not have permission to create sequences."
-msgstr "شما اجازه ساخت سکانس را ندارید."
+msgid "beats"
+msgstr "ریتم"
 
-msgid "The template request could not be verified."
-msgstr "درخواست قالب قابل تأیید نبود."
+msgid "Overlay slots:"
+msgstr "شیارهای رویه:"
 
-msgid "Template draft created."
-msgstr "پیش‌نویس قالب ساخته شد."
+msgid "Master frame %d"
+msgstr "فریم اصلی %d"
 
-msgid "The selected template was not found."
-msgstr "قالب انتخاب‌شده پیدا نشد."
+# ── Settings page ─────────────────────────────────────────────────────────
 
-msgid "The sequence draft could not be created."
-msgstr "پیش‌نویس سکانس ساخته نشد."
+msgid "StoryBoard Live Settings"
+msgstr "تنظیمات استوری‌بورد زنده"
+
+msgid "AI Generation (Pro) — API Keys"
+msgstr "تولید هوش مصنوعی (حرفه‌ای) — کلیدهای API"
+
+msgid "Privacy notice:"
+msgstr "اطلاعیه حریم خصوصی:"
+
+msgid "When you generate frames, your uploaded images and text prompt are sent to the configured AI provider (OpenAI and/or Replicate). Each provider's privacy policy applies. Do not generate frames containing personal or sensitive information."
+msgstr "هنگام تولید فریم، تصاویر آپلودشده و متن دستور شما به ارائه‌دهنده هوش مصنوعی پیکربندی‌شده (OpenAI و/یا Replicate) ارسال می‌شود. سیاست حریم خصوصی هر ارائه‌دهنده اعمال می‌شود. فریم‌هایی حاوی اطلاعات شخصی یا حساس تولید نکنید."
+
+msgid "OpenAI API Key"
+msgstr "کلید API اوپن‌ای‌آی"
+
+msgid "sk-…"
+msgstr "sk-…"
+
+msgid "Create a key at %s. Used to generate the Start Frame from your prompt (DALL·E 3)."
+msgstr "یک کلید در %s بسازید. برای تولید فریم شروع از دستور شما (DALL·E 3) استفاده می‌شود."
+
+msgid "Replicate API Token"
+msgstr "توکن API رپلیکیت"
+
+msgid "r8_…"
+msgstr "r8_…"
+
+msgid "Create a token at %s. Used to interpolate 24–36 frames from Start → End (FILM model)."
+msgstr "یک توکن در %s بسازید. برای درون‌یابی ۲۴ تا ۳۶ فریم از شروع تا پایان (مدل FILM) استفاده می‌شود."
+
+msgid "Pro Plan"
+msgstr "طرح حرفه‌ای"
+
+msgid "Enable Pro features (AI generation, 15 heroes, 36 frames, 10 content steps)"
+msgstr "فعال‌سازی ویژگی‌های حرفه‌ای (تولید هوش مصنوعی، ۱۵ قهرمان، ۳۶ فریم، ۱۰ مرحله محتوا)"
+
+msgid "Sprint 3 placeholder — will be replaced by verified license-key check in a future release."
+msgstr "جایگاه نگهدار اسپرینت ۳ — در نسخه آینده با بررسی کلید مجوز تأییدشده جایگزین می‌شود."
+
+msgid "Mobile animation"
+msgstr "انیمیشن موبایل"
+
+msgid "Disable scroll animation on mobile devices (show static last frame instead)"
+msgstr "غیرفعال کردن انیمیشن اسکرول در دستگاه‌های موبایل (به جای آن آخرین فریم ثابت نمایش داده می‌شود)"
+
+msgid "Remove data on uninstall"
+msgstr "حذف داده‌ها هنگام حذف نصب"
+
+msgid "Delete all plugin data (sequences, frames, settings) when the plugin is uninstalled"
+msgstr "حذف تمام داده‌های افزونه (سکانس‌ها، فریم‌ها، تنظیمات) هنگام حذف نصب افزونه"
+
+msgid "StoryBoard Live version %s"
+msgstr "نسخه استوری‌بورد زنده %s"
+
+msgid "Test OpenAI"
+msgstr "تست اوپن‌ای‌آی"
+
+msgid "Test Replicate"
+msgstr "تست رپلیکیت"
+
+msgid "Connected successfully."
+msgstr "با موفقیت متصل شد."
+
+msgid "Connected as @%s."
+msgstr "به عنوان @%s متصل شد."
+
+msgid "Enter a key first."
+msgstr "ابتدا یک کلید وارد کنید."
+
+msgid "Testing…"
+msgstr "در حال آزمایش…"
+
+msgid "Request failed."
+msgstr "درخواست ناموفق بود."
+
+msgid "No API key provided."
+msgstr "کلید API ارائه نشده."
+
+msgid "Nonce verification failed."
+msgstr "تأیید نانس ناموفق بود."
+
+# ── Meta boxes ────────────────────────────────────────────────────────────
+
+msgid "Golden Master image"
+msgstr "تصویر پایانی"
+
+msgid "Upload one confirmed Golden Master (the final frame). The plugin applies the Production Sheet motion, overlays, header reveal and golden handoff to this single image."
+msgstr "یک تصویر پایانی تأییدشده (آخرین فریم) آپلود کنید. افزونه حرکت Production Sheet، رویه‌ها، نمایش هدر و انتقال طلایی را روی این تصویر اعمال می‌کند."
+
+msgid "Desktop Golden Master (confirm first)"
+msgstr "تصویر پایانی دسکتاپ (اول تأیید کنید)"
+
+msgid "Tablet Golden Master"
+msgstr "تصویر پایانی تبلت"
+
+msgid "Mobile Golden Master"
+msgstr "تصویر پایانی موبایل"
+
+msgid "Confirm the desktop Golden Master first. The same structure is then applied here."
+msgstr "ابتدا تصویر پایانی دسکتاپ را تأیید کنید. سپس همان ساختار اینجا اعمال می‌شود."
 
 msgid "Story Structure"
 msgstr "ساختار داستان"
 
 msgid "This sequence does not have a template structure yet. Create one from Ready Templates to start from a complete production sheet."
-msgstr "این سکانس هنوز ساختار قالب ندارد. برای شروع از یک شیت تولید کامل، آن را از بخش قالب‌های آماده بسازید."
+msgstr "این سکانس هنوز ساختار قالبی ندارد. از قالب‌های آماده یکی بسازید تا از یک Production Sheet کامل شروع کنید."
 
-msgid "This draft is a copy of the selected ready template. Editing these fields changes this Sequence only; the built-in template remains immutable."
-msgstr "این پیش‌نویس یک نسخه مستقل از قالب آماده انتخاب‌شده است. ویرایش این فیلدها فقط همین سکانس را تغییر می‌دهد و قالب اصلی دست‌نخورده باقی می‌ماند."
+msgid "Define up to %1$d content overlays (%2$s plan). Each step appears at the scroll %% position you choose."
+msgstr "تا %1$d رویه محتوایی تعریف کنید (طرح %2$s). هر مرحله در موقعیت اسکرول %% که انتخاب می‌کنید نمایش داده می‌شود."
 
-msgid "Production frame contract"
-msgstr "قرارداد فریم‌های تولید"
+msgid "Maximum %d steps reached."
+msgstr "حداکثر %d مرحله رسیده شد."
 
-msgid "Total frames"
-msgstr "تعداد کل فریم‌ها"
+msgid "Upgrade to Pro for 10 steps."
+msgstr "ارتقا به حرفه‌ای برای ۱۰ مرحله."
 
-msgid "Master reference frame"
-msgstr "فریم مرجع اصلی"
+msgid "Select up to %d images from the Media Library to form the scroll sequence. Free plan — no AI generation."
+msgstr "تا %d تصویر از کتابخانه رسانه انتخاب کنید تا سکانس اسکرول تشکیل شود. طرح رایگان — بدون تولید هوش مصنوعی."
 
-msgid "Golden handoff frame"
-msgstr "فریم تحویل طلایی"
+msgid "Upload your End Frame, enter a prompt, and click Generate to let AI build the frame sequence. Or upload frames manually below."
+msgstr "فریم پایانی را آپلود کنید، یک دستور وارد کنید و روی تولید کلیک کنید تا هوش مصنوعی سکانس فریم بسازد. یا فریم‌ها را به صورت دستی آپلود کنید."
 
-msgid "Title"
-msgstr "عنوان"
+msgid "AI Generation (Pro)"
+msgstr "تولید هوش مصنوعی (حرفه‌ای)"
 
-msgid "Start"
-msgstr "شروع"
+msgid "Prompt (describe the starting frame)"
+msgstr "دستور (فریم شروع را توصیف کنید)"
 
-msgid "End"
-msgstr "پایان"
+msgid "e.g. Camera far away, product tiny in the centre of a clean white studio, soft shadows..."
+msgstr "مثلاً: دوربین از دور، محصول کوچک در مرکز استودیوی سفید تمیز، سایه‌های ملایم..."
 
-msgid "12-beat scroll timeline"
-msgstr "خط زمانی ۱۲ ضرب‌آهنگ اسکرول"
+msgid "AI generation will be available in the next sprint. Your prompt is saved for when the feature launches."
+msgstr "تولید هوش مصنوعی در اسپرینت بعدی در دسترس خواهد بود. دستور شما برای زمان راه‌اندازی ویژگی ذخیره می‌شود."
 
-msgid "Beat"
-msgstr "ضرب‌آهنگ"
+msgid "Frame sequence (%1$d / %2$d)"
+msgstr "سکانس فریم (%1$d از %2$d)"
 
-msgid "Scroll %"
-msgstr "درصد اسکرول"
+msgid "+ Add Frames"
+msgstr "+ افزودن فریم‌ها"
 
-msgid "Scene"
-msgstr "صحنه"
+msgid "Remove frame"
+msgstr "حذف فریم"
 
-msgid "Reference keyframes"
-msgstr "کی‌فریم‌های مرجع"
+msgid "Add Frames from Media Library"
+msgstr "افزودن فریم از کتابخانه رسانه"
 
-msgid "Theme header and golden handoff"
-msgstr "هدر قالب و تحویل طلایی"
+# ── Shortcode / Frontend ──────────────────────────────────────────────────
 
-msgid "Header reveal starts"
-msgstr "شروع نمایش هدر"
+msgid "%s — scroll animation"
+msgstr "%s — انیمیشن اسکرول"
 
-msgid "Header becomes interactive"
-msgstr "فعال‌شدن هدر"
+msgid "StoryBoard Live — demo frames not found"
+msgstr "استوری‌بورد زنده — فریم‌های دمو یافت نشد"
 
-msgid "Header reveal completes"
-msgstr "تکمیل نمایش هدر"
+msgid "The [storyboard_live_demo] shortcode requires demo frame images that are not included in the plugin package. Use [storyboard_live id=\"YOUR_ID\"] to embed your own published sequence instead."
+msgstr "شورت‌کد [storyboard_live_demo] به تصاویر فریم دمو نیاز دارد که در بسته افزونه گنجانده نشده. به جای آن از [storyboard_live id=\"YOUR_ID\"] برای جاسازی سکانس منتشرشده خود استفاده کنید."
 
-msgid "Handoff frame"
-msgstr "فریم تحویل"
+msgid "Interactive visual storytelling for the web"
+msgstr "داستان‌سرایی بصری تعاملی برای وب"
 
-msgid "Ready template copied. You can now edit this sequence structure without changing the original template."
-msgstr "قالب آماده کپی شد. اکنون می‌توانید ساختار این سکانس را بدون تغییر قالب اصلی ویرایش کنید."
+msgid "Bring your story to life with every scroll"
+msgstr "داستان خود را با هر اسکرول زنده کنید"
 
-msgid "Start from a complete production sheet"
-msgstr "از یک شیت تولید کامل شروع کنید"
+msgid "Embed your own sequence with [storyboard_live id=\"YOUR_ID\"]."
+msgstr "سکانس خود را با [storyboard_live id=\"YOUR_ID\"] جاسازی کنید."
 
-msgid "Choose a built-in structure, copy it into a new draft, and edit its scenes, beats, keyframes, real theme-header reveal, and golden handoff."
-msgstr "یک ساختار آماده را انتخاب کنید، آن را در یک پیش‌نویس جدید کپی کنید و صحنه‌ها، ضرب‌آهنگ‌ها، کی‌فریم‌ها، نمایش هدر واقعی قالب و تحویل طلایی را ویرایش کنید."
+msgid "StoryBoard Live demo"
+msgstr "دمو استوری‌بورد زنده"
 
-msgid "Browse Ready Templates"
-msgstr "مشاهده قالب‌های آماده"
+# ── Preview ───────────────────────────────────────────────────────────────
+
+msgid "Preview — %s"
+msgstr "پیش‌نمایش — %s"
+
+msgid "Preview link has expired. Go back and generate a fresh preview."
+msgstr "لینک پیش‌نمایش منقضی شده. برگردید و پیش‌نمایش جدید بگیرید."
+
+msgid "Preview not available."
+msgstr "پیش‌نمایش در دسترس نیست."
+
+msgid "Edit: %s"
+msgstr "ویرایش: %s"
+
+msgid "Preview in new tab"
+msgstr "پیش‌نمایش در تب جدید"
+
+msgid "(Untitled)"
+msgstr "(بی‌عنوان)"
+
+# ── Duplicator ────────────────────────────────────────────────────────────
+
+msgid "Duplicate"
+msgstr "کپی کردن"
+
+msgid "%s — Copy"
+msgstr "%s — کپی"
+
+msgid "You do not have permission to duplicate sequences."
+msgstr "اجازه کپی کردن سکانس‌ها را ندارید."
+
+msgid "The duplicate request could not be verified."
+msgstr "درخواست کپی قابل تأیید نبود."
+
+msgid "Sequence not found."
+msgstr "سکانس یافت نشد."
+
+msgid "You do not have permission to duplicate this sequence."
+msgstr "اجازه کپی کردن این سکانس را ندارید."
+
+# ── Post type labels ──────────────────────────────────────────────────────
+
+msgid "Sequence"
+msgstr "سکانس"
+
+msgid "Add New"
+msgstr "افزودن جدید"
+
+msgid "Add New Sequence"
+msgstr "افزودن سکانس جدید"
+
+msgid "New Sequence"
+msgstr "سکانس جدید"
+
+msgid "Edit Sequence"
+msgstr "ویرایش سکانس"
+
+msgid "View Sequence"
+msgstr "مشاهده سکانس"
+
+msgid "All Items"
+msgstr "همه موارد"
+
+msgid "Search Sequences"
+msgstr "جستجوی سکانس‌ها"
+
+msgid "No sequences found."
+msgstr "سکانسی یافت نشد."
+
+msgid "No sequences found in Trash."
+msgstr "سکانسی در سطل زباله یافت نشد."
+
+msgid "Sequence published."
+msgstr "سکانس منتشر شد."
+
+msgid "Sequence updated."
+msgstr "سکانس به‌روزرسانی شد."
+
+msgid "Sequence reverted to draft."
+msgstr "سکانس به پیش‌نویس برگردانده شد."
+
+msgid "Sequence Revisions"
+msgstr "بازبینی‌های سکانس"
+
+# ── Admin bar ─────────────────────────────────────────────────────────────
+
+msgid "You do not have permission to access this page."
+msgstr "اجازه دسترسی به این صفحه را ندارید."
+
+msgid "You have reached the %1$d-hero limit on the Free plan. Upgrade to Pro for up to %2$d heroes."
+msgstr "به محدودیت %1$d قهرمان در طرح رایگان رسیده‌اید. برای تا %2$d قهرمان به طرح حرفه‌ای ارتقا دهید."
+
+msgid "StoryBoard Live requires PHP %1$s or later. Your server is running PHP %2$s."
+msgstr "استوری‌بورد زنده به PHP %1$s یا جدیدتر نیاز دارد. سرور شما PHP %2$s را اجرا می‌کند."
+
+msgid "StoryBoard Live requires WordPress %1$s or later. You are running %2$s."
+msgstr "استوری‌بورد زنده به WordPress %1$s یا جدیدتر نیاز دارد. شما %2$s را اجرا می‌کنید."
+
+msgid "Plugin Activation Error"
+msgstr "خطای فعال‌سازی افزونه"
+
+msgid "StoryBoard Live — Golden Master"
+msgstr "استوری‌بورد زنده — تصویر پایانی"
+
+msgid "%s: Using desktop Golden Master as fallback for: %s. Upload and confirm variant-specific images for the best result on those screen sizes."
+msgstr "%s: استفاده از تصویر پایانی دسکتاپ به عنوان جایگزین برای: %s. برای بهترین نتیجه در آن سایزهای صفحه، تصاویر مخصوص نوع را آپلود و تأیید کنید."
+
+# ── License / quota ───────────────────────────────────────────────────────
+
+msgid "OpenAI API key is not configured. Go to StoryBoard Live → Settings to add it."
+msgstr "کلید API اوپن‌ای‌آی پیکربندی نشده. برای افزودن به استوری‌بورد زنده → تنظیمات بروید."
+
+msgid "Replicate API token is not configured. Go to StoryBoard Live → Settings to add it."
+msgstr "توکن API رپلیکیت پیکربندی نشده. برای افزودن به استوری‌بورد زنده → تنظیمات بروید."
+
+msgid "Action Scheduler is not available. Please install WooCommerce or the Action Scheduler plugin."
+msgstr "Action Scheduler در دسترس نیست. لطفاً WooCommerce یا افزونه Action Scheduler را نصب کنید."
+
+msgid "Prompt cannot be empty."
+msgstr "دستور نمی‌تواند خالی باشد."
+
+msgid "AI prompt is empty."
+msgstr "دستور هوش مصنوعی خالی است."
+
+msgid "End Frame (Golden Master) not found."
+msgstr "فریم پایانی (تصویر پایانی) یافت نشد."
+
+# ── Frame generation status ───────────────────────────────────────────────
+
+msgid "Ready"
+msgstr "آماده"
+
+msgid "Queued…"
+msgstr "در صف…"
+
+msgid "Generating start frame…"
+msgstr "در حال تولید فریم شروع…"
+
+msgid "Interpolating frames…"
+msgstr "در حال درون‌یابی فریم‌ها…"
+
+msgid "Saving frames…"
+msgstr "در حال ذخیره فریم‌ها…"
+
+msgid "Done — frames ready!"
+msgstr "تمام — فریم‌ها آماده!"
+
+msgid "Failed"
+msgstr "ناموفق"
+
+# ── Plugin links ──────────────────────────────────────────────────────────
+
+msgid "Activate per site — network activation not supported."
+msgstr "فعال‌سازی به ازای هر سایت — فعال‌سازی شبکه‌ای پشتیبانی نمی‌شود."
+
+# ── Validation ────────────────────────────────────────────────────────────
+
+msgid "Golden Master%1$s: unsupported file type \"%2$s\". Allowed types: %3$s."
+msgstr "تصویر پایانی%1$s: نوع فایل «%2$s» پشتیبانی نمی‌شود. انواع مجاز: %3$s."
+
+msgid "Golden Master%1$s: file size %2$s exceeds the %3$s limit. Optimise the image before uploading."
+msgstr "تصویر پایانی%1$s: حجم فایل %2$s از محدودیت %3$s بیشتر است. قبل از آپلود تصویر را بهینه کنید."
+
+msgid "Golden Master%1$s: dimensions %2$s exceed the maximum of %3$spx on either side. Resize the image before uploading."
+msgstr "تصویر پایانی%1$s: ابعاد %2$s از حداکثر %3$s پیکسل در هر طرف بیشتر است. قبل از آپلود تصویر را تغییر اندازه دهید."
+
+# ── Misc ──────────────────────────────────────────────────────────────────
+
+msgid "Version %s"
+msgstr "نسخه %s"
+
+msgid "Created by %s"
+msgstr "ساخته‌شده توسط %s"
+
+msgid "Build your next visual story"
+msgstr "داستان بصری بعدی خود را بسازید"
+
+msgid "Create a private sequence entity now; the interactive editor arrives in a later milestone."
+msgstr "همین حالا یک سکانس بسازید؛ ویرایشگر تعاملی در مرحله بعدی می‌آید."
+
+msgid "Create Sequence"
+msgstr "ایجاد سکانس"
