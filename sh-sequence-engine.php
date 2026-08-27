@@ -24,20 +24,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // ── Plugin constants ──────────────────────────────────────────────────────
 
-define( 'SHSEQ_VERSION', '1.0.0' );
-define( 'SHSEQ_FILE',    __FILE__ );
-define( 'SHSEQ_DIR',     plugin_dir_path( __FILE__ ) );
-define( 'SHSEQ_URL',     plugin_dir_url( __FILE__ ) );
-define( 'SHSEQ_SLUG',    'sh-sequence-engine' );
+define( 'SHSEQ_VERSION',        '1.0.0' );
+define( 'SHSEQ_FILE',           __FILE__ );
+define( 'SHSEQ_DIR',            plugin_dir_path( __FILE__ ) );
+define( 'SHSEQ_URL',            plugin_dir_url( __FILE__ ) );
+define( 'SHSEQ_SLUG',           'sh-sequence-engine' );
+// BUG-01 FIX: SHSEQ_BASENAME was never defined — used by I18n and PluginLinks.
+define( 'SHSEQ_BASENAME',       plugin_basename( __FILE__ ) );
+// BUG-02 FIX: SHSEQ_SCHEMA_VERSION was never defined — used by SchemaManager.
+define( 'SHSEQ_SCHEMA_VERSION', 1 );
 
 // ── Autoloader ────────────────────────────────────────────────────────────
 
-// Try Composer autoloader first (production build with vendor/).
 $composer_autoload = SHSEQ_DIR . 'vendor/autoload.php';
 if ( file_exists( $composer_autoload ) ) {
 	require_once $composer_autoload;
 } else {
-	// Fallback PSR-4 loader for development / WP.org zip (no vendor/).
+	// PSR-4 fallback for development / WP.org zip.
 	spl_autoload_register(
 		static function ( $class ) {
 			$prefix = 'ShahreHonar\\SequenceEngine\\';
