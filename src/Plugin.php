@@ -1,17 +1,4 @@
 <?php
-/**
- * Main plugin composition root.
- *
- * BUG-03 FIX: Removed erroneous `new GoldenMasterValidation()` and
- * `$golden_validation->register_hooks()` calls. GoldenMasterValidation is
- * a static utility class — its methods are called directly from
- * GoldenMasterMetaBox, no instantiation or hook registration needed.
- *
- * BUG-10 FIX: Removed unused `use GoldenMasterValidation` import.
- *
- * @package StoryBoardLive
- */
-
 namespace ShahreHonar\SequenceEngine;
 
 use ShahreHonar\SequenceEngine\Admin\AdminAssets;
@@ -26,6 +13,7 @@ use ShahreHonar\SequenceEngine\Admin\PluginLinks;
 use ShahreHonar\SequenceEngine\Admin\SequenceDuplicator;
 use ShahreHonar\SequenceEngine\Admin\SequencePreview;
 use ShahreHonar\SequenceEngine\Admin\SequenceStructureMetaBox;
+use ShahreHonar\SequenceEngine\Admin\SequenceWizard;
 use ShahreHonar\SequenceEngine\Admin\SettingsPage;
 use ShahreHonar\SequenceEngine\Admin\TemplatesPage;
 use ShahreHonar\SequenceEngine\AI\OpenAIProvider;
@@ -43,39 +31,31 @@ use ShahreHonar\SequenceEngine\Jobs\FrameGenerationJob;
 use ShahreHonar\SequenceEngine\License\LicenseManager;
 use ShahreHonar\SequenceEngine\Templates\TemplateCatalog;
 
-/**
- * Wires plugin services together.
- */
 final class Plugin {
 
 	public function boot() {
 
 		// ── Core ─────────────────────────────────────────────────────────
-
 		( new I18n() )->register_hooks();
 		( new SchemaManager() )->register_hooks();
 		( new SequencePostType() )->register_hooks();
 		( new RevisionPostType() )->register_hooks();
 
 		// ── AI pipeline ───────────────────────────────────────────────────
-
 		$openai    = new OpenAIProvider();
 		$replicate = new ReplicateProvider();
 		( new FrameGenerationJob( $openai, $replicate ) )->register_hooks();
 
 		// ── Frontend ──────────────────────────────────────────────────────
-
 		$frame_assets    = new FrameSequenceAssets();
 		$frame_manifest  = new FrameSequenceManifest();
 		$frame_shortcode = new FrameSequenceShortcode( $frame_manifest, $frame_assets );
-
 		$frame_assets->register_hooks();
 		$frame_shortcode->register_hooks();
 		( new FrameSequenceBlock( $frame_shortcode ) )->register_hooks();
 		( new DemoPlaceholder() )->register_hooks();
 
 		// ── Admin only ───────────────────────────────────────────────────
-
 		if ( ! is_admin() ) {
 			return;
 		}
@@ -83,13 +63,21 @@ final class Plugin {
 		$template_catalog = new TemplateCatalog();
 		$dashboard_page   = new DashboardPage();
 		$templates_page   = new TemplatesPage( $template_catalog );
+		$sequence_wizard  = new SequenceWizard( $template_catalog );
 
+		// Wizard (new step-by-step creator — primary creation path)
+		$sequence_wizard->register_hooks();
+
+		// Admin menu — uses updated dashboard + templates pages
+		( new AdminMenu( $dashboard_page, $templates_page ) )->register_hooks();
+
+		// Meta boxes (still needed for full editor fallback)
 		( new SequenceStructureMetaBox() )->register_hooks();
 		( new GoldenMasterMetaBox() )->register_hooks();
-		( new ContentStepsMetaBox() )->register_hooks();
+		( new ContentStepsMetaBox() )->register_hooks();  // BUG-printf fixed version
 		( new FrameUploadMetaBox() )->register_hooks();
-		// NOTE: GoldenMasterValidation is static — no hook registration.
-		( new AdminMenu( $dashboard_page, $templates_page ) )->register_hooks();
+		// GoldenMasterValidation is static — no registration needed
+
 		( new AdminAssets() )->register_hooks();
 		( new AdminBar() )->register_hooks();
 		( new PluginLinks() )->register_hooks();
@@ -103,36 +91,28 @@ final class Plugin {
 	}
 
 	private function register_quota_gate() {
-		add_action(
-			'admin_notices',
-			static function () {
-				if ( LicenseManager::can_create_hero() ) {
-					return;
-				}
-				$screen = get_current_screen();
-				if ( ! $screen || 'edit-shseq_sequence' !== $screen->id ) {
-					return;
-				}
-				printf(
-					'<div class="notice notice-warning"><p>%s</p></div>',
-					esc_html( LicenseManager::upgrade_notice() )
-				);
+		add_action( 'admin_notices', static function () {
+			if ( LicenseManager::can_create_hero() ) {
+				return;
 			}
-		);
+			$screen = get_current_screen();
+			if ( ! $screen || 'edit-shseq_sequence' !== $screen->id ) {
+				return;
+			}
+			printf(
+				'<div class="notice notice-warning"><p>%s</p></div>',
+				esc_html( LicenseManager::upgrade_notice() )
+			);
+		} );
 
-		add_filter(
-			'user_has_cap',
-			static function ( $allcaps, $caps, $args ) {
-				if ( ! in_array( 'create_shseq_sequences', (array) $caps, true ) ) {
-					return $allcaps;
-				}
-				if ( ! LicenseManager::can_create_hero() ) {
-					$allcaps['create_shseq_sequences'] = false;
-				}
+		add_filter( 'user_has_cap', static function ( $allcaps, $caps, $args ) {
+			if ( ! in_array( 'create_shseq_sequences', (array) $caps, true ) ) {
 				return $allcaps;
-			},
-			10,
-			3
-		);
+			}
+			if ( ! LicenseManager::can_create_hero() ) {
+				$allcaps['create_shseq_sequences'] = false;
+			}
+			return $allcaps;
+		}, 10, 3 );
 	}
 }
