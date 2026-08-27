@@ -1,49 +1,46 @@
 <?php
-/**
- * WizardMode — تعریف سه حالت ساخت سکانس
- *
- * Pure PHP enum — بدون هیچ import وردپرسی
- *
- * @package ShahreHonar\SequenceEngine\SequenceWizard\Domain
- */
-
 declare(strict_types=1);
 
 namespace ShahreHonar\SequenceEngine\SequenceWizard\Domain;
 
 /**
- * سه حالت ساخت سکانس:
- *
- * GOLDEN_MASTER  → ادمین PNG آپلود می‌کند؛ Vision API متن‌ها را استخراج می‌کند؛
- *                  GD inpainter متن‌ها را پاک می‌کند؛ overlay editor روی canvas.
- *
- * FRAME_UPLOAD   → ادمین فریم‌های WebP/JPEG را یک‌به‌یک آپلود می‌کند.
- *
- * AI_GENERATE    → ادمین prompt می‌نویسد؛ OpenAI + Replicate فریم‌ها را می‌سازند.
+ * WizardMode — سه حالت ورودی برای ساخت سکانس
  */
 enum WizardMode: string
 {
-    case GOLDEN_MASTER = 'golden_master';
-    case FRAME_UPLOAD  = 'frame_upload';
-    case AI_GENERATE   = 'ai_generate';
+    /** آپلود Last Frame PNG/JPG → Vision + Inpaint + Canvas */
+    case LAST_FRAME   = 'last_frame';
 
-    /** label فارسی برای نمایش در UI */
+    /** آپلود مستقیم فریم‌های آماده */
+    case FRAME_UPLOAD = 'frame_upload';
+
+    /** ساخت Last Frame از روی prompt با AI */
+    case AI_GENERATE  = 'ai_generate';
+
     public function label(): string
     {
         return match ($this) {
-            self::GOLDEN_MASTER => 'آپلود Golden Master PNG',
-            self::FRAME_UPLOAD  => 'آپلود فریم‌های آماده',
-            self::AI_GENERATE   => 'ساخت با هوش مصنوعی',
+            self::LAST_FRAME   => 'آپلود Last Frame',
+            self::FRAME_UPLOAD => 'آپلود فریم‌های آماده',
+            self::AI_GENERATE  => 'ساخت با هوش مصنوعی',
         };
     }
 
-    /** آیکون Bootstrap Icons */
-    public function icon(): string
+    /** آیا این حالت نیاز به Canvas Overlay Editor دارد؟ */
+    public function needsCanvasEditor(): bool
     {
         return match ($this) {
-            self::GOLDEN_MASTER => 'bi-image-fill',
-            self::FRAME_UPLOAD  => 'bi-collection-fill',
-            self::AI_GENERATE   => 'bi-stars',
+            self::LAST_FRAME, self::AI_GENERATE => true,
+            self::FRAME_UPLOAD                  => false,
+        };
+    }
+
+    /** آیا این حالت نیاز به Frame Generation دارد؟ */
+    public function needsFrameGeneration(): bool
+    {
+        return match ($this) {
+            self::LAST_FRAME, self::AI_GENERATE => true,
+            self::FRAME_UPLOAD                  => false,
         };
     }
 }
