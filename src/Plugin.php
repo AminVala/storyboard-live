@@ -2,13 +2,9 @@
 /**
  * Main plugin composition root — Sprint 3 update.
  *
- * New in Sprint 3:
- *   - OpenAIProvider     (DALL·E 3 Start Frame generation)
- *   - ReplicateProvider  (FILM/RIFE frame interpolation)
- *   - FrameGenerationJob (Action Scheduler async pipeline)
- *   - SettingsPage       (updated with BYOK API key fields + test buttons)
- *
- * Sprint 1 & 2 services remain wired as before.
+ * Fixed: GoldenMasterValidation is a static utility class — no instantiation
+ * or register_hooks() call needed. Removed the erroneous lines that caused
+ * the Fatal error on boot.
  *
  * @package StoryBoardLive
  */
@@ -23,7 +19,6 @@ use ShahreHonar\SequenceEngine\Admin\DashboardPage;
 use ShahreHonar\SequenceEngine\Admin\FallbackNotice;
 use ShahreHonar\SequenceEngine\Admin\FrameUploadMetaBox;
 use ShahreHonar\SequenceEngine\Admin\GoldenMasterMetaBox;
-use ShahreHonar\SequenceEngine\Admin\GoldenMasterValidation;
 use ShahreHonar\SequenceEngine\Admin\PluginLinks;
 use ShahreHonar\SequenceEngine\Admin\SequenceDuplicator;
 use ShahreHonar\SequenceEngine\Admin\SequencePreview;
@@ -105,9 +100,11 @@ final class Plugin {
 		$golden_box        = new GoldenMasterMetaBox();
 		$content_steps_box = new ContentStepsMetaBox();
 		$frame_upload_box  = new FrameUploadMetaBox();
-		$golden_validation = new GoldenMasterValidation();
+		// NOTE: GoldenMasterValidation is a static utility class.
+		// Its validate() / store_errors() / render_errors() methods are called
+		// directly from GoldenMasterMetaBox — no instantiation needed here.
 		$dashboard_page    = new DashboardPage();
-		$settings_page     = new SettingsPage(); // ← Sprint 3 updated version
+		$settings_page     = new SettingsPage();
 		$admin_menu        = new AdminMenu( $dashboard_page, $templates_page );
 		$admin_assets      = new AdminAssets();
 		$admin_bar         = new AdminBar();
@@ -121,7 +118,6 @@ final class Plugin {
 		$golden_box->register_hooks();
 		$content_steps_box->register_hooks();
 		$frame_upload_box->register_hooks();
-		$golden_validation->register_hooks();
 		$admin_menu->register_hooks();
 		$admin_assets->register_hooks();
 		$admin_bar->register_hooks();
