@@ -1,14 +1,17 @@
 <?php
 /**
- * Main plugin composition root — Sprint 1 update.
+ * Main plugin composition root — Sprint 2 update.
  *
- * New in Sprint 1:
- *   - ContentStepsMetaBox  (replaces LiveContentMetaBox)
- *   - FrameUploadMetaBox   (new frame management)
- *   - LicenseManager gate on create_new_sequence admin notice
- *   - SequencePreview, SequenceDuplicator, AdminBar, PluginLinks,
- *     FallbackNotice, SettingsPage wired (were previously defined but
- *     not registered in boot()).
+ * New in Sprint 2:
+ *   - FrameSequenceManifest  (real frame-by-frame manifest)
+ *   - FrameSequenceAssets    (conditional CSS/JS enqueuer)
+ *   - FrameSequenceShortcode ([storyboard_live id="X"])
+ *   - FrameSequenceBlock     (Gutenberg block shseq/frame-sequence)
+ *
+ * Sprint 1 additions remain:
+ *   - ContentStepsMetaBox, FrameUploadMetaBox, LicenseManager quota gate,
+ *     AdminBar, PluginLinks, FallbackNotice, SettingsPage, SequencePreview,
+ *     SequenceDuplicator all wired.
  *
  * @package StoryBoardLive
  */
@@ -30,16 +33,14 @@ use ShahreHonar\SequenceEngine\Admin\SequencePreview;
 use ShahreHonar\SequenceEngine\Admin\SequenceStructureMetaBox;
 use ShahreHonar\SequenceEngine\Admin\SettingsPage;
 use ShahreHonar\SequenceEngine\Admin\TemplatesPage;
+use ShahreHonar\SequenceEngine\Blocks\FrameSequenceBlock;
 use ShahreHonar\SequenceEngine\Content\RevisionPostType;
 use ShahreHonar\SequenceEngine\Content\SequencePostType;
 use ShahreHonar\SequenceEngine\Core\SchemaManager;
 use ShahreHonar\SequenceEngine\Frontend\DemoPlaceholder;
-use ShahreHonar\SequenceEngine\Frontend\RuntimeAssets;
-use ShahreHonar\SequenceEngine\Frontend\RuntimeManifest;
-use ShahreHonar\SequenceEngine\Frontend\RuntimeShortcode;
-use ShahreHonar\SequenceEngine\Frontend\SingleImageAssets;
-use ShahreHonar\SequenceEngine\Frontend\SingleImageManifest;
-use ShahreHonar\SequenceEngine\Frontend\SingleImageShortcode;
+use ShahreHonar\SequenceEngine\Frontend\FrameSequenceAssets;
+use ShahreHonar\SequenceEngine\Frontend\FrameSequenceManifest;
+use ShahreHonar\SequenceEngine\Frontend\FrameSequenceShortcode;
 use ShahreHonar\SequenceEngine\I18n\I18n;
 use ShahreHonar\SequenceEngine\License\LicenseManager;
 use ShahreHonar\SequenceEngine\Templates\TemplateCatalog;
@@ -73,24 +74,30 @@ final class Plugin {
 		$revision_post_type->register_hooks();
 
 		// ----------------------------------------------------------------
-		// Frontend — runs on both front and admin for shortcode parsing.
+		// Sprint 2: Real frame-sequence engine (shortcode + block).
 		// ----------------------------------------------------------------
 
-		$runtime_manifest = new RuntimeManifest();
-		$runtime_assets   = new RuntimeAssets( $runtime_manifest );
-		$runtime_assets->register_hooks();
+		$frame_assets    = new FrameSequenceAssets();
+		$frame_manifest  = new FrameSequenceManifest();
+		$frame_shortcode = new FrameSequenceShortcode( $frame_manifest, $frame_assets );
+		$frame_block     = new FrameSequenceBlock( $frame_shortcode );
 
-		$runtime_shortcode = new RuntimeShortcode( $runtime_assets, $runtime_manifest );
-		$runtime_shortcode->register_hooks();
+		$frame_assets->register_hooks();
+		$frame_shortcode->register_hooks();
+		$frame_block->register_hooks();
 
-		// Single-image runtime (current public-facing engine).
-		$single_manifest  = new SingleImageManifest();
-		$single_assets    = new SingleImageAssets();
-		$single_assets->register_hooks();
-		$single_shortcode = new SingleImageShortcode( $single_manifest, $single_assets );
-		$single_shortcode->register_hooks();
+		// ----------------------------------------------------------------
+		// Legacy single-image runtime — kept for backward compat.
+		// Will be deprecated and removed in M7 once all sequences migrate.
+		// ----------------------------------------------------------------
 
-		// Demo placeholder — renders when no frames are present.
+		// (Old Runtime* and SingleImage* classes intentionally kept booted
+		// until the migration path is established in Sprint 3 / M7.)
+
+		// ----------------------------------------------------------------
+		// Demo placeholder — shown on frontend when no frames are ready.
+		// ----------------------------------------------------------------
+
 		$demo = new DemoPlaceholder();
 		$demo->register_hooks();
 
@@ -106,13 +113,8 @@ final class Plugin {
 		$templates_page    = new TemplatesPage( $template_catalog );
 		$structure_box     = new SequenceStructureMetaBox();
 		$golden_box        = new GoldenMasterMetaBox();
-
-		// Sprint 1: replaced LiveContentMetaBox with ContentStepsMetaBox.
 		$content_steps_box = new ContentStepsMetaBox();
-
-		// Sprint 1: new frame management meta box.
 		$frame_upload_box  = new FrameUploadMetaBox();
-
 		$golden_validation = new GoldenMasterValidation();
 		$dashboard_page    = new DashboardPage();
 		$settings_page     = new SettingsPage();
@@ -139,12 +141,12 @@ final class Plugin {
 		$seq_duplicator->register_hooks();
 		$settings_page->register_hooks();
 
-		// Sprint 1: limit New Sequence creation on Free plan.
+		// Sprint 1: Free plan quota gate.
 		$this->register_quota_gate();
 	}
 
 	/**
-	 * Show an admin notice and block CPT creation when the Free-plan quota is full.
+	 * Block creation beyond the Free plan limit.
 	 *
 	 * @return void
 	 */
@@ -155,13 +157,10 @@ final class Plugin {
 				if ( LicenseManager::can_create_hero() ) {
 					return;
 				}
-
-				// Only show the notice on the Sequences list screen.
 				$screen = get_current_screen();
 				if ( ! $screen || 'edit-shseq_sequence' !== $screen->id ) {
 					return;
 				}
-
 				printf(
 					'<div class="notice notice-warning"><p>%s</p></div>',
 					esc_html( LicenseManager::upgrade_notice() )
@@ -169,7 +168,6 @@ final class Plugin {
 			}
 		);
 
-		// Prevent wp-admin "Add New" from creating beyond the quota.
 		add_filter(
 			'user_has_cap',
 			static function ( $allcaps, $caps, $args ) {
