@@ -2,19 +2,17 @@
 /**
  * Plugin activation handler.
  *
- * Called once on plugin activation via register_activation_hook().
- * Responsible for:
- *   - Creating / upgrading the DB schema (no custom tables currently,
- *     but reserved for future use).
- *   - Flushing rewrite rules so CPT permalinks work immediately.
- *   - Storing the plugin version to detect future upgrades.
- *   - Checking for the minimum PHP / WP version and deactivating
- *     gracefully if the environment is too old.
+ * BUG-04 FIX: Custom capabilities were never assigned to any role.
+ * All primitive capabilities from SequencePostType::primitive_capabilities()
+ * are now granted to the 'administrator' role on activation, so admins can
+ * access the Sequences menu, create/edit/delete sequences, etc.
  *
  * @package StoryBoardLive
  */
 
 namespace ShahreHonar\SequenceEngine\Core;
+
+use ShahreHonar\SequenceEngine\Content\SequencePostType;
 
 /**
  * Handles plugin activation.
@@ -27,28 +25,23 @@ final class Activator {
 
 	/**
 	 * Run activation tasks.
-	 *
-	 * @return void
 	 */
 	public static function activate() {
-		// Environment check.
 		if ( ! self::check_environment() ) {
-			return; // check_environment() deactivates the plugin and exits.
+			return;
 		}
 
 		// Register CPTs so flush_rewrite_rules picks them up.
-		// We call the registration methods directly rather than relying on
-		// the init hook because activation runs before init fires.
 		self::register_post_types();
 
-		// Flush rewrite rules.
+		// BUG-04 FIX: Assign custom capabilities to admin role.
+		self::assign_capabilities();
+
 		flush_rewrite_rules();
 
-		// Store current plugin version.
 		update_option( self::OPTION_VERSION, SHSEQ_VERSION, false );
 
-		// Action Scheduler availability notice — store a flag; the notice
-		// is displayed by FallbackNotice on the next admin page load.
+		// Warn about missing Action Scheduler.
 		if ( ! function_exists( 'as_enqueue_async_action' ) ) {
 			update_option( 'shseq_as_missing_notice', 1, false );
 		} else {
@@ -57,19 +50,52 @@ final class Activator {
 	}
 
 	/**
+	 * Grant all custom capabilities to administrator role.
+	 *
+	 * Also grants the minimum subset to the 'editor' role so editors can
+	 * create and manage sequences without needing admin access.
+	 */
+	private static function assign_capabilities() {
+		$admin_role  = get_role( 'administrator' );
+		$editor_role = get_role( 'editor' );
+
+		// Full capability set for administrators.
+		$all_caps = SequencePostType::primitive_capabilities();
+		// Also add manage_shseq_settings so PluginLinks shows the Settings link.
+		$all_caps[] = 'manage_shseq_settings';
+
+		if ( $admin_role ) {
+			foreach ( $all_caps as $cap ) {
+				$admin_role->add_cap( $cap );
+			}
+		}
+
+		// Editors get create/edit capabilities but NOT delete or publish.
+		$editor_caps = array(
+			'edit_shseq_sequences',
+			'edit_private_shseq_sequences',
+			'edit_published_shseq_sequences',
+			'create_shseq_sequences',
+			'read_private_shseq_sequences',
+		);
+
+		if ( $editor_role ) {
+			foreach ( $editor_caps as $cap ) {
+				$editor_role->add_cap( $cap );
+			}
+		}
+	}
+
+	/**
 	 * Check PHP and WordPress version requirements.
 	 *
-	 * Deactivates the plugin and shows an admin notice if requirements
-	 * are not met.
-	 *
-	 * @return bool True if requirements are met, false otherwise.
+	 * @return bool
 	 */
 	private static function check_environment() {
 		$errors = array();
 
 		if ( version_compare( PHP_VERSION, self::MIN_PHP, '<' ) ) {
 			$errors[] = sprintf(
-				/* translators: 1: required version, 2: current version. */
 				__( 'StoryBoard Live requires PHP %1$s or later. Your server is running PHP %2$s.', 'sh-sequence-engine' ),
 				self::MIN_PHP,
 				PHP_VERSION
@@ -79,7 +105,6 @@ final class Activator {
 		global $wp_version;
 		if ( version_compare( $wp_version, self::MIN_WP, '<' ) ) {
 			$errors[] = sprintf(
-				/* translators: 1: required version, 2: current version. */
 				__( 'StoryBoard Live requires WordPress %1$s or later. You are running %2$s.', 'sh-sequence-engine' ),
 				self::MIN_WP,
 				$wp_version
@@ -90,7 +115,6 @@ final class Activator {
 			return true;
 		}
 
-		// Deactivate and show error.
 		deactivate_plugins( plugin_basename( SHSEQ_FILE ) );
 
 		wp_die(
@@ -99,13 +123,11 @@ final class Activator {
 			array( 'back_link' => true )
 		);
 
-		return false; // Never reached, but satisfies static analysis.
+		return false;
 	}
 
 	/**
-	 * Register CPTs inline so rewrite rules can be flushed during activation.
-	 *
-	 * @return void
+	 * Register CPTs inline during activation for rewrite rule flushing.
 	 */
 	private static function register_post_types() {
 		if ( ! post_type_exists( 'shseq_sequence' ) ) {
@@ -116,6 +138,8 @@ final class Activator {
 					'has_archive' => false,
 					'rewrite'     => array( 'slug' => 'shseq-sequence' ),
 					'supports'    => array( 'title' ),
+					'capability_type' => array( 'shseq_sequence', 'shseq_sequences' ),
+					'map_meta_cap'    => true,
 				)
 			);
 		}
