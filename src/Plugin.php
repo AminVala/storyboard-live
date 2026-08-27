@@ -1,10 +1,13 @@
 <?php
 /**
- * Main plugin composition root — Sprint 3 update.
+ * Main plugin composition root.
  *
- * Fixed: GoldenMasterValidation is a static utility class — no instantiation
- * or register_hooks() call needed. Removed the erroneous lines that caused
- * the Fatal error on boot.
+ * BUG-03 FIX: Removed erroneous `new GoldenMasterValidation()` and
+ * `$golden_validation->register_hooks()` calls. GoldenMasterValidation is
+ * a static utility class — its methods are called directly from
+ * GoldenMasterMetaBox, no instantiation or hook registration needed.
+ *
+ * BUG-10 FIX: Removed unused `use GoldenMasterValidation` import.
  *
  * @package StoryBoardLive
  */
@@ -45,48 +48,31 @@ use ShahreHonar\SequenceEngine\Templates\TemplateCatalog;
  */
 final class Plugin {
 
-	/**
-	 * Boot plugin services.
-	 *
-	 * @return void
-	 */
 	public function boot() {
 
 		// ── Core ─────────────────────────────────────────────────────────
 
-		$i18n = new I18n();
-		$i18n->register_hooks();
+		( new I18n() )->register_hooks();
+		( new SchemaManager() )->register_hooks();
+		( new SequencePostType() )->register_hooks();
+		( new RevisionPostType() )->register_hooks();
 
-		$schema_manager = new SchemaManager();
-		$schema_manager->register_hooks();
-
-		$sequence_post_type = new SequencePostType();
-		$sequence_post_type->register_hooks();
-
-		$revision_post_type = new RevisionPostType();
-		$revision_post_type->register_hooks();
-
-		// ── Sprint 3: AI pipeline (runs on front + admin for AS callbacks) ─
+		// ── AI pipeline ───────────────────────────────────────────────────
 
 		$openai    = new OpenAIProvider();
 		$replicate = new ReplicateProvider();
-		$gen_job   = new FrameGenerationJob( $openai, $replicate );
-		$gen_job->register_hooks();
+		( new FrameGenerationJob( $openai, $replicate ) )->register_hooks();
 
-		// ── Sprint 2: Frame sequence frontend ────────────────────────────
+		// ── Frontend ──────────────────────────────────────────────────────
 
 		$frame_assets    = new FrameSequenceAssets();
 		$frame_manifest  = new FrameSequenceManifest();
 		$frame_shortcode = new FrameSequenceShortcode( $frame_manifest, $frame_assets );
-		$frame_block     = new FrameSequenceBlock( $frame_shortcode );
 
 		$frame_assets->register_hooks();
 		$frame_shortcode->register_hooks();
-		$frame_block->register_hooks();
-
-		// Demo placeholder.
-		$demo = new DemoPlaceholder();
-		$demo->register_hooks();
+		( new FrameSequenceBlock( $frame_shortcode ) )->register_hooks();
+		( new DemoPlaceholder() )->register_hooks();
 
 		// ── Admin only ───────────────────────────────────────────────────
 
@@ -94,48 +80,28 @@ final class Plugin {
 			return;
 		}
 
-		$template_catalog  = new TemplateCatalog();
-		$templates_page    = new TemplatesPage( $template_catalog );
-		$structure_box     = new SequenceStructureMetaBox();
-		$golden_box        = new GoldenMasterMetaBox();
-		$content_steps_box = new ContentStepsMetaBox();
-		$frame_upload_box  = new FrameUploadMetaBox();
-		// NOTE: GoldenMasterValidation is a static utility class.
-		// Its validate() / store_errors() / render_errors() methods are called
-		// directly from GoldenMasterMetaBox — no instantiation needed here.
-		$dashboard_page    = new DashboardPage();
-		$settings_page     = new SettingsPage();
-		$admin_menu        = new AdminMenu( $dashboard_page, $templates_page );
-		$admin_assets      = new AdminAssets();
-		$admin_bar         = new AdminBar();
-		$plugin_links      = new PluginLinks();
-		$fallback_notice   = new FallbackNotice();
-		$seq_preview       = new SequencePreview();
-		$seq_duplicator    = new SequenceDuplicator();
+		$template_catalog = new TemplateCatalog();
+		$dashboard_page   = new DashboardPage();
+		$templates_page   = new TemplatesPage( $template_catalog );
 
+		( new SequenceStructureMetaBox() )->register_hooks();
+		( new GoldenMasterMetaBox() )->register_hooks();
+		( new ContentStepsMetaBox() )->register_hooks();
+		( new FrameUploadMetaBox() )->register_hooks();
+		// NOTE: GoldenMasterValidation is static — no hook registration.
+		( new AdminMenu( $dashboard_page, $templates_page ) )->register_hooks();
+		( new AdminAssets() )->register_hooks();
+		( new AdminBar() )->register_hooks();
+		( new PluginLinks() )->register_hooks();
+		( new FallbackNotice() )->register_hooks();
+		( new SequencePreview() )->register_hooks();
+		( new SequenceDuplicator() )->register_hooks();
+		( new SettingsPage() )->register_hooks();
 		$templates_page->register_hooks();
-		$structure_box->register_hooks();
-		$golden_box->register_hooks();
-		$content_steps_box->register_hooks();
-		$frame_upload_box->register_hooks();
-		$admin_menu->register_hooks();
-		$admin_assets->register_hooks();
-		$admin_bar->register_hooks();
-		$plugin_links->register_hooks();
-		$fallback_notice->register_hooks();
-		$seq_preview->register_hooks();
-		$seq_duplicator->register_hooks();
-		$settings_page->register_hooks();
 
-		// Free plan quota gate.
 		$this->register_quota_gate();
 	}
 
-	/**
-	 * Block creation beyond the Free plan limit.
-	 *
-	 * @return void
-	 */
 	private function register_quota_gate() {
 		add_action(
 			'admin_notices',
