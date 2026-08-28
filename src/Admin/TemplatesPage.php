@@ -591,7 +591,7 @@ final class TemplatesPage {
 
 		// Go directly to Wizard Step 2 (canvas/overlay editor).
 		wp_safe_redirect( add_query_arg( array(
-			'page'    => 'shseq-new-sequence',
+			'page'    => 'shseq-create',
 			'step'    => 2,
 			'post_id' => $post_id,
 		), admin_url( 'admin.php' ) ) );
@@ -615,7 +615,7 @@ final class TemplatesPage {
 
 	private function wizard_url( string $template_id, int $step ): string {
 		return add_query_arg( array_filter( array(
-			'page'        => 'shseq-new-sequence',
+			'page'        => 'shseq-create',
 			'step'        => $step,
 			'template_id' => $template_id ?: null,
 		) ), admin_url( 'admin.php' ) );
