@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin navigation.
+ * Admin navigation — updated to add "All Sequences" page.
  *
  * @package StoryBoardLive
  */
@@ -14,46 +14,31 @@ final class AdminMenu {
 
 	const MENU_SLUG = 'shseq-dashboard';
 
-	/**
-	 * Dashboard renderer.
-	 *
-	 * @var DashboardPage
-	 */
+	/** @var DashboardPage */
 	private $dashboard_page;
 
-	/**
-	 * Ready templates renderer.
-	 *
-	 * @var TemplatesPage
-	 */
+	/** @var TemplatesPage */
 	private $templates_page;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param DashboardPage $dashboard_page Dashboard page renderer.
-	 * @param TemplatesPage $templates_page Ready templates renderer.
-	 */
-	public function __construct( DashboardPage $dashboard_page, TemplatesPage $templates_page ) {
-		$this->dashboard_page = $dashboard_page;
-		$this->templates_page = $templates_page;
+	/** @var AllSequencesPage */
+	private $all_sequences_page;
+
+	public function __construct(
+		DashboardPage $dashboard_page,
+		TemplatesPage $templates_page,
+		AllSequencesPage $all_sequences_page
+	) {
+		$this->dashboard_page     = $dashboard_page;
+		$this->templates_page     = $templates_page;
+		$this->all_sequences_page = $all_sequences_page;
 	}
 
-	/**
-	 * Register hooks.
-	 *
-	 * @return void
-	 */
-	public function register_hooks() {
+	public function register_hooks(): void {
 		add_action( 'admin_menu', array( $this, 'register' ), 9 );
 	}
 
-	/**
-	 * Register top-level dashboard and first submenu label.
-	 *
-	 * @return void
-	 */
-	public function register() {
+	public function register(): void {
+		// Top-level
 		add_menu_page(
 			__( 'استوری برد زنده | StoryBoard Live', 'sh-sequence-engine' ),
 			__( 'StoryBoard Live', 'sh-sequence-engine' ),
@@ -64,18 +49,30 @@ final class AdminMenu {
 			58
 		);
 
+		// Dashboard
 		add_submenu_page(
 			self::MENU_SLUG,
-			__( 'استوری برد زنده | StoryBoard Live Dashboard', 'sh-sequence-engine' ),
+			__( 'Dashboard — StoryBoard Live', 'sh-sequence-engine' ),
 			__( 'Dashboard', 'sh-sequence-engine' ),
 			'edit_shseq_sequences',
 			self::MENU_SLUG,
 			array( $this->dashboard_page, 'render' )
 		);
 
+		// All Sequences (custom page)
 		add_submenu_page(
 			self::MENU_SLUG,
-			__( 'Ready Templates', 'sh-sequence-engine' ),
+			__( 'All Sequences — StoryBoard Live', 'sh-sequence-engine' ),
+			__( 'All Sequences', 'sh-sequence-engine' ),
+			'edit_shseq_sequences',
+			AllSequencesPage::PAGE_SLUG,
+			array( $this->all_sequences_page, 'render' )
+		);
+
+		// Ready Templates
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Ready Templates — StoryBoard Live', 'sh-sequence-engine' ),
 			__( 'Ready Templates', 'sh-sequence-engine' ),
 			'edit_shseq_sequences',
 			TemplatesPage::PAGE_SLUG,
