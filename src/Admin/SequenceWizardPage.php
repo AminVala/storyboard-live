@@ -140,6 +140,7 @@ final class SequenceWizardPage {
 			'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
 			'isPro'        => LicenseManager::is_pro(),
 			'postId'       => $post_id,
+			'preselectedTemplate' => sanitize_key( isset( $_GET['template_id'] ) ? $_GET['template_id'] : '' ),
 			'currentStep'  => $post_id ? (int) get_post_meta( $post_id, self::META_STEP, true ) : 1,
 			'restUrl'      => get_rest_url( null, 'shseq/v1' ),
 			'restNonce'    => wp_create_nonce( 'wp_rest' ),
@@ -340,7 +341,7 @@ final class SequenceWizardPage {
 						</button>
 					</div>
 
-					<input type="hidden" id="shseq-selected-template" value="blank">
+					<input type="hidden" id="shseq-selected-template" value="<?php echo esc_attr( isset( $_GET['template_id'] ) && $_GET['template_id'] ? sanitize_key( $_GET['template_id'] ) : 'blank' ); ?>">
 					<input type="hidden" id="shseq-post-id" value="<?php echo (int) $post_id; ?>">
 				</section>
 
