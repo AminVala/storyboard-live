@@ -70,7 +70,7 @@ final class DashboardPage {
 		$show_env = ( $env !== 'production' );
 
 		// ── URLs ──────────────────────────────────────────────────────
-		$create_url  = admin_url( 'admin.php?page=' . SequenceWizard::PAGE_SLUG );
+		$create_url  = admin_url( 'admin.php?page=' . SequenceWizardPage::PAGE_SLUG );
 		$all_url     = admin_url( 'edit.php?post_type=' . SequencePostType::POST_TYPE );
 		$settings_url = admin_url( 'admin.php?page=shseq-settings' );
 
@@ -205,7 +205,7 @@ final class DashboardPage {
 										<?php foreach ( $recent as $seq ) :
 											$frame_count  = FrameManager::count( $seq->ID );
 											$has_frames   = $frame_count > 0;
-											$wizard_url   = add_query_arg( [ 'page' => SequenceWizard::PAGE_SLUG, 'id' => $seq->ID, 'step' => 1 ], admin_url( 'admin.php' ) );
+											$wizard_url   = add_query_arg( [ 'page' => SequenceWizardPage::PAGE_SLUG, 'id' => $seq->ID, 'step' => 1 ], admin_url( 'admin.php' ) );
 											$preview_url  = SequencePreview::preview_url( $seq->ID );
 											$status_obj   = get_post_status_object( $seq->post_status );
 											$shortcode    = '[storyboard_live id="' . (int) $seq->ID . '"]';
