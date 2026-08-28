@@ -37,7 +37,7 @@ use ShahreHonar\SequenceEngine\Templates\TemplateCatalog;
 final class SequenceWizardPage {
 
 	// ── Constants ─────────────────────────────────────────────────────────
-	const PAGE_SLUG = 'shseq-new-sequence';
+	const PAGE_SLUG = 'shseq-create';
 
 	// Meta keys (canonical — همان‌طور که در معماری تعریف شد)
 	const META_STEP         = '_shseq_wizard_step';
