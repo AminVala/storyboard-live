@@ -1,6 +1,9 @@
 <?php
 /**
- * Admin navigation — updated to add "All Sequences" page.
+ * Admin navigation — updated for all sections (Dashboard, All Sequences, Ready Templates).
+ *
+ * Settings and New Sequence Wizard register their own submenus
+ * via their own register_hooks() methods.
  *
  * @package StoryBoardLive
  */
@@ -8,7 +11,7 @@
 namespace ShahreHonar\SequenceEngine\Admin;
 
 /**
- * Registers the plugin top-level menu before CPT submenus are attached.
+ * Registers the plugin top-level menu and the three main submenus.
  */
 final class AdminMenu {
 
@@ -38,7 +41,7 @@ final class AdminMenu {
 	}
 
 	public function register(): void {
-		// Top-level
+		// Top-level menu
 		add_menu_page(
 			__( 'استوری برد زنده | StoryBoard Live', 'sh-sequence-engine' ),
 			__( 'StoryBoard Live', 'sh-sequence-engine' ),
@@ -49,7 +52,7 @@ final class AdminMenu {
 			58
 		);
 
-		// Dashboard
+		// 1 — Dashboard (same slug as parent to avoid double top entry)
 		add_submenu_page(
 			self::MENU_SLUG,
 			__( 'Dashboard — StoryBoard Live', 'sh-sequence-engine' ),
@@ -59,7 +62,7 @@ final class AdminMenu {
 			array( $this->dashboard_page, 'render' )
 		);
 
-		// All Sequences (custom page)
+		// 2 — All Sequences
 		add_submenu_page(
 			self::MENU_SLUG,
 			__( 'All Sequences — StoryBoard Live', 'sh-sequence-engine' ),
@@ -69,7 +72,7 @@ final class AdminMenu {
 			array( $this->all_sequences_page, 'render' )
 		);
 
-		// Ready Templates
+		// 3 — Ready Templates
 		add_submenu_page(
 			self::MENU_SLUG,
 			__( 'Ready Templates — StoryBoard Live', 'sh-sequence-engine' ),
@@ -78,5 +81,8 @@ final class AdminMenu {
 			TemplatesPage::PAGE_SLUG,
 			array( $this->templates_page, 'render' )
 		);
+
+		// NOTE: "New Sequence" (SequenceWizardPage) and "Settings" (SettingsPage)
+		// register their own submenus via their own register_hooks() → admin_menu actions.
 	}
 }
