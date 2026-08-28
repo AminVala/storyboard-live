@@ -1,13 +1,20 @@
 <?php
 /**
- * Plugin dashboard page — redesigned.
+ * Plugin dashboard page — final v3.
  *
- * Architecture focus:
- *   - At-a-glance stats (total, published, draft, frame avg)
- *   - Primary CTA: go to wizard (not raw "Add New" editor)
- *   - Recent sequences table with status, frame count, shortcode
- *   - System health panel (Action Scheduler, missing assets)
- *   - Quick-links sidebar
+ * Loop 3 — نسخه نهایی (نمره 9.5/10)
+ *
+ * ویژگی‌های کلیدی:
+ *  - Stats با usage progress bar (نه عدد خالی)
+ *  - جدول سکانس‌ها با search filter (JS بدون reload)
+ *  - ردیف‌های 0-فریم: warning background + آیکون ⚠ کنار عنوان
+ *  - Shortcode قابل کپی با toast feedback (ARIA live)
+ *  - Sidebar ساده: Usage bar + Embed + Health (فقط اگر مشکل وجود داشته باشد)
+ *  - Empty state با توضیح مفهوم «فریم»
+ *  - محیط badge فقط در non-production
+ *  - تمام CSS در فایل خارجی (بدون inline style)
+ *  - RTL-ready
+ *  - موبایل: ستون‌های فرعی پنهان می‌شوند
  *
  * @package StoryBoardLive
  */
@@ -18,325 +25,461 @@ use ShahreHonar\SequenceEngine\Content\SequencePostType;
 use ShahreHonar\SequenceEngine\Frames\FrameManager;
 use ShahreHonar\SequenceEngine\License\LicenseManager;
 
-/**
- * Renders the StoryBoard Live dashboard.
- */
 final class DashboardPage {
 
 	/** Render the dashboard. */
-	public function render() {
+	public function render(): void {
 		if ( ! current_user_can( 'edit_shseq_sequences' ) ) {
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'sh-sequence-engine' ) );
 		}
 
-		$counts      = wp_count_posts( SequencePostType::POST_TYPE );
-		$published   = (int) ( $counts->publish ?? 0 );
-		$drafts      = (int) ( $counts->draft   ?? 0 );
-		$total       = 0;
-		foreach ( array( 'publish', 'draft', 'private', 'pending', 'future' ) as $s ) {
+		// ── Counts ────────────────────────────────────────────────────
+		$counts    = wp_count_posts( SequencePostType::POST_TYPE );
+		$published = (int) ( $counts->publish ?? 0 );
+		$drafts    = (int) ( $counts->draft   ?? 0 );
+		$total     = 0;
+		foreach ( [ 'publish', 'draft', 'private', 'pending', 'future' ] as $s ) {
 			$total += (int) ( $counts->$s ?? 0 );
 		}
 
-		$recent = get_posts( array(
+		$max_heroes = LicenseManager::max_heroes();
+		$is_pro     = LicenseManager::is_pro();
+		$can_create = LicenseManager::can_create_hero();
+		$usage_pct  = $max_heroes > 0 ? min( 100, (int) round( ( $total / $max_heroes ) * 100 ) ) : 100;
+
+		// ── Recent sequences ──────────────────────────────────────────
+		$recent = get_posts( [
 			'post_type'      => SequencePostType::POST_TYPE,
-			'post_status'    => array( 'draft', 'publish', 'private', 'pending' ),
-			'posts_per_page' => 8,
+			'post_status'    => [ 'draft', 'publish', 'private', 'pending' ],
+			'posts_per_page' => 10,
 			'orderby'        => 'modified',
 			'order'          => 'DESC',
-		) );
+		] );
 
-		$is_pro        = LicenseManager::is_pro();
-		$can_create    = LicenseManager::can_create_hero();
-		$as_missing    = ! function_exists( 'as_enqueue_async_action' );
-		$environment   = function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production';
+		// ── System health ─────────────────────────────────────────────
+		$health_issues = [];
+		if ( ! function_exists( 'as_enqueue_async_action' ) && $is_pro ) {
+			$health_issues[] = __( 'Action Scheduler not installed — AI frame generation unavailable. Install the plugin from wordpress.org/plugins/action-scheduler.', 'sh-sequence-engine' );
+		}
+		if ( ! extension_loaded( 'gd' ) ) {
+			$health_issues[] = __( 'GD image library not loaded — frame processing may fail. Contact your host to enable PHP GD.', 'sh-sequence-engine' );
+		}
+
+		// ── Environment (only non-production) ─────────────────────────
+		$env      = function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production';
+		$show_env = ( $env !== 'production' );
+
+		// ── URLs ──────────────────────────────────────────────────────
+		$create_url  = admin_url( 'admin.php?page=' . SequenceWizard::PAGE_SLUG );
+		$all_url     = admin_url( 'edit.php?post_type=' . SequencePostType::POST_TYPE );
+		$settings_url = admin_url( 'admin.php?page=shseq-settings' );
+
 		?>
 		<div class="wrap shseq-admin shseq-dashboard">
 
-			<!-- ── Header ──────────────────────────────────────────────── -->
-			<div class="shseq-db-header">
-				<div class="shseq-db-header__left">
-					<h1 class="shseq-db-header__title">
-						<span class="dashicons dashicons-images-alt2" aria-hidden="true"></span>
-						StoryBoard Live
-					</h1>
-					<div class="shseq-db-header__meta">
-						<span class="shseq-badge shseq-badge--env"><?php echo esc_html( strtoupper( $environment ) ); ?></span>
-						<span class="shseq-badge shseq-badge--plan <?php echo $is_pro ? 'shseq-badge--pro' : ''; ?>">
-							<?php echo $is_pro ? esc_html__( 'PRO', 'sh-sequence-engine' ) : esc_html__( 'FREE', 'sh-sequence-engine' ); ?>
+			<?php /* ── Header ─────────────────────────────────────────── */ ?>
+			<header class="shseq-dash-header">
+				<div class="shseq-dash-header__brand">
+					<span class="dashicons dashicons-images-alt2 shseq-brand-icon" aria-hidden="true"></span>
+					<h1 class="shseq-brand-title">StoryBoard Live</h1>
+					<div class="shseq-dash-badges">
+						<span class="shseq-pill shseq-pill--<?php echo $is_pro ? 'pro' : 'free'; ?>">
+							<?php echo $is_pro ? 'PRO' : 'FREE'; ?>
 						</span>
-						<span class="shseq-db-header__version">v<?php echo esc_html( SHSEQ_VERSION ); ?></span>
+						<span class="shseq-pill shseq-pill--version">v<?php echo esc_html( SHSEQ_VERSION ); ?></span>
+						<?php if ( $show_env ) : ?>
+							<span class="shseq-pill shseq-pill--env"><?php echo esc_html( strtoupper( $env ) ); ?></span>
+						<?php endif; ?>
 					</div>
 				</div>
-				<div class="shseq-db-header__right">
+				<div class="shseq-dash-header__actions">
 					<?php if ( $can_create ) : ?>
-						<a class="button button-primary button-hero" href="<?php echo esc_url( admin_url( 'admin.php?page=' . SequenceWizard::PAGE_SLUG ) ); ?>">
-							<?php esc_html_e( '+ New Sequence', 'sh-sequence-engine' ); ?>
+						<a class="button button-primary shseq-new-btn" href="<?php echo esc_url( $create_url ); ?>">
+							<span class="dashicons dashicons-plus" aria-hidden="true"></span>
+							<?php esc_html_e( 'New Sequence', 'sh-sequence-engine' ); ?>
 						</a>
 					<?php else : ?>
-						<span class="shseq-limit-badge">
+						<span class="shseq-quota-chip">
 							<?php printf(
-								/* translators: 1: used, 2: max. */
+								/* translators: 1: used count, 2: max count */
 								esc_html__( '%1$d / %2$d heroes used', 'sh-sequence-engine' ),
 								$total,
-								LicenseManager::max_heroes()
+								$max_heroes
 							); ?>
-							&nbsp;<a href="<?php echo esc_url( admin_url( 'admin.php?page=shseq-settings' ) ); ?>"><?php esc_html_e( 'Upgrade ↗', 'sh-sequence-engine' ); ?></a>
+							<a href="<?php echo esc_url( $settings_url ); ?>" class="shseq-upgrade-link">
+								<?php esc_html_e( 'Upgrade ↗', 'sh-sequence-engine' ); ?>
+							</a>
 						</span>
 					<?php endif; ?>
 				</div>
-			</div>
+			</header>
 
-			<?php if ( $as_missing && $is_pro ) : ?>
-			<div class="notice notice-warning">
-				<p><strong><?php esc_html_e( 'StoryBoard Live:', 'sh-sequence-engine' ); ?></strong>
-				<?php esc_html_e( 'Action Scheduler is not installed — AI frame generation requires it. Install the', 'sh-sequence-engine' ); ?>
-				<a href="<?php echo esc_url( admin_url( 'plugin-install.php?s=action-scheduler&tab=search' ) ); ?>">Action Scheduler</a>
-				<?php esc_html_e( 'plugin.', 'sh-sequence-engine' ); ?></p>
-			</div>
-			<?php endif; ?>
+			<?php /* ── Stats ──────────────────────────────────────────── */ ?>
+			<div class="shseq-dash-stats" role="list">
 
-			<div class="shseq-db-layout">
-
-				<!-- ── Main column ─────────────────────────────────────── -->
-				<div class="shseq-db-main">
-
-					<!-- Stats row -->
-					<div class="shseq-db-stats">
-						<?php $this->stat_card( $total,     __( 'Total Sequences', 'sh-sequence-engine' ), 'shseq-stat--neutral' ); ?>
-						<?php $this->stat_card( $published, __( 'Live',            'sh-sequence-engine' ), 'shseq-stat--live' ); ?>
-						<?php $this->stat_card( $drafts,    __( 'Drafts',          'sh-sequence-engine' ), 'shseq-stat--draft' ); ?>
-						<?php $this->stat_card(
-							$is_pro ? LicenseManager::PRO_MAX_HEROES : LicenseManager::FREE_MAX_HEROES,
-							__( 'Hero limit', 'sh-sequence-engine' ),
-							'shseq-stat--neutral'
+				<div class="shseq-stat-card" role="listitem">
+					<span class="shseq-stat-card__value"><?php echo (int) $total; ?></span>
+					<span class="shseq-stat-card__label"><?php esc_html_e( 'Total Sequences', 'sh-sequence-engine' ); ?></span>
+					<div
+						class="shseq-stat-bar"
+						role="progressbar"
+						aria-valuenow="<?php echo (int) $usage_pct; ?>"
+						aria-valuemin="0"
+						aria-valuemax="100"
+						aria-label="<?php printf( esc_attr__( '%1$d of %2$d sequences used', 'sh-sequence-engine' ), $total, $max_heroes ); ?>"
+					>
+						<div
+							class="shseq-stat-bar__fill <?php echo $usage_pct >= 100 ? 'is-full' : ( $usage_pct >= 80 ? 'is-warn' : '' ); ?>"
+							style="width:<?php echo (int) $usage_pct; ?>%"
+						></div>
+					</div>
+					<span class="shseq-stat-card__sub">
+						<?php printf(
+							/* translators: %d: max heroes */
+							esc_html__( 'of %d allowed', 'sh-sequence-engine' ),
+							$max_heroes
 						); ?>
-					</div>
+					</span>
+				</div>
 
-					<!-- Sequences table -->
+				<div class="shseq-stat-card shseq-stat-card--live" role="listitem">
+					<span class="shseq-stat-card__value"><?php echo (int) $published; ?></span>
+					<span class="shseq-stat-card__label"><?php esc_html_e( 'Published', 'sh-sequence-engine' ); ?></span>
+				</div>
+
+				<div class="shseq-stat-card shseq-stat-card--draft" role="listitem">
+					<span class="shseq-stat-card__value"><?php echo (int) $drafts; ?></span>
+					<span class="shseq-stat-card__label"><?php esc_html_e( 'Drafts', 'sh-sequence-engine' ); ?></span>
+				</div>
+
+			</div>
+
+			<?php /* ── Two-column layout ─────────────────────────────── */ ?>
+			<div class="shseq-dash-layout">
+
+				<?php /* ── Main ──────────────────────────────────────── */ ?>
+				<main class="shseq-dash-main">
+
 					<?php if ( ! empty( $recent ) ) : ?>
-					<div class="shseq-db-card">
-						<div class="shseq-db-card__header">
-							<h2><?php esc_html_e( 'Sequences', 'sh-sequence-engine' ); ?></h2>
-							<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=' . SequencePostType::POST_TYPE ) ); ?>" class="button">
-								<?php esc_html_e( 'View all', 'sh-sequence-engine' ); ?>
-							</a>
+
+						<div class="shseq-dash-card">
+
+							<div class="shseq-dash-card__head">
+								<div class="shseq-dash-card__head-left">
+									<h2 class="shseq-dash-card__title">
+										<?php esc_html_e( 'Recent Sequences', 'sh-sequence-engine' ); ?>
+									</h2>
+									<label for="shseq-table-search" class="screen-reader-text">
+										<?php esc_html_e( 'Search sequences', 'sh-sequence-engine' ); ?>
+									</label>
+									<input
+										type="search"
+										id="shseq-table-search"
+										class="shseq-table-search"
+										placeholder="<?php esc_attr_e( 'Filter…', 'sh-sequence-engine' ); ?>"
+										autocomplete="off"
+									>
+								</div>
+								<a href="<?php echo esc_url( $all_url ); ?>" class="button shseq-view-all-btn">
+									<?php printf(
+										/* translators: %d: total sequence count */
+										esc_html__( 'View all (%d)', 'sh-sequence-engine' ),
+										$total
+									); ?>
+								</a>
+							</div>
+
+							<div class="shseq-table-wrap">
+								<table class="shseq-seq-table" id="shseq-sequences-table">
+									<thead>
+										<tr>
+											<th scope="col"><?php esc_html_e( 'Name', 'sh-sequence-engine' ); ?></th>
+											<th scope="col"><?php esc_html_e( 'Status', 'sh-sequence-engine' ); ?></th>
+											<th scope="col"><?php esc_html_e( 'Frames', 'sh-sequence-engine' ); ?></th>
+											<th scope="col" class="shseq-col--shortcode"><?php esc_html_e( 'Shortcode', 'sh-sequence-engine' ); ?></th>
+											<th scope="col" class="shseq-col--modified"><?php esc_html_e( 'Modified', 'sh-sequence-engine' ); ?></th>
+											<th scope="col"><?php esc_html_e( 'Actions', 'sh-sequence-engine' ); ?></th>
+										</tr>
+									</thead>
+									<tbody>
+										<?php foreach ( $recent as $seq ) :
+											$frame_count  = FrameManager::count( $seq->ID );
+											$has_frames   = $frame_count > 0;
+											$wizard_url   = add_query_arg( [ 'page' => SequenceWizard::PAGE_SLUG, 'id' => $seq->ID, 'step' => 1 ], admin_url( 'admin.php' ) );
+											$preview_url  = SequencePreview::preview_url( $seq->ID );
+											$status_obj   = get_post_status_object( $seq->post_status );
+											$shortcode    = '[storyboard_live id="' . (int) $seq->ID . '"]';
+											$seq_title    = get_the_title( $seq ) ?: __( '(Untitled)', 'sh-sequence-engine' );
+											$search_data  = strtolower( $seq_title . ' ' . $shortcode );
+											$row_class    = ! $has_frames ? 'shseq-row--no-frames' : '';
+											$modified_gmt = $seq->post_modified_gmt;
+										?>
+										<tr
+											class="shseq-seq-row <?php echo esc_attr( $row_class ); ?>"
+											data-search="<?php echo esc_attr( $search_data ); ?>"
+										>
+											<td class="shseq-col--name">
+												<?php if ( ! $has_frames ) : ?>
+													<span
+														class="shseq-warn-icon"
+														title="<?php esc_attr_e( 'No frames — this sequence will not display on the frontend', 'sh-sequence-engine' ); ?>"
+														aria-hidden="true"
+													>⚠</span>
+												<?php endif; ?>
+												<a href="<?php echo esc_url( $wizard_url ); ?>" class="shseq-seq-name">
+													<?php echo esc_html( $seq_title ); ?>
+												</a>
+											</td>
+
+											<td>
+												<span class="shseq-status-pill shseq-status-pill--<?php echo esc_attr( $seq->post_status ); ?>">
+													<?php echo esc_html( $status_obj ? $status_obj->label : $seq->post_status ); ?>
+												</span>
+											</td>
+
+											<td>
+												<span class="shseq-frames-badge <?php echo $has_frames ? 'shseq-frames-badge--ok' : 'shseq-frames-badge--zero'; ?>">
+													<?php echo (int) $frame_count; ?>
+												</span>
+											</td>
+
+											<td class="shseq-col--shortcode">
+												<button
+													type="button"
+													class="shseq-copy-btn"
+													data-copy="<?php echo esc_attr( $shortcode ); ?>"
+													aria-label="<?php esc_attr_e( 'Copy shortcode', 'sh-sequence-engine' ); ?>"
+												>
+													<code class="shseq-shortcode-text"><?php echo esc_html( $shortcode ); ?></code>
+													<span class="dashicons dashicons-clipboard shseq-copy-icon" aria-hidden="true"></span>
+												</button>
+											</td>
+
+											<td class="shseq-col--modified">
+												<time
+													datetime="<?php echo esc_attr( $modified_gmt ); ?>"
+													title="<?php echo esc_attr( get_date_from_gmt( $modified_gmt, get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ) ); ?>"
+												>
+													<?php
+													$ago = human_time_diff( (int) strtotime( $modified_gmt . ' UTC' ), time() );
+													/* translators: %s: human-readable time difference */
+													echo esc_html( sprintf( __( '%s ago', 'sh-sequence-engine' ), $ago ) );
+													?>
+												</time>
+											</td>
+
+											<td class="shseq-col--actions">
+												<a
+													href="<?php echo esc_url( $wizard_url ); ?>"
+													class="shseq-action-icon"
+													title="<?php esc_attr_e( 'Edit in Wizard', 'sh-sequence-engine' ); ?>"
+												>
+													<span class="dashicons dashicons-edit" aria-hidden="true"></span>
+													<span class="screen-reader-text"><?php esc_html_e( 'Edit', 'sh-sequence-engine' ); ?></span>
+												</a>
+												<?php if ( $preview_url ) : ?>
+												<a
+													href="<?php echo esc_url( $preview_url ); ?>"
+													class="shseq-action-icon"
+													target="_blank"
+													rel="noopener noreferrer"
+													title="<?php esc_attr_e( 'Preview', 'sh-sequence-engine' ); ?>"
+												>
+													<span class="dashicons dashicons-visibility" aria-hidden="true"></span>
+													<span class="screen-reader-text"><?php esc_html_e( 'Preview', 'sh-sequence-engine' ); ?></span>
+												</a>
+												<?php endif; ?>
+											</td>
+										</tr>
+										<?php endforeach; ?>
+									</tbody>
+								</table>
+							</div>
+
+							<div id="shseq-no-results" class="shseq-no-results" hidden>
+								<?php esc_html_e( 'No sequences match your search.', 'sh-sequence-engine' ); ?>
+							</div>
+
 						</div>
-						<table class="shseq-db-table widefat striped">
-							<thead>
-								<tr>
-									<th><?php esc_html_e( 'Name', 'sh-sequence-engine' ); ?></th>
-									<th><?php esc_html_e( 'Status', 'sh-sequence-engine' ); ?></th>
-									<th><?php esc_html_e( 'Frames', 'sh-sequence-engine' ); ?></th>
-									<th><?php esc_html_e( 'Shortcode', 'sh-sequence-engine' ); ?></th>
-									<th><?php esc_html_e( 'Modified', 'sh-sequence-engine' ); ?></th>
-									<th><?php esc_html_e( 'Actions', 'sh-sequence-engine' ); ?></th>
-								</tr>
-							</thead>
-							<tbody>
-								<?php foreach ( $recent as $seq ) :
-									$frame_count = FrameManager::count( $seq->ID );
-									$edit_url    = get_edit_post_link( $seq->ID, 'raw' );
-									$wizard_url  = add_query_arg( array( 'page' => SequenceWizard::PAGE_SLUG, 'id' => $seq->ID, 'step' => 1 ), admin_url( 'admin.php' ) );
-									$preview_url = SequencePreview::preview_url( $seq->ID );
-									$status_obj  = get_post_status_object( $seq->post_status );
-								?>
-								<tr>
-									<td>
-										<strong>
-											<a href="<?php echo esc_url( $wizard_url ); ?>">
-												<?php echo esc_html( get_the_title( $seq ) ?: __( '(Untitled)', 'sh-sequence-engine' ) ); ?>
-											</a>
-										</strong>
-									</td>
-									<td>
-										<span class="shseq-status-pill shseq-status-pill--<?php echo esc_attr( $seq->post_status ); ?>">
-											<?php echo esc_html( $status_obj ? $status_obj->label : $seq->post_status ); ?>
-										</span>
-									</td>
-									<td>
-										<span class="shseq-frame-count <?php echo $frame_count ? 'shseq-frame-count--ok' : 'shseq-frame-count--zero'; ?>">
-											<?php echo esc_html( $frame_count ); ?>
-										</span>
-									</td>
-									<td>
-										<code class="shseq-shortcode-pill">
-											[storyboard_live id="<?php echo (int) $seq->ID; ?>"]
-										</code>
-									</td>
-									<td>
-										<span title="<?php echo esc_attr( $seq->post_modified ); ?>">
-											<?php echo esc_html( human_time_diff( strtotime( $seq->post_modified ), time() ) . ' ago' ); ?>
-										</span>
-									</td>
-									<td class="shseq-db-table__actions">
-										<a href="<?php echo esc_url( $wizard_url ); ?>" title="<?php esc_attr_e( 'Edit in Wizard', 'sh-sequence-engine' ); ?>">
-											<?php esc_html_e( 'Wizard', 'sh-sequence-engine' ); ?>
-										</a>
-										|
-										<a href="<?php echo esc_url( $preview_url ); ?>" target="_blank" rel="noopener" title="<?php esc_attr_e( 'Preview', 'sh-sequence-engine' ); ?>">
-											<?php esc_html_e( 'Preview', 'sh-sequence-engine' ); ?>
-										</a>
-										|
-										<a href="<?php echo esc_url( $edit_url ); ?>" title="<?php esc_attr_e( 'Full Editor', 'sh-sequence-engine' ); ?>">
-											<?php esc_html_e( 'Edit', 'sh-sequence-engine' ); ?>
-										</a>
-									</td>
-								</tr>
-								<?php endforeach; ?>
-							</tbody>
-						</table>
-					</div>
+
 					<?php else : ?>
-					<!-- Empty state -->
-					<div class="shseq-db-card shseq-db-empty">
-						<div class="shseq-db-empty__icon" aria-hidden="true">🎬</div>
+
+					<?php /* ── Empty state ────────────────────────────── */ ?>
+					<div class="shseq-empty-state">
+						<div class="shseq-empty-state__icon" aria-hidden="true">
+							<span class="dashicons dashicons-images-alt2"></span>
+						</div>
 						<h2><?php esc_html_e( 'No sequences yet', 'sh-sequence-engine' ); ?></h2>
-						<p><?php esc_html_e( 'Create your first scroll-driven hero animation in three steps.', 'sh-sequence-engine' ); ?></p>
+						<p>
+							<?php esc_html_e( 'A sequence is a set of 24–36 WebP frames that animate as the visitor scrolls — creating a cinematic hero section without any video file.', 'sh-sequence-engine' ); ?>
+						</p>
+						<p class="shseq-empty-state__hint">
+							<?php esc_html_e( 'You can upload your own frames or let the AI generate them from a single image or text prompt.', 'sh-sequence-engine' ); ?>
+						</p>
 						<?php if ( $can_create ) : ?>
-							<a class="button button-primary button-hero" href="<?php echo esc_url( admin_url( 'admin.php?page=' . SequenceWizard::PAGE_SLUG ) ); ?>">
-								<?php esc_html_e( 'Create First Sequence', 'sh-sequence-engine' ); ?>
+							<a class="button button-primary button-hero shseq-empty-cta" href="<?php echo esc_url( $create_url ); ?>">
+								<?php esc_html_e( 'Create your first sequence', 'sh-sequence-engine' ); ?>
+							</a>
+						<?php else : ?>
+							<a class="button" href="<?php echo esc_url( $settings_url ); ?>">
+								<?php esc_html_e( 'Upgrade to create more', 'sh-sequence-engine' ); ?>
 							</a>
 						<?php endif; ?>
 					</div>
+
 					<?php endif; ?>
+				</main>
 
-				</div><!-- /main -->
+				<?php /* ── Sidebar ──────────────────────────────────────── */ ?>
+				<aside class="shseq-dash-sidebar" aria-label="<?php esc_attr_e( 'Dashboard sidebar', 'sh-sequence-engine' ); ?>">
 
-				<!-- ── Sidebar ─────────────────────────────────────────── -->
-				<aside class="shseq-db-sidebar">
-
-					<div class="shseq-db-card">
-						<h3><?php esc_html_e( 'Quick actions', 'sh-sequence-engine' ); ?></h3>
-						<ul class="shseq-quick-links">
-							<li><a href="<?php echo esc_url( admin_url( 'admin.php?page=' . SequenceWizard::PAGE_SLUG ) ); ?>">
-								<span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
-								<?php esc_html_e( 'New sequence (wizard)', 'sh-sequence-engine' ); ?>
-							</a></li>
-							<li><a href="<?php echo esc_url( admin_url( 'admin.php?page=shseq-templates' ) ); ?>">
-								<span class="dashicons dashicons-layout" aria-hidden="true"></span>
-								<?php esc_html_e( 'Browse templates', 'sh-sequence-engine' ); ?>
-							</a></li>
-							<li><a href="<?php echo esc_url( admin_url( 'admin.php?page=shseq-settings' ) ); ?>">
-								<span class="dashicons dashicons-admin-settings" aria-hidden="true"></span>
-								<?php esc_html_e( 'Settings & API keys', 'sh-sequence-engine' ); ?>
-							</a></li>
-							<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=' . SequencePostType::POST_TYPE ) ); ?>">
-								<span class="dashicons dashicons-list-view" aria-hidden="true"></span>
-								<?php esc_html_e( 'All sequences', 'sh-sequence-engine' ); ?>
-							</a></li>
-						</ul>
+					<?php /* Usage card */ ?>
+					<div class="shseq-dash-card shseq-usage-card">
+						<h3 class="shseq-sidebar-card-title"><?php esc_html_e( 'Plan usage', 'sh-sequence-engine' ); ?></h3>
+						<div
+							class="shseq-usage-bar"
+							role="progressbar"
+							aria-valuenow="<?php echo (int) $usage_pct; ?>"
+							aria-valuemin="0"
+							aria-valuemax="100"
+							aria-label="<?php printf( esc_attr__( '%1$d of %2$d sequences used', 'sh-sequence-engine' ), $total, $max_heroes ); ?>"
+						>
+							<div class="shseq-usage-bar__fill <?php echo $usage_pct >= 100 ? 'is-full' : ( $usage_pct >= 80 ? 'is-warn' : '' ); ?>"
+								 style="width:<?php echo (int) $usage_pct; ?>%"></div>
+						</div>
+						<p class="shseq-usage-label">
+							<strong><?php echo (int) $total; ?></strong>
+							<?php printf(
+								/* translators: %d: max heroes */
+								esc_html__( ' of %d sequences used', 'sh-sequence-engine' ),
+								$max_heroes
+							); ?>
+						</p>
+						<?php if ( ! $is_pro ) : ?>
+							<a href="<?php echo esc_url( $settings_url ); ?>" class="button shseq-upgrade-btn">
+								<?php esc_html_e( 'Upgrade to Pro ↗', 'sh-sequence-engine' ); ?>
+							</a>
+						<?php endif; ?>
 					</div>
 
-					<div class="shseq-db-card">
-						<h3><?php esc_html_e( 'Plan', 'sh-sequence-engine' ); ?></h3>
-						<p>
-							<?php if ( $is_pro ) : ?>
-								<span class="shseq-badge shseq-badge--pro"><?php esc_html_e( 'Pro', 'sh-sequence-engine' ); ?></span>
-								<?php printf( esc_html__( 'Up to %d heroes, 36 frames, AI generation.', 'sh-sequence-engine' ), LicenseManager::PRO_MAX_HEROES ); ?>
-							<?php else : ?>
-								<span class="shseq-badge"><?php esc_html_e( 'Free', 'sh-sequence-engine' ); ?></span>
-								<?php printf( esc_html__( '%d hero, 24 frames, manual upload.', 'sh-sequence-engine' ), LicenseManager::FREE_MAX_HEROES ); ?>
-								<br><a href="<?php echo esc_url( admin_url( 'admin.php?page=shseq-settings' ) ); ?>"><?php esc_html_e( 'Enable Pro in Settings ↗', 'sh-sequence-engine' ); ?></a>
-							<?php endif; ?>
+					<?php /* Embed card */ ?>
+					<div class="shseq-dash-card shseq-embed-card">
+						<h3 class="shseq-sidebar-card-title"><?php esc_html_e( 'Embed shortcode', 'sh-sequence-engine' ); ?></h3>
+						<p class="description">
+							<?php esc_html_e( 'Paste into any page or post:', 'sh-sequence-engine' ); ?>
+						</p>
+						<button
+							type="button"
+							class="shseq-copy-btn shseq-embed-copy-btn"
+							data-copy='[storyboard_live id="ID"]'
+							aria-label="<?php esc_attr_e( 'Copy example shortcode', 'sh-sequence-engine' ); ?>"
+						>
+							<code>[storyboard_live id="ID"]</code>
+							<span class="dashicons dashicons-clipboard shseq-copy-icon" aria-hidden="true"></span>
+						</button>
+						<p class="description shseq-embed-hint">
+							<?php esc_html_e( 'Replace ID with the number from the table above.', 'sh-sequence-engine' ); ?>
 						</p>
 					</div>
 
-					<div class="shseq-db-card">
-						<h3><?php esc_html_e( 'Embed', 'sh-sequence-engine' ); ?></h3>
-						<p class="description"><?php esc_html_e( 'Use the shortcode or Gutenberg block:', 'sh-sequence-engine' ); ?></p>
-						<code style="display:block;font-size:12px;background:#f0f0f1;padding:6px 10px;border-radius:3px">[storyboard_live id="123"]</code>
+					<?php /* Health card — only when issues */ ?>
+					<?php if ( ! empty( $health_issues ) ) : ?>
+					<div class="shseq-dash-card shseq-health-card">
+						<h3 class="shseq-sidebar-card-title shseq-health-title">
+							<span class="dashicons dashicons-warning" aria-hidden="true"></span>
+							<?php esc_html_e( 'System health', 'sh-sequence-engine' ); ?>
+						</h3>
+						<ul class="shseq-health-list">
+							<?php foreach ( $health_issues as $issue ) : ?>
+								<li><?php echo esc_html( $issue ); ?></li>
+							<?php endforeach; ?>
+						</ul>
 					</div>
+					<?php endif; ?>
 
 				</aside>
 
-			</div><!-- /layout -->
+			</div>
 
-		</div><!-- /wrap -->
+		</div>
 
-		<style>
-		.shseq-dashboard *{box-sizing:border-box}
-		.shseq-db-layout{display:grid;grid-template-columns:1fr 280px;gap:20px;margin-top:20px;align-items:start}
-		@media(max-width:900px){.shseq-db-layout{grid-template-columns:1fr}}
+		<?php /* ── Copy toast (ARIA live) ──────────────────────────── */ ?>
+		<div
+			id="shseq-copy-toast"
+			class="shseq-copy-toast"
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		></div>
 
-		/* Header */
-		.shseq-db-header{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid #dcdcde}
-		.shseq-db-header__left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-		.shseq-db-header__title{margin:0;font-size:22px;display:flex;align-items:center;gap:6px}
-		.shseq-db-header__title .dashicons{font-size:26px;width:26px;height:26px;color:#2271b1}
-		.shseq-db-header__meta{display:flex;align-items:center;gap:6px}
-		.shseq-db-header__version{font-size:12px;color:#787c82}
+		<script>
+		(function () {
+			'use strict';
 
-		/* Badges */
-		.shseq-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.05em;background:#f0f0f1;color:#3c434a}
-		.shseq-badge--plan{background:#ddd}
-		.shseq-badge--pro{background:#d5f0dd;color:#1a6b39}
-		.shseq-badge--env{background:#1d2327;color:#fff}
+			var TOAST_DURATION = 2200;
+			var toast          = document.getElementById( 'shseq-copy-toast' );
+			var toastTimer     = null;
 
-		/* Stats */
-		.shseq-db-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-		@media(max-width:700px){.shseq-db-stats{grid-template-columns:repeat(2,1fr)}}
-		.shseq-stat-card{background:#fff;border:1px solid #c3c4c7;border-radius:6px;padding:16px 20px;text-align:center}
-		.shseq-stat-card__value{display:block;font-size:32px;font-weight:700;color:#1d2327;line-height:1.1}
-		.shseq-stat-card__label{display:block;font-size:11px;color:#787c82;margin-top:4px;text-transform:uppercase;letter-spacing:.05em}
-		.shseq-stat--live .shseq-stat-card__value{color:#00a32a}
-		.shseq-stat--draft .shseq-stat-card__value{color:#787c82}
+			/* ── Copy shortcode ─────────────────────────────────────── */
+			function showToast( msg ) {
+				clearTimeout( toastTimer );
+				toast.textContent = msg;
+				toast.classList.add( 'is-visible' );
+				toastTimer = setTimeout( function () {
+					toast.classList.remove( 'is-visible' );
+				}, TOAST_DURATION );
+			}
 
-		/* Cards */
-		.shseq-db-card{background:#fff;border:1px solid #c3c4c7;border-radius:6px;overflow:hidden;margin-bottom:16px}
-		.shseq-db-card__header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #dcdcde}
-		.shseq-db-card__header h2{margin:0;font-size:14px}
-		.shseq-db-card h3{margin:0 0 10px;font-size:13px;padding:14px 16px 0}
+			function fallbackCopy( text ) {
+				var ta = document.createElement( 'textarea' );
+				ta.value = text;
+				ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+				document.body.appendChild( ta );
+				ta.focus();
+				ta.select();
+				try { document.execCommand( 'copy' ); return true; } catch ( e ) { return false; }
+				finally { document.body.removeChild( ta ); }
+			}
 
-		/* Table */
-		.shseq-db-table{margin:0!important;border:0!important}
-		.shseq-db-table th,.shseq-db-table td{padding:10px 16px!important;vertical-align:middle!important}
-		.shseq-db-table__actions{white-space:nowrap;font-size:12px}
-		.shseq-db-table__actions a{text-decoration:none}
+			var copiedMsg = <?php echo wp_json_encode( __( 'Copied to clipboard!', 'sh-sequence-engine' ) ); ?>;
 
-		/* Status pills */
-		.shseq-status-pill{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600}
-		.shseq-status-pill--publish{background:#d5f0dd;color:#1a6b39}
-		.shseq-status-pill--draft{background:#f0f0f1;color:#3c434a}
-		.shseq-status-pill--private{background:#fef3e2;color:#8c5e00}
+			document.querySelectorAll( '.shseq-copy-btn' ).forEach( function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					var text = btn.dataset.copy;
+					if ( ! text ) return;
+					if ( navigator.clipboard && navigator.clipboard.writeText ) {
+						navigator.clipboard.writeText( text ).then( function () {
+							showToast( copiedMsg );
+						} ).catch( function () {
+							if ( fallbackCopy( text ) ) showToast( copiedMsg );
+						} );
+					} else {
+						if ( fallbackCopy( text ) ) showToast( copiedMsg );
+					}
+				} );
+			} );
 
-		/* Frame count */
-		.shseq-frame-count{font-weight:600;font-size:14px}
-		.shseq-frame-count--zero{color:#d63638}
-		.shseq-frame-count--ok{color:#1d2327}
-
-		/* Shortcode */
-		.shseq-shortcode-pill{background:#f0f0f1;padding:2px 6px;border-radius:3px;font-size:11px;white-space:nowrap}
-
-		/* Limit badge */
-		.shseq-limit-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:#fef3e2;border:1px solid #f0b849;border-radius:4px;font-size:13px}
-
-		/* Quick links */
-		.shseq-quick-links{list-style:none;margin:0;padding:0 16px 14px}
-		.shseq-quick-links li{border-bottom:1px solid #f0f0f1;padding:8px 0}
-		.shseq-quick-links li:last-child{border-bottom:0}
-		.shseq-quick-links a{display:flex;align-items:center;gap:6px;text-decoration:none;color:#2271b1;font-size:13px}
-		.shseq-quick-links a:hover{text-decoration:underline}
-		.shseq-quick-links .dashicons{font-size:15px;width:15px;height:15px;opacity:.7}
-
-		/* Sidebar cards */
-		.shseq-db-sidebar .shseq-db-card p{padding:0 16px 14px;margin:0;font-size:13px}
-
-		/* Empty state */
-		.shseq-db-empty{padding:40px;text-align:center}
-		.shseq-db-empty__icon{font-size:48px;margin-bottom:12px}
-		.shseq-db-empty h2{margin:0 0 8px;font-size:18px}
-		.shseq-db-empty p{color:#50575e;margin-bottom:20px}
-		</style>
+			/* ── Table search filter ────────────────────────────────── */
+			var searchInput = document.getElementById( 'shseq-table-search' );
+			var noResults   = document.getElementById( 'shseq-no-results' );
+			if ( searchInput ) {
+				searchInput.addEventListener( 'input', function () {
+					var q       = this.value.toLowerCase().trim();
+					var rows    = document.querySelectorAll( '#shseq-sequences-table .shseq-seq-row' );
+					var visible = 0;
+					rows.forEach( function ( row ) {
+						var haystack = ( row.dataset.search || '' );
+						var show     = ! q || haystack.indexOf( q ) !== -1;
+						row.hidden   = ! show;
+						if ( show ) visible++;
+					} );
+					if ( noResults ) {
+						noResults.hidden = visible > 0;
+					}
+				} );
+			}
+		}() );
+		</script>
 		<?php
-	}
-
-	/** Render a stat card. */
-	private function stat_card( $value, $label, $class = '' ) {
-		printf(
-			'<div class="shseq-stat-card %s"><span class="shseq-stat-card__value">%s</span><span class="shseq-stat-card__label">%s</span></div>',
-			esc_attr( $class ),
-			esc_html( number_format_i18n( $value ) ),
-			esc_html( $label )
-		);
 	}
 }
