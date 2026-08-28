@@ -979,3 +979,38 @@
 	saveUndoSnapshot();
 
 }());
+
+
+// ── Pre-select template from URL param (when coming from Templates page) ──
+(function () {
+  var preselected = (window.shseqWizard && window.shseqWizard.preselectedTemplate) || '';
+  if (!preselected || preselected === 'blank') return;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Small delay to ensure cards are rendered
+    setTimeout(function () {
+      var card = document.querySelector('.shseq-tpl-card[data-template-id="' + preselected + '"]');
+      if (!card) return;
+
+      // Deselect current (blank) card
+      document.querySelectorAll('.shseq-tpl-card').forEach(function (c) {
+        c.classList.remove('is-selected');
+        c.setAttribute('aria-checked', 'false');
+        c.setAttribute('tabindex', c.classList.contains('is-locked') ? '-1' : '0');
+      });
+
+      // Select the target card
+      card.classList.add('is-selected');
+      card.setAttribute('aria-checked', 'true');
+      card.setAttribute('tabindex', '0');
+
+      // Update hidden input
+      var hiddenInput = document.getElementById('shseq-selected-template');
+      if (hiddenInput) hiddenInput.value = preselected;
+
+      // Scroll card into view smoothly
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.focus({ preventScroll: true });
+    }, 100);
+  });
+}());
