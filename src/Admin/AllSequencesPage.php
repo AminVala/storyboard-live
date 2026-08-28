@@ -152,7 +152,7 @@ final class AllSequencesPage {
 		) ), admin_url( 'admin.php' ) );
 
 		// ── Create URL ──────────────────────────────────────────────────────
-		$create_url  = admin_url( 'admin.php?page=' . ( class_exists( __NAMESPACE__ . '\SequenceWizard' ) ? SequenceWizard::PAGE_SLUG : 'shseq-new-sequence' ) );
+		$create_url  = admin_url( 'admin.php?page=' . SequenceWizardPage::PAGE_SLUG );
 		?>
 		<div class="wrap shseq-admin shseq-all-sequences" dir="<?php echo is_rtl() ? 'rtl' : 'ltr'; ?>">
 
