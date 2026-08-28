@@ -1,168 +1,526 @@
-/* StoryBoard Live — Admin Dashboard Styles */
+/*
+ * StoryBoard Live — Admin Dashboard CSS — Final v3
+ * فایل خارجی CSS (بدون inline style در PHP)
+ */
 
-/* ── Layout ─────────────────────────────────────────────────────────────── */
-.shseq-admin { max-width: 1200px; }
-.shseq-admin * { box-sizing: border-box; }
+/* ── Reset ───────────────────────────────────────────────────────────── */
+.shseq-dashboard *  { box-sizing: border-box; }
+.shseq-admin        { max-width: 1280px; }
 
-/* ── Hero header ─────────────────────────────────────────────────────────── */
-.shseq-hero {
+/* ── Header ──────────────────────────────────────────────────────────── */
+.shseq-dash-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 24px 0 20px;
+	flex-wrap: wrap;
+	gap: 12px;
+	padding: 18px 0 14px;
 	border-bottom: 1px solid #dcdcde;
-	margin-bottom: 24px;
+	margin-bottom: 22px;
 }
-.shseq-hero h1 { margin: 0 0 4px; font-size: 22px; }
-.shseq-byline  { margin: 0; color: #787c82; font-size: 13px; }
-.shseq-hero__meta { display: flex; align-items: center; gap: 10px; }
-.shseq-badge {
+
+.shseq-dash-header__brand {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.shseq-brand-icon {
+	font-size: 28px !important;
+	width: 28px !important;
+	height: 28px !important;
+	color: #2271b1;
+	line-height: 1 !important;
+	flex-shrink: 0;
+}
+
+.shseq-brand-title {
+	margin: 0;
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 1.3;
+	color: #1d2327;
+}
+
+.shseq-dash-badges {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+/* Pill / badge */
+.shseq-pill {
 	display: inline-block;
 	padding: 2px 8px;
-	background: #1d2327;
-	color: #fff;
-	border-radius: 3px;
-	font-size: 10px;
-	letter-spacing: .05em;
-	text-transform: uppercase;
-}
-.shseq-version { font-size: 12px; color: #787c82; }
-
-/* ── Primary action card ─────────────────────────────────────────────────── */
-.shseq-primary-action {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 20px;
-	background: #fff;
-	border: 1px solid #c3c4c7;
-	border-radius: 6px;
-	padding: 20px 24px;
-	margin-bottom: 20px;
-}
-.shseq-primary-action h2 { margin: 0 0 6px; font-size: 16px; }
-.shseq-primary-action p  { margin: 0; color: #50575e; }
-
-/* ── Template callout ────────────────────────────────────────────────────── */
-.shseq-template-callout {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 20px;
-	background: linear-gradient(135deg, #f0f6fc 0%, #e8f4fd 100%);
-	border: 1px solid #72aee6;
-	border-radius: 6px;
-	padding: 20px 24px;
-	margin-bottom: 20px;
-}
-.shseq-template-callout h2 { margin: 6px 0 8px; font-size: 15px; }
-.shseq-template-callout p  { margin: 0; color: #50575e; font-size: 13px; }
-.shseq-kicker {
-	display: inline-block;
+	border-radius: 12px;
 	font-size: 10px;
 	font-weight: 700;
-	letter-spacing: .08em;
+	letter-spacing: .06em;
 	text-transform: uppercase;
-	color: #0a4b78;
+	white-space: nowrap;
+}
+.shseq-pill--free    { background: #f0f0f1; color: #3c434a; }
+.shseq-pill--pro     { background: #d5f0dd; color: #1a6b39; }
+.shseq-pill--version { background: transparent; color: #787c82; border: 1px solid #dcdcde; }
+.shseq-pill--env     { background: #1d2327; color: #fff; }
+
+/* Header actions */
+.shseq-new-btn {
+	display: inline-flex !important;
+	align-items: center;
+	gap: 5px;
+}
+.shseq-new-btn .dashicons {
+	font-size: 16px !important;
+	width: 16px !important;
+	height: 16px !important;
+	line-height: 1 !important;
+	margin-top: -1px;
 }
 
-/* ── Runtime card ────────────────────────────────────────────────────────── */
-.shseq-runtime-card {
-	display: flex;
-	align-items: flex-start;
+.shseq-quota-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 12px;
+	background: #fef3e2;
+	border: 1px solid #f0b849;
+	border-radius: 4px;
+	font-size: 13px;
+	color: #8c5e00;
+}
+.shseq-upgrade-link {
+	font-weight: 600;
+	text-decoration: none;
+	color: #2271b1;
+}
+.shseq-upgrade-link:hover { text-decoration: underline; }
+
+/* ── Stats row ───────────────────────────────────────────────────────── */
+.shseq-dash-stats {
+	display: grid;
+	grid-template-columns: 2fr 1fr 1fr;
+	gap: 14px;
+	margin-bottom: 22px;
+}
+@media (max-width: 640px) {
+	.shseq-dash-stats { grid-template-columns: 1fr 1fr; }
+}
+
+.shseq-stat-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 8px;
+	padding: 18px 20px 14px;
+}
+
+.shseq-stat-card__value {
+	display: block;
+	font-size: 36px;
+	font-weight: 700;
+	line-height: 1;
+	color: #1d2327;
+}
+.shseq-stat-card--live .shseq-stat-card__value { color: #00a32a; }
+.shseq-stat-card--draft .shseq-stat-card__value { color: #787c82; }
+
+.shseq-stat-card__label {
+	display: block;
+	font-size: 11px;
+	color: #787c82;
+	text-transform: uppercase;
+	letter-spacing: .06em;
+	margin: 6px 0 10px;
+}
+
+.shseq-stat-card__sub {
+	display: block;
+	font-size: 11px;
+	color: #a7aaad;
+	margin-top: 4px;
+}
+
+/* Progress bar inside stat card */
+.shseq-stat-bar {
+	height: 6px;
+	background: #f0f0f1;
+	border-radius: 9999px;
+	overflow: hidden;
+}
+.shseq-stat-bar__fill {
+	height: 100%;
+	background: #2271b1;
+	border-radius: 9999px;
+	transition: width .3s ease;
+}
+.shseq-stat-bar__fill.is-warn { background: #dba617; }
+.shseq-stat-bar__fill.is-full { background: #d63638; }
+
+/* ── Two-column layout ───────────────────────────────────────────────── */
+.shseq-dash-layout {
+	display: grid;
+	grid-template-columns: 1fr 280px;
 	gap: 20px;
+	align-items: start;
+}
+@media (max-width: 960px) {
+	.shseq-dash-layout { grid-template-columns: 1fr; }
+}
+
+/* ── Card ────────────────────────────────────────────────────────────── */
+.shseq-dash-card {
 	background: #fff;
 	border: 1px solid #c3c4c7;
-	border-radius: 6px;
-	padding: 20px 24px;
-	margin-bottom: 20px;
+	border-radius: 8px;
+	overflow: hidden;
+	margin-bottom: 16px;
 }
-.shseq-runtime-card h2 { margin: 6px 0 8px; font-size: 15px; }
-.shseq-runtime-card p  { margin: 0 0 10px; color: #50575e; font-size: 13px; }
-.shseq-runtime-card code { background: #f0f0f1; padding: 2px 8px; border-radius: 3px; font-size: 13px; }
 
-/* ── Stats ───────────────────────────────────────────────────────────────── */
-.shseq-stats {
-	display: flex;
-	gap: 16px;
-	margin-bottom: 20px;
-}
-.shseq-stat {
-	flex: 1;
-	background: #fff;
-	border: 1px solid #c3c4c7;
-	border-radius: 6px;
-	padding: 16px 20px;
-	text-align: center;
-}
-.shseq-stat__value { display: block; font-size: 28px; font-weight: 700; color: #1d2327; }
-.shseq-stat__label { display: block; font-size: 12px; color: #787c82; margin-top: 4px; }
-
-/* ── Recent sequences ────────────────────────────────────────────────────── */
-.shseq-recent { background: #fff; border: 1px solid #c3c4c7; border-radius: 6px; overflow: hidden; }
-.shseq-recent__header {
+.shseq-dash-card__head {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
 	padding: 14px 20px;
 	border-bottom: 1px solid #dcdcde;
 }
-.shseq-recent__header h2 { margin: 0; font-size: 14px; }
-.shseq-sequence-list { margin: 0; padding: 0; list-style: none; }
-.shseq-sequence-list li {
+
+.shseq-dash-card__head-left {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	padding: 10px 20px;
-	border-bottom: 1px solid #f0f0f1;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.shseq-dash-card__title {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.shseq-view-all-btn {
+	white-space: nowrap;
+}
+
+/* Search input */
+.shseq-table-search {
+	font-size: 13px;
+	padding: 4px 10px;
+	height: 30px;
+	border-radius: 4px;
+	border: 1px solid #c3c4c7;
+	min-width: 180px;
+}
+.shseq-table-search:focus {
+	outline: 2px solid #2271b1;
+	outline-offset: 0;
+	border-color: #2271b1;
+}
+
+/* ── Table ───────────────────────────────────────────────────────────── */
+.shseq-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+.shseq-seq-table {
+	width: 100%;
+	border-collapse: collapse;
+	border: 0;
 	font-size: 13px;
 }
-.shseq-sequence-list li:last-child { border-bottom: none; }
-.shseq-sequence-list a { font-weight: 500; text-decoration: none; color: #2271b1; }
-.shseq-sequence-list a:hover { text-decoration: underline; }
-.shseq-sequence-status {
-	display: inline-block;
-	padding: 1px 8px;
-	border-radius: 3px;
+.shseq-seq-table th,
+.shseq-seq-table td {
+	padding: 11px 16px;
+	text-align: left;
+	vertical-align: middle;
+	border-bottom: 1px solid #f0f0f1;
+}
+.shseq-seq-table thead th {
 	font-size: 11px;
 	font-weight: 600;
 	text-transform: uppercase;
-	letter-spacing: .04em;
+	letter-spacing: .05em;
+	color: #787c82;
+	background: #f9f9f9;
 }
-.shseq-sequence-status--publish { background: #d5f0dd; color: #1a6b39; }
-.shseq-sequence-status--draft   { background: #f0f0f1; color: #3c434a; }
-.shseq-sequence-status--private { background: #fef3e2; color: #8c5e00; }
+.shseq-seq-table tbody tr:last-child td { border-bottom: 0; }
+.shseq-seq-table tbody tr:hover { background: #f9f9f9; }
 
-/* ── Sequence editor meta boxes ──────────────────────────────────────────── */
-.shseq-master-box .shseq-master-variant {
+/* Row with no frames */
+.shseq-row--no-frames td {
+	background: #fffbf0;
+}
+.shseq-row--no-frames:hover td { background: #fef6e0; }
+
+/* Warn icon */
+.shseq-warn-icon {
+	color: #dba617;
+	font-size: 13px;
+	margin-right: 4px;
+	vertical-align: middle;
+	cursor: help;
+}
+
+/* Sequence name */
+.shseq-seq-name {
+	font-weight: 500;
+	text-decoration: none;
+	color: #2271b1;
+}
+.shseq-seq-name:hover { text-decoration: underline; }
+.shseq-col--name { min-width: 160px; }
+
+/* Status pill */
+.shseq-status-pill {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: .03em;
+}
+.shseq-status-pill--publish { background: #d5f0dd; color: #1a6b39; }
+.shseq-status-pill--draft   { background: #f0f0f1; color: #3c434a; }
+.shseq-status-pill--private { background: #fef3e2; color: #8c5e00; }
+.shseq-status-pill--pending { background: #e5f5fa; color: #00597b; }
+
+/* Frames badge */
+.shseq-frames-badge {
+	display: inline-block;
+	min-width: 28px;
+	text-align: center;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-weight: 700;
+	font-size: 13px;
+}
+.shseq-frames-badge--ok   { background: #f0f0f1; color: #1d2327; }
+.shseq-frames-badge--zero { background: #fce8e8; color: #d63638; font-weight: 700; }
+
+/* Shortcode copy button */
+.shseq-copy-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 8px;
+	background: #f6f7f7;
 	border: 1px solid #dcdcde;
 	border-radius: 4px;
-	padding: 10px 12px;
-	margin-bottom: 10px;
+	cursor: pointer;
+	font: inherit;
+	color: inherit;
+	transition: background .15s, border-color .15s;
+	max-width: 100%;
 }
-.shseq-master-variant.is-locked { opacity: .5; }
-.shseq-master-preview {
-	min-height: 48px;
-	background: #f6f7f7;
-	border: 1px dashed #c3c4c7;
-	border-radius: 3px;
-	display: flex;
+.shseq-copy-btn:hover {
+	background: #eef1f4;
+	border-color: #2271b1;
+}
+.shseq-copy-btn:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: 1px;
+}
+.shseq-shortcode-text {
+	font-size: 11px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 180px;
+	display: block;
+}
+.shseq-copy-icon {
+	font-size: 14px !important;
+	width: 14px !important;
+	height: 14px !important;
+	color: #787c82;
+	flex-shrink: 0;
+}
+
+/* Responsive: hide lower-priority columns */
+@media (max-width: 700px) {
+	.shseq-col--shortcode,
+	.shseq-col--modified { display: none; }
+}
+
+/* Modified column */
+.shseq-col--modified { color: #787c82; white-space: nowrap; }
+
+/* Actions column */
+.shseq-col--actions {
+	white-space: nowrap;
+}
+.shseq-action-icon {
+	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	padding: 8px;
-	margin: 8px 0;
+	width: 30px;
+	height: 30px;
+	border-radius: 4px;
+	text-decoration: none;
+	color: #787c82;
+	transition: background .12s, color .12s;
 }
-.shseq-master-preview img { max-width: 100%; max-height: 80px; object-fit: contain; }
-.shseq-master-empty { font-size: 12px; color: #787c82; }
-.shseq-master-actions { display: flex; gap: 8px; align-items: center; margin: 6px 0; }
-.shseq-master-badge {
-	display: inline-block;
-	margin-left: 6px;
-	padding: 1px 6px;
-	border-radius: 3px;
-	font-size: 10px;
+.shseq-action-icon:hover {
+	background: #f0f0f1;
+	color: #2271b1;
+}
+.shseq-action-icon .dashicons {
+	font-size: 16px !important;
+	width: 16px !important;
+	height: 16px !important;
+}
+
+/* No results row */
+.shseq-no-results {
+	padding: 20px;
+	text-align: center;
+	color: #787c82;
+	font-size: 13px;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────── */
+.shseq-empty-state {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 8px;
+	padding: 48px 32px;
+	text-align: center;
+}
+.shseq-empty-state__icon .dashicons {
+	font-size: 56px !important;
+	width: 56px !important;
+	height: 56px !important;
+	color: #c3c4c7;
+}
+.shseq-empty-state h2 {
+	margin: 16px 0 8px;
+	font-size: 18px;
+	color: #1d2327;
+}
+.shseq-empty-state p {
+	max-width: 480px;
+	margin: 0 auto 8px;
+	color: #50575e;
+	font-size: 14px;
+	line-height: 1.6;
+}
+.shseq-empty-state__hint {
+	font-size: 13px !important;
+	color: #787c82 !important;
+}
+.shseq-empty-cta {
+	margin-top: 20px;
+}
+
+/* ── Sidebar cards ───────────────────────────────────────────────────── */
+.shseq-sidebar-card-title {
+	margin: 0;
+	padding: 14px 16px 10px;
+	font-size: 12px;
 	font-weight: 700;
 	text-transform: uppercase;
+	letter-spacing: .07em;
+	color: #3c434a;
+	border-bottom: 1px solid #f0f0f1;
 }
-.shseq-master-badge--ok { background: #d5f0dd; color: #1a6b39; }
-.shseq-master-lock { font-size: 12px; color: #787c82; font-style: italic; margin: 4px 0; }
+
+/* Usage card */
+.shseq-usage-card { padding-bottom: 14px; }
+.shseq-usage-bar {
+	height: 8px;
+	background: #f0f0f1;
+	border-radius: 9999px;
+	overflow: hidden;
+	margin: 12px 16px 6px;
+}
+.shseq-usage-bar__fill {
+	height: 100%;
+	background: #2271b1;
+	border-radius: 9999px;
+	transition: width .3s ease;
+}
+.shseq-usage-bar__fill.is-warn { background: #dba617; }
+.shseq-usage-bar__fill.is-full { background: #d63638; }
+.shseq-usage-label {
+	margin: 0 16px 10px;
+	font-size: 12px;
+	color: #50575e;
+}
+.shseq-upgrade-btn {
+	display: block !important;
+	margin: 0 16px;
+	text-align: center;
+}
+
+/* Embed card */
+.shseq-embed-card { padding-bottom: 14px; }
+.shseq-embed-card .description {
+	margin: 8px 16px 6px;
+	font-size: 12px;
+}
+.shseq-embed-copy-btn {
+	margin: 0 16px;
+	width: calc(100% - 32px);
+	justify-content: space-between;
+}
+.shseq-embed-copy-btn code { font-size: 11px; }
+.shseq-embed-hint {
+	margin: 6px 16px 0 !important;
+	font-size: 11px !important;
+	color: #a7aaad !important;
+}
+
+/* Health card */
+.shseq-health-card {
+	border-color: #f0b849;
+	background: #fffbf0;
+}
+.shseq-health-title {
+	color: #8c5e00 !important;
+	border-bottom-color: #f0b849 !important;
+}
+.shseq-health-title .dashicons {
+	font-size: 16px !important;
+	width: 16px !important;
+	height: 16px !important;
+	color: #dba617;
+	vertical-align: middle;
+	margin-right: 4px;
+}
+.shseq-health-list {
+	margin: 10px 16px 14px;
+	padding: 0 0 0 18px;
+	font-size: 12px;
+	color: #50575e;
+	line-height: 1.6;
+}
+
+/* ── Copy toast ──────────────────────────────────────────────────────── */
+.shseq-copy-toast {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX(-50%) translateY(20px);
+	background: #1d2327;
+	color: #fff;
+	font-size: 13px;
+	padding: 10px 20px;
+	border-radius: 6px;
+	box-shadow: 0 4px 16px rgba(0,0,0,.2);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity .2s ease, transform .2s ease;
+	z-index: 99999;
+	white-space: nowrap;
+}
+.shseq-copy-toast.is-visible {
+	opacity: 1;
+	transform: translateX(-50%) translateY(0);
+}
+
+/* ── RTL ─────────────────────────────────────────────────────────────── */
+[dir="rtl"] .shseq-seq-table th,
+[dir="rtl"] .shseq-seq-table td { text-align: right; }
+[dir="rtl"] .shseq-warn-icon { margin-right: 0; margin-left: 4px; }
+[dir="rtl"] .shseq-health-title .dashicons { margin-right: 0; margin-left: 4px; }
