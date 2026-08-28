@@ -83,6 +83,7 @@ final class SequenceWizardPage {
 	// ── Hooks ──────────────────────────────────────────────────────────────
 
 	public function register_hooks(): void {
+		add_action( 'admin_menu',            array( $this, 'register_page'  ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'wp_ajax_shseq_wiz_step1',         array( $this, 'ajax_step1'         ) );
 		add_action( 'wp_ajax_shseq_wiz_step2_upload',  array( $this, 'ajax_step2_upload'  ) );
@@ -95,6 +96,17 @@ final class SequenceWizardPage {
 		add_action( 'wp_ajax_shseq_wiz_publish',       array( $this, 'ajax_publish'       ) );
 		add_action( 'wp_ajax_shseq_wiz_back',          array( $this, 'ajax_back'          ) );
 		add_action( 'wp_ajax_shseq_wiz_check_name',    array( $this, 'ajax_check_name'    ) );
+	}
+
+	public function register_page(): void {
+		add_submenu_page(
+			null,
+			__( 'New Sequence — StoryBoard Live', 'sh-sequence-engine' ),
+			__( 'New Sequence', 'sh-sequence-engine' ),
+			'edit_shseq_sequences',
+			self::PAGE_SLUG,
+			array( $this, 'render' )
+		);
 	}
 
 	public function enqueue_assets( string $hook ): void {
