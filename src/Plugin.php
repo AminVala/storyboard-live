@@ -4,6 +4,7 @@ namespace ShahreHonar\SequenceEngine;
 use ShahreHonar\SequenceEngine\Admin\AdminAssets;
 use ShahreHonar\SequenceEngine\Admin\AdminBar;
 use ShahreHonar\SequenceEngine\Admin\AdminMenu;
+use ShahreHonar\SequenceEngine\Admin\AllSequencesPage;
 use ShahreHonar\SequenceEngine\Admin\ContentStepsMetaBox;
 use ShahreHonar\SequenceEngine\Admin\DashboardPage;
 use ShahreHonar\SequenceEngine\Admin\FallbackNotice;
@@ -13,7 +14,7 @@ use ShahreHonar\SequenceEngine\Admin\PluginLinks;
 use ShahreHonar\SequenceEngine\Admin\SequenceDuplicator;
 use ShahreHonar\SequenceEngine\Admin\SequencePreview;
 use ShahreHonar\SequenceEngine\Admin\SequenceStructureMetaBox;
-use ShahreHonar\SequenceEngine\Admin\SequenceWizard;
+use ShahreHonar\SequenceEngine\Admin\SequenceWizardPage;
 use ShahreHonar\SequenceEngine\Admin\SettingsPage;
 use ShahreHonar\SequenceEngine\Admin\TemplatesPage;
 use ShahreHonar\SequenceEngine\AI\OpenAIProvider;
@@ -60,23 +61,26 @@ final class Plugin {
 			return;
 		}
 
-		$template_catalog = new TemplateCatalog();
-		$dashboard_page   = new DashboardPage();
-		$templates_page   = new TemplatesPage( $template_catalog );
-		$sequence_wizard  = new SequenceWizard( $template_catalog );
+		$template_catalog     = new TemplateCatalog();
+		$dashboard_page       = new DashboardPage();
+		$templates_page       = new TemplatesPage( $template_catalog );
+		$all_sequences_page   = new AllSequencesPage();
+		$sequence_wizard_page = new SequenceWizardPage( $template_catalog );
 
-		// Wizard (new step-by-step creator — primary creation path)
-		$sequence_wizard->register_hooks();
+		// Wizard V3 — primary creation path (Section 4)
+		$sequence_wizard_page->register_hooks();
 
-		// Admin menu — uses updated dashboard + templates pages
-		( new AdminMenu( $dashboard_page, $templates_page ) )->register_hooks();
+		// All Sequences page: AJAX + cache-invalidation hooks
+		$all_sequences_page->register_hooks();
 
-		// Meta boxes (still needed for full editor fallback)
+		// Admin menu — Dashboard + All Sequences + Ready Templates
+		( new AdminMenu( $dashboard_page, $templates_page, $all_sequences_page ) )->register_hooks();
+
+		// Meta boxes (editor fallback)
 		( new SequenceStructureMetaBox() )->register_hooks();
 		( new GoldenMasterMetaBox() )->register_hooks();
-		( new ContentStepsMetaBox() )->register_hooks();  // BUG-printf fixed version
+		( new ContentStepsMetaBox() )->register_hooks();
 		( new FrameUploadMetaBox() )->register_hooks();
-		// GoldenMasterValidation is static — no registration needed
 
 		( new AdminAssets() )->register_hooks();
 		( new AdminBar() )->register_hooks();
