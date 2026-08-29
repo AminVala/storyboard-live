@@ -1,21 +1,24 @@
 <?php
 /**
- * Frame Sequence shortcode handler.
+ * Frame Sequence Shortcode — Loop 3 Final (v3)
  *
- * Registers [storyboard_live id="123"] (and the deprecated alias
- * [shseq_sequence id="123"]).
+ * Registers [storyboard_live id="123"] and legacy alias [shseq_sequence id="123"].
  *
- * Output:
- *   - A sticky wrapper div that the JS engine pins during scroll.
- *   - A <canvas> element for frame rendering.
- *   - Content step overlay divs (hidden, faded-in by JS).
- *   - A noscript fallback with the last frame as a static image.
- *   - Inline JSON manifest consumed by the engine (escaped via wp_json_encode).
+ * DOM structure (v3):
+ *   .shseq-frame-sequence           — outer sentinel (420 vh tall)
+ *     .shseq-stage                  — position:sticky, height = vh − header_offset
+ *       canvas.shseq-canvas         — frame renderer (cover-fit via JS)
+ *       img.shseq-static-fallback   — reduced-motion static image (CSS-controlled)
+ *       .shseq-overlays             — content step overlays (inside sticky stage ✓)
+ *         .shseq-overlay[data-step]
+ *     noscript > img                — no-JS fallback
+ *     script.shseq-manifest         — inline JSON for JS engine (class fixed from v1 bug)
  *
- * Accessibility:
- *   - role="region" with aria-label on the wrapper.
- *   - prefers-reduced-motion: engine switches to static last frame.
- *   - Alt text on the noscript <img> and on the canvas via aria-label.
+ * Fixes vs v1:
+ *   - manifest class was "shseq-manifest-data" → JS looked for "shseq-manifest" → never found
+ *   - overlays were OUTSIDE .shseq-stage → scrolled away from viewport during animation
+ *   - no reduced-motion static image inside the sticky stage
+ *   - no CSS custom property for header offset (--shseq-top)
  *
  * @package StoryBoardLive
  */
@@ -24,7 +27,6 @@ namespace ShahreHonar\SequenceEngine\Frontend;
 
 use ShahreHonar\SequenceEngine\Admin\ContentStepsMetaBox;
 use ShahreHonar\SequenceEngine\Frames\FrameManager;
-use ShahreHonar\SequenceEngine\License\LicenseManager;
 
 /**
  * Handles [storyboard_live] shortcode rendering.
@@ -69,7 +71,7 @@ final class FrameSequenceShortcode {
 			array(
 				'id'     => '0',
 				'class'  => '',
-				'height' => '100vh',
+				'height' => '420vh',
 			),
 			$atts,
 			self::SHORTCODE
@@ -77,41 +79,42 @@ final class FrameSequenceShortcode {
 
 		$post_id = absint( $atts['id'] );
 		if ( 0 === $post_id ) {
-			return $this->comment( 'storyboard_live: missing id attribute' );
+			return $this->debug_comment( 'storyboard_live: missing id attribute' );
 		}
 
 		if ( 'shseq_sequence' !== get_post_type( $post_id ) ) {
-			return $this->comment( 'storyboard_live: post ' . $post_id . ' is not a Sequence' );
+			return $this->debug_comment( 'storyboard_live: post ' . $post_id . ' is not a Sequence' );
 		}
 
-		// Build manifest first — bail silently if no frames yet.
+		// Build manifest — bail silently if no frames yet.
 		$instance_id = 'shseq-' . $post_id . '-' . ( ++self::$instance_counter );
 		$data        = $this->manifest->build( $post_id, $instance_id );
 
 		if ( null === $data ) {
-			// Fallback: show placeholder if frames aren't ready yet.
-			if ( is_admin() ) {
-				return $this->comment( 'storyboard_live: no frames for sequence ' . $post_id );
-			}
-			return $this->render_placeholder( $post_id );
+			return is_admin()
+				? $this->debug_comment( 'storyboard_live: no frames for sequence ' . $post_id )
+				: $this->render_placeholder( $post_id );
 		}
 
-		// Ensure assets are enqueued on this page.
+		// Enqueue assets on this page (idempotent).
 		$this->assets->enqueue_for_page();
 
-		// Resolve last frame for noscript/reduced-motion fallback.
-		$frames     = FrameManager::get_frames( $post_id );
-		$last_att   = ! empty( $frames ) ? end( $frames ) : 0;
-		$last_url   = $last_att ? wp_get_attachment_image_url( $last_att, 'full' ) : '';
-		$last_alt   = $last_att ? trim( (string) get_post_meta( $last_att, '_wp_attachment_image_alt', true ) ) : '';
+		// Resolve last frame for static fallbacks.
+		$frames   = FrameManager::get_frames( $post_id );
+		$last_att = ! empty( $frames ) ? end( $frames ) : 0;
+		$last_url = $last_att ? (string) wp_get_attachment_image_url( $last_att, 'full' ) : '';
+		$last_alt = '';
+		if ( $last_att ) {
+			$last_alt = trim( (string) get_post_meta( $last_att, '_wp_attachment_image_alt', true ) );
+		}
 		if ( '' === $last_alt ) {
-			$last_alt = get_the_title( $post_id );
+			$last_alt = (string) get_the_title( $post_id );
 		}
 
-		$steps    = ContentStepsMetaBox::get_steps( $post_id );
-		$extra_class = esc_attr( $atts['class'] );
-		$height      = esc_attr( $atts['height'] );
-		$title       = esc_attr( get_the_title( $post_id ) );
+		$steps       = ContentStepsMetaBox::get_steps( $post_id );
+		$extra_class = esc_attr( trim( (string) $atts['class'] ) );
+		$height      = esc_attr( (string) $atts['height'] );
+		$title       = esc_attr( (string) get_the_title( $post_id ) );
 
 		ob_start();
 		?>
@@ -123,77 +126,100 @@ final class FrameSequenceShortcode {
 			aria-label="<?php printf( esc_attr__( '%s — scroll animation', 'sh-sequence-engine' ), $title ); ?>"
 			style="--shseq-height:<?php echo $height; ?>;"
 		>
-			<?php /* Sticky canvas wrapper — pinned while user scrolls */ ?>
+			<?php /*
+			 * Sticky stage — pinned while user scrolls.
+			 * --shseq-top is set by the JS engine after detecting the theme header + admin bar heights.
+			 * All interactive overlay content lives INSIDE this stage so it stays in the viewport.
+			 */ ?>
 			<div class="shseq-stage" aria-hidden="true">
+
 				<canvas
 					class="shseq-canvas"
 					aria-label="<?php echo esc_attr( $last_alt ); ?>"
 				></canvas>
-			</div>
 
-			<?php /* Content Step overlays */ ?>
-			<div class="shseq-overlays" aria-hidden="true">
-				<?php foreach ( $steps as $i => $step ) : ?>
-					<div
-						class="shseq-overlay"
-						data-step="<?php echo (int) $i; ?>"
-						data-scroll="<?php echo (int) ( $step['scroll_pct'] ?? 0 ); ?>"
+				<?php /* Reduced-motion static fallback — visible via CSS when prefers-reduced-motion: reduce */ ?>
+				<?php if ( $last_url ) : ?>
+					<img
+						class="shseq-static-fallback"
+						src="<?php echo esc_url( $last_url ); ?>"
+						alt="<?php echo esc_attr( $last_alt ); ?>"
+						loading="eager"
 					>
-						<?php if ( ! empty( $step['logo_url'] ) ) : ?>
-							<img
-								class="shseq-overlay__logo"
-								src="<?php echo esc_url( $step['logo_url'] ); ?>"
-								alt=""
-								loading="lazy"
+				<?php endif; ?>
+
+				<?php /* Content step overlays — inside sticky stage (v3 fix) */ ?>
+				<?php if ( ! empty( $steps ) ) : ?>
+					<div class="shseq-overlays">
+						<?php foreach ( $steps as $i => $step ) : ?>
+							<div
+								class="shseq-overlay"
+								data-step="<?php echo (int) $i; ?>"
+								data-scroll="<?php echo (int) ( $step['scroll_pct'] ?? 0 ); ?>"
+								aria-hidden="true"
 							>
-						<?php endif; ?>
+								<?php if ( ! empty( $step['logo_url'] ) ) : ?>
+									<img
+										class="shseq-overlay__logo"
+										src="<?php echo esc_url( $step['logo_url'] ); ?>"
+										alt=""
+										loading="lazy"
+									>
+								<?php endif; ?>
 
-						<?php if ( ! empty( $step['heading'] ) ) : ?>
-							<h2 class="shseq-overlay__heading">
-								<?php echo esc_html( $step['heading'] ); ?>
-							</h2>
-						<?php endif; ?>
+								<?php if ( ! empty( $step['heading'] ) ) : ?>
+									<h2 class="shseq-overlay__heading">
+										<?php echo esc_html( $step['heading'] ); ?>
+									</h2>
+								<?php endif; ?>
 
-						<?php if ( ! empty( $step['paragraph'] ) ) : ?>
-							<p class="shseq-overlay__paragraph">
-								<?php echo esc_html( $step['paragraph'] ); ?>
-							</p>
-						<?php endif; ?>
+								<?php if ( ! empty( $step['paragraph'] ) ) : ?>
+									<p class="shseq-overlay__paragraph">
+										<?php echo esc_html( $step['paragraph'] ); ?>
+									</p>
+								<?php endif; ?>
 
-						<?php if ( ! empty( $step['badge_text'] ) ) : ?>
-							<span class="shseq-overlay__badge">
-								<?php echo esc_html( $step['badge_text'] ); ?>
-							</span>
-						<?php endif; ?>
+								<?php if ( ! empty( $step['badge_text'] ) ) : ?>
+									<span class="shseq-overlay__badge">
+										<?php echo esc_html( $step['badge_text'] ); ?>
+									</span>
+								<?php endif; ?>
 
-						<?php if ( ! empty( $step['cta_text'] ) ) : ?>
-							<a
-								class="shseq-overlay__cta"
-								href="<?php echo esc_url( $step['cta_url'] ?? '#' ); ?>"
-							>
-								<?php echo esc_html( $step['cta_text'] ); ?>
-							</a>
-						<?php endif; ?>
+								<?php if ( ! empty( $step['cta_text'] ) ) : ?>
+									<a
+										class="shseq-overlay__cta"
+										href="<?php echo esc_url( $step['cta_url'] ?? '#' ); ?>"
+									>
+										<?php echo esc_html( $step['cta_text'] ); ?>
+									</a>
+								<?php endif; ?>
+							</div>
+						<?php endforeach; ?>
 					</div>
-				<?php endforeach; ?>
-			</div>
+				<?php endif; ?>
 
-			<?php /* Noscript fallback — static last frame */ ?>
+			</div><?php /* end .shseq-stage */ ?>
+
+			<?php /* Noscript fallback — static last frame when JS disabled */ ?>
 			<?php if ( $last_url ) : ?>
 				<noscript>
 					<img
 						class="shseq-noscript-fallback"
 						src="<?php echo esc_url( $last_url ); ?>"
 						alt="<?php echo esc_attr( $last_alt ); ?>"
-						loading="lazy"
 					>
 				</noscript>
 			<?php endif; ?>
 
-			<?php /* Inline manifest for the JS engine */ ?>
-			<script type="application/json" class="shseq-manifest-data">
+			<?php /*
+			 * Inline JSON manifest for the JS engine.
+			 * Class "shseq-manifest" must match the querySelector in frame-sequence-engine.js.
+			 * (v1 bug: class was "shseq-manifest-data" → engine never found it)
+			 */ ?>
+			<script type="application/json" class="shseq-manifest">
 				<?php echo wp_json_encode( $data ); ?>
 			</script>
+
 		</div>
 		<?php
 		return ob_get_clean();
@@ -205,21 +231,25 @@ final class FrameSequenceShortcode {
 	 * @param int $post_id Sequence post ID.
 	 * @return string
 	 */
-	private function render_placeholder( $post_id ) {
+	private function render_placeholder( int $post_id ): string {
 		return sprintf(
 			'<div class="shseq-placeholder" aria-label="%s"><span>%s</span></div>',
-			esc_attr( get_the_title( $post_id ) ),
+			esc_attr( (string) get_the_title( $post_id ) ),
 			esc_html__( 'Hero sequence loading…', 'sh-sequence-engine' )
 		);
 	}
 
 	/**
-	 * Return an HTML comment (visible in source, not in browser).
+	 * HTML comment visible in source but not in browser.
+	 * Only emitted in WP_DEBUG mode.
 	 *
-	 * @param string $msg Debug message.
+	 * @param string $msg Message.
 	 * @return string
 	 */
-	private function comment( $msg ) {
-		return '<!-- ' . esc_html( $msg ) . ' -->';
+	private function debug_comment( string $msg ): string {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			return '<!-- ' . esc_html( $msg ) . ' -->';
+		}
+		return '';
 	}
 }
