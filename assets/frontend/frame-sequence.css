@@ -1,21 +1,39 @@
-/* StoryBoard Live — Frame Sequence Frontend CSS */
+/* ============================================================================
+   StoryBoard Live — Frame Sequence Frontend CSS (Loop 3 Final, v3)
+   ============================================================================
+   Changes from v1:
+     - .shseq-static-fallback: visible under prefers-reduced-motion (v1 had none)
+     - .shseq-stage: top offset driven by --shseq-top (set by JS after header detection)
+     - .shseq-overlays: moved INSIDE .shseq-stage in the DOM; CSS adjusted accordingly
+     - canvas object-fit: cover removed (was never applied to <canvas>; engine does it in JS)
+     - Mobile card layout for .shseq-overlay on narrow viewports
+     - RTL support via [dir="rtl"]
+   ============================================================================ */
 
-/* ── Sequence wrapper ────────────────────────────────────────────────────── */
+/* ── Sequence wrapper (scroll sentinel) ─────────────────────────────────── */
 .shseq-frame-sequence {
 	position: relative;
 	width: 100%;
-	/* Height is the scrollable sentinel; the sticky canvas sits inside */
+	/* CSS custom property set from shortcode [height] attribute */
 	height: var(--shseq-height, 420vh);
+	/* Remove any theme margin that would offset the sticky stage */
+	margin-left: 0;
+	margin-right: 0;
 }
 
-/* ── Sticky stage (pinned during scroll) ─────────────────────────────────── */
+/* ── Sticky stage ────────────────────────────────────────────────────────── */
+/*
+ * --shseq-top: injected by JS once the theme-header height is known.
+ * Falls back to 0px so the stage is visible even before JS runs.
+ */
 .shseq-stage {
 	position: sticky;
-	top: 0;
+	top: var(--shseq-top, 0px);
 	width: 100%;
-	height: 100vh;
+	height: calc(100vh - var(--shseq-top, 0px));
 	overflow: hidden;
 	z-index: 0;
+	background: #000; /* visible while frame 0 loads */
 }
 
 /* ── Canvas ──────────────────────────────────────────────────────────────── */
@@ -23,10 +41,37 @@
 	display: block;
 	width: 100%;
 	height: 100%;
+	/* object-fit intentionally NOT set — cover is implemented in JS for <canvas> */
+}
+
+/* ── Static fallback (reduced-motion & mobile-static) ───────────────────── */
+.shseq-static-fallback {
+	display: none; /* hidden by default; shown by the rules below */
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
 	object-fit: cover;
 }
 
-/* ── Overlay container ───────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+	.shseq-canvas {
+		display: none;
+	}
+	.shseq-static-fallback {
+		display: block;
+	}
+}
+
+/* Mobile static (added by JS when disableOnMobile + viewport < 768px) */
+.shseq-static-fallback.is-mobile-static {
+	display: block;
+}
+.shseq-static-fallback.is-mobile-static ~ .shseq-canvas {
+	display: none;
+}
+
+/* ── Overlay container (inside .shseq-stage in DOM — v3 fix) ────────────── */
 .shseq-overlays {
 	position: absolute;
 	inset: 0;
@@ -42,25 +87,63 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 40px 20px;
+	padding: 40px 24px;
 	opacity: 0;
-	transition: opacity 0.4s ease;
+	transform: translateY(8px);
+	transition: opacity 0.4s ease, transform 0.4s ease;
 	pointer-events: none;
 	text-align: center;
 }
+
 .shseq-overlay.is-visible {
 	opacity: 1;
+	transform: translateY(0);
 	pointer-events: auto;
 }
 
 /* Overlay elements */
-.shseq-overlay__logo      { max-height: 48px; margin-bottom: 16px; }
-.shseq-overlay__heading   { margin: 0 0 12px; font-size: clamp(24px, 5vw, 56px); line-height: 1.15; font-weight: 700; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.4); }
-.shseq-overlay__paragraph { margin: 0 0 20px; font-size: clamp(15px, 2vw, 20px); color: rgba(255,255,255,.9); max-width: 640px; }
-.shseq-overlay__badge     { display: inline-block; padding: 4px 14px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); border-radius: 99px; font-size: 13px; color: #fff; margin-bottom: 16px; }
+.shseq-overlay__logo {
+	max-height: 52px;
+	max-width: 180px;
+	margin-bottom: 18px;
+	object-fit: contain;
+}
+
+.shseq-overlay__heading {
+	margin: 0 0 14px;
+	font-size: clamp(22px, 5vw, 58px);
+	line-height: 1.12;
+	font-weight: 700;
+	color: #fff;
+	text-shadow: 0 2px 12px rgba(0, 0, 0, .45);
+}
+
+.shseq-overlay__paragraph {
+	margin: 0 0 22px;
+	font-size: clamp(14px, 2vw, 20px);
+	line-height: 1.55;
+	color: rgba(255, 255, 255, .9);
+	max-width: 640px;
+	text-shadow: 0 1px 4px rgba(0, 0, 0, .35);
+}
+
+.shseq-overlay__badge {
+	display: inline-block;
+	padding: 5px 16px;
+	background: rgba(255, 255, 255, .15);
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
+	border: 1px solid rgba(255, 255, 255, .3);
+	border-radius: 99px;
+	font-size: 13px;
+	color: #fff;
+	margin-bottom: 18px;
+	letter-spacing: .02em;
+}
+
 .shseq-overlay__cta {
 	display: inline-block;
-	padding: 14px 32px;
+	padding: 14px 36px;
 	background: #fff;
 	color: #1d2327;
 	border-radius: 4px;
@@ -68,9 +151,18 @@
 	font-weight: 600;
 	text-decoration: none;
 	pointer-events: auto;
-	transition: background .2s, transform .2s;
+	transition: background .2s, transform .2s, box-shadow .2s;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, .2);
 }
-.shseq-overlay__cta:hover { background: #f0f0f0; transform: translateY(-1px); }
+
+.shseq-overlay__cta:hover,
+.shseq-overlay__cta:focus-visible {
+	background: #f0f0f0;
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(0, 0, 0, .25);
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}
 
 /* ── Noscript fallback ───────────────────────────────────────────────────── */
 .shseq-noscript-fallback {
@@ -80,16 +172,69 @@
 	object-fit: cover;
 }
 
-/* ── Reduced-motion: skip animation ─────────────────────────────────────── */
+/* ── Placeholder (no frames yet) ─────────────────────────────────────────── */
+.shseq-placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 60vh;
+	background: #0a0a0a;
+	color: rgba(255, 255, 255, .5);
+	font-size: 15px;
+}
+
+/* ── RTL ─────────────────────────────────────────────────────────────────── */
+[dir="rtl"] .shseq-overlay {
+	direction: rtl;
+}
+[dir="rtl"] .shseq-overlay__heading,
+[dir="rtl"] .shseq-overlay__paragraph {
+	text-align: right;
+}
+
+/* ── Full-width: remove theme content-area constraints ───────────────────── */
+/*
+ * Many themes wrap content in a max-width container.
+ * When the sequence is placed directly in a page template (not inside a column),
+ * the author can add class="shseq-full-bleed" to break out of the container.
+ */
+.shseq-full-bleed {
+	width: 100vw;
+	position: relative;
+	left: 50%;
+	right: 50%;
+	margin-left: -50vw;
+	margin-right: -50vw;
+}
+
+/* ── Mobile: simplified layout ───────────────────────────────────────────── */
+@media (max-width: 767px) {
+	.shseq-overlay {
+		padding: 24px 16px;
+	}
+	.shseq-overlay__heading {
+		font-size: clamp(18px, 6vw, 28px);
+	}
+	.shseq-overlay__cta {
+		padding: 12px 24px;
+	}
+}
+
+/* ── Reduced-motion: collapse scroll height, show static ─────────────────── */
 @media (prefers-reduced-motion: reduce) {
 	.shseq-frame-sequence {
 		height: auto !important;
 	}
 	.shseq-stage {
 		position: relative;
+		top: 0;
 		height: auto;
 	}
-	.shseq-canvas {
-		display: none;
+	/* Show first overlay in static mode */
+	.shseq-overlay:first-child {
+		opacity: 1;
+		transform: none;
+		pointer-events: auto;
 	}
 }
