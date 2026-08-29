@@ -120,16 +120,33 @@ final class SequenceWizardPage {
 
 		wp_enqueue_media();
 
+		// Main wizard CSS + Canvas overlay CSS
 		wp_enqueue_style(
 			'shseq-wizard-v3',
 			$url . 'assets/admin/wizard-v3.css',
 			array(),
 			$ver
 		);
+		wp_enqueue_style(
+			'shseq-wizard-canvas',
+			$url . 'assets/admin/wizard-canvas.css',
+			array( 'shseq-wizard-v3' ),
+			$ver
+		);
+
+		// Main wizard JS
 		wp_enqueue_script(
 			'shseq-wizard-v3',
 			$url . 'assets/admin/wizard-v3.js',
 			array(),
+			$ver,
+			true
+		);
+		// Canvas overlay + Step4 fix JS (loads after main)
+		wp_enqueue_script(
+			'shseq-wizard-overlay',
+			$url . 'assets/admin/wizard-v3-overlay.js',
+			array( 'shseq-wizard-v3' ),
 			$ver,
 			true
 		);
