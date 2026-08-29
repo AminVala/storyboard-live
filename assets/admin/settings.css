@@ -1,0 +1,220 @@
+/* ── StoryBoard Live — Settings Page v3 ── */
+
+/* Layout */
+.shseq-settings-wrap { max-width: 960px; }
+
+/* Header */
+.shseq-settings-header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 0 8px;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 0;
+}
+.shseq-settings-header__icon {
+  font-size: 32px; width: 32px; height: 32px;
+  color: #2271b1; flex-shrink: 0;
+}
+.shseq-settings-header__text h1 { margin: 0; padding: 0; font-size: 1.5em; }
+.shseq-settings-header__text p  { margin: 4px 0 0; color: #646970; font-size: 13px; }
+
+/* Tabs */
+.shseq-settings-tabs {
+  display: flex; gap: 0;
+  border-bottom: 2px solid #e0e0e0;
+  margin: 0 0 24px;
+  flex-wrap: wrap;
+}
+.shseq-settings-tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 12px 18px;
+  text-decoration: none;
+  color: #646970;
+  font-size: 13px; font-weight: 500;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  border-radius: 4px 4px 0 0;
+  transition: color .15s, border-color .15s;
+}
+.shseq-settings-tab:hover { color: #2271b1; }
+.shseq-settings-tab.is-active {
+  color: #2271b1;
+  border-bottom-color: #2271b1;
+  background: #fff;
+  font-weight: 600;
+}
+.shseq-settings-tab .dashicons { font-size: 16px; width: 16px; height: 16px; }
+
+/* Panel */
+.shseq-settings-panel { display: none; }
+.shseq-settings-panel.is-active { display: block; }
+
+/* Form */
+.shseq-settings-form { max-width: 760px; }
+
+/* Section */
+.shseq-settings-section {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.shseq-settings-section--danger {
+  border-color: #d63638;
+  background: #fef7f7;
+}
+.shseq-settings-section__title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 600;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  color: #1d2327;
+}
+.shseq-settings-section--danger .shseq-settings-section__title { color: #d63638; }
+.shseq-settings-section__title .dashicons { font-size: 18px; width: 18px; height: 18px; }
+
+/* Field rows */
+.shseq-settings-field {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 8px 24px;
+  align-items: start;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.shseq-settings-field:last-child { border-bottom: none; padding-bottom: 0; }
+.shseq-settings-field__label {
+  padding-top: 6px;
+  font-weight: 500;
+  color: #1d2327;
+  font-size: 13px;
+}
+.shseq-settings-field__label label { cursor: pointer; }
+.shseq-settings-field__control { display: flex; flex-direction: column; gap: 6px; }
+
+/* Number input */
+.shseq-number-wrap { display: flex; align-items: center; gap: 8px; }
+.shseq-number-wrap input[type="number"] { width: 80px; }
+.shseq-unit { color: #646970; font-size: 12px; }
+
+/* Toggle switch */
+.shseq-toggle { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
+.shseq-toggle input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+.shseq-toggle__track {
+  display: inline-flex; align-items: center;
+  width: 40px; height: 22px;
+  background: #ccc; border-radius: 11px;
+  position: relative; flex-shrink: 0;
+  transition: background .2s;
+}
+.shseq-toggle input:checked ~ .shseq-toggle__track { background: #2271b1; }
+.shseq-toggle--danger input:checked ~ .shseq-toggle__track { background: #d63638; }
+.shseq-toggle__thumb {
+  position: absolute; left: 3px;
+  width: 16px; height: 16px;
+  background: #fff; border-radius: 50%;
+  transition: left .2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+.shseq-toggle input:checked ~ .shseq-toggle__track .shseq-toggle__thumb { left: 21px; }
+.shseq-toggle__label { font-size: 13px; color: #1d2327; }
+.shseq-toggle input:focus-visible ~ .shseq-toggle__track {
+  outline: 2px solid #2271b1; outline-offset: 2px;
+}
+
+/* Hints */
+.shseq-hint { font-size: 12px; color: #646970; margin: 0; }
+.shseq-hint--danger { color: #d63638; }
+
+/* Notice */
+.shseq-notice {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 18px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+.shseq-notice--info { background: #e8f4fd; border: 1px solid #a8d4f0; }
+.shseq-notice .dashicons { font-size: 20px; width: 20px; height: 20px; color: #2271b1; flex-shrink: 0; }
+.shseq-notice strong { display: block; margin-bottom: 4px; }
+.shseq-notice p { margin: 0; color: #2c3338; }
+
+/* API key field */
+.shseq-api-field { display: flex; flex-direction: column; gap: 8px; }
+.shseq-api-field__row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.shseq-api-field__input-wrap { position: relative; display: flex; align-items: center; }
+.shseq-api-field__input { padding-right: 36px !important; font-family: monospace; }
+.shseq-api-field__reveal {
+  position: absolute; right: 6px;
+  background: none; border: none; cursor: pointer;
+  color: #646970; padding: 2px;
+  display: flex; align-items: center;
+}
+.shseq-api-field__reveal:hover { color: #2271b1; }
+.shseq-api-field__reveal .dashicons { font-size: 16px; width: 16px; height: 16px; }
+.shseq-api-field__test { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.shseq-api-field__test-icon { font-size: 14px; width: 14px; height: 14px; }
+.shseq-api-field__stored { font-size: 12px; color: #00a32a; margin: 0; display: flex; align-items: center; gap: 4px; }
+.shseq-api-field__stored .dashicons { font-size: 14px; width: 14px; height: 14px; }
+.shseq-api-field__result { font-size: 13px; min-height: 20px; font-weight: 500; }
+.shseq-api-field__result.is-success { color: #00a32a; }
+.shseq-api-field__result.is-error   { color: #d63638; }
+.shseq-api-field__test-icon.spin { animation: shseq-spin .8s linear infinite; }
+@keyframes shseq-spin { to { transform: rotate(360deg); } }
+
+/* Plan panel */
+.shseq-plan-wrap { display: flex; justify-content: center; padding: 24px 0; }
+.shseq-plan-card {
+  width: 100%; max-width: 480px;
+  background: #fff; border: 2px solid #e0e0e0;
+  border-radius: 12px; padding: 32px;
+  text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.shseq-plan-card--pro { border-color: #f5a623; background: #fffbf4; }
+.shseq-plan-card__badge {
+  display: inline-block;
+  padding: 3px 14px;
+  border-radius: 20px;
+  font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.shseq-plan-card--free .shseq-plan-card__badge { background: #e0e0e0; color: #444; }
+.shseq-plan-card--pro  .shseq-plan-card__badge { background: #f5a623; color: #fff; }
+.shseq-plan-card h2 { margin: 0 0 24px; font-size: 1.2em; }
+.shseq-plan-features { list-style: none; margin: 0 0 28px; padding: 0; text-align: left; }
+.shseq-plan-feature {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+}
+.shseq-plan-feature:last-child { border-bottom: none; }
+.shseq-plan-feature.is-available { color: #1d2327; }
+.shseq-plan-feature.is-locked    { color: #999; }
+.shseq-plan-feature.is-available .dashicons { color: #00a32a; }
+.shseq-plan-feature.is-locked    .dashicons { color: #bbb; }
+.shseq-plan-upgrade-btn { width: 100%; justify-content: center; display: inline-flex !important; align-items: center; gap: 6px; font-size: 14px !important; padding: 10px 0 !important; }
+.shseq-plan-active-msg { display: flex; align-items: center; justify-content: center; gap: 8px; color: #00a32a; font-weight: 600; margin: 0; }
+
+/* Sysinfo */
+.shseq-sysinfo-wrap { max-width: 700px; }
+.shseq-sysinfo-intro { color: #646970; font-size: 13px; margin-bottom: 16px; }
+.shseq-sysinfo-table th { font-weight: 500; white-space: nowrap; width: 220px; }
+.shseq-sysinfo-table code { font-size: 12px; background: #f6f7f7; padding: 1px 6px; border-radius: 3px; }
+.shseq-sysinfo-copy-btn { display: inline-flex !important; align-items: center; gap: 6px; margin-top: 16px; }
+.shseq-sysinfo-copy-feedback { display: inline-block; margin-left: 12px; font-size: 13px; color: #00a32a; }
+
+/* RTL */
+.rtl .shseq-settings-field { direction: rtl; }
+.rtl .shseq-plan-features { text-align: right; }
+.rtl .shseq-api-field__input { padding-right: 12px !important; padding-left: 36px !important; }
+.rtl .shseq-api-field__reveal { right: auto; left: 6px; }
+
+/* Mobile */
+@media (max-width: 782px) {
+  .shseq-settings-field { grid-template-columns: 1fr; }
+  .shseq-settings-tabs  { gap: 0; }
+  .shseq-settings-tab   { padding: 10px 12px; font-size: 12px; }
+  .shseq-settings-section { padding: 16px; }
+}
