@@ -17,6 +17,7 @@ use ShahreHonar\SequenceEngine\Admin\SequenceStructureMetaBox;
 use ShahreHonar\SequenceEngine\Admin\SequenceWizardPage;
 use ShahreHonar\SequenceEngine\Admin\SettingsPage;
 use ShahreHonar\SequenceEngine\Admin\TemplatesPage;
+use ShahreHonar\SequenceEngine\Admin\WizardStep4Override;
 use ShahreHonar\SequenceEngine\AI\OpenAIProvider;
 use ShahreHonar\SequenceEngine\AI\ReplicateProvider;
 use ShahreHonar\SequenceEngine\Blocks\FrameSequenceBlock;
@@ -69,6 +70,9 @@ final class Plugin {
 
 		// Wizard V3 — primary creation path (Section 4)
 		$sequence_wizard_page->register_hooks();
+
+		// WizardStep4Override — fixes mode-aware generation (must register AFTER wizard)
+		( new WizardStep4Override( $sequence_wizard_page ) )->register_hooks();
 
 		// All Sequences page: AJAX + cache-invalidation hooks
 		$all_sequences_page->register_hooks();
