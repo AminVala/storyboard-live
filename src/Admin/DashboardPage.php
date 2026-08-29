@@ -1,14 +1,9 @@
 <?php
 /**
- * Plugin dashboard page — v5 Final
+ * Plugin dashboard page — v6 Final (bilingual fix)
  *
- * Fixes:
- *  - Full fa_IR / English bilingual via fa() helper
- *  - "صفحات استفاده شده" column added
- *  - Edit button uses post_id + reads current wizard step from meta
- *  - "View all" links to AllSequencesPage slug
- *  - Usage sidebar: all Persian when fa_IR
- *  - Shortcode sidebar: all Persian when fa_IR
+ * Bug fixed: static $is_fa was cached before locale was loaded → always English.
+ * Fix: use instance method, no static cache, called on demand.
  *
  * @package StoryBoardLive
  */
@@ -21,15 +16,10 @@ use ShahreHonar\SequenceEngine\License\LicenseManager;
 
 final class DashboardPage {
 
-	// ── Bilingual helper ───────────────────────────────────────────────────
-
-	private static ?bool $is_fa = null;
+	// ── Bilingual ─────────────────────────────────────────────────────────
 
 	private function is_fa(): bool {
-		if ( self::$is_fa === null ) {
-			self::$is_fa = ( strpos( get_locale(), 'fa' ) === 0 ) || is_rtl();
-		}
-		return self::$is_fa;
+		return is_rtl();
 	}
 
 	private function fa( string $fa, string $en ): string {
@@ -60,8 +50,8 @@ final class DashboardPage {
 
 	private function get_pages_using( int $post_id ): array {
 		global $wpdb;
-		$like  = $wpdb->esc_like( '[storyboard_live id="' . $post_id . '"' );
-		$rows  = $wpdb->get_results(
+		$like = $wpdb->esc_like( '[storyboard_live id="' . $post_id . '"' );
+		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT ID, post_title FROM {$wpdb->posts}
 				 WHERE post_status NOT IN ('trash','auto-draft')
@@ -112,7 +102,7 @@ final class DashboardPage {
 		}
 		if ( ! extension_loaded( 'gd' ) ) {
 			$health_issues[] = $this->fa(
-				'GD library بارگذاری نشده — پردازش فریم ممکن است با خطا مواجه شود.',
+				'کتابخانه GD بارگذاری نشده — پردازش فریم ممکن است با خطا مواجه شود.',
 				'GD image library not loaded — frame processing may fail.'
 			);
 		}
@@ -125,8 +115,10 @@ final class DashboardPage {
 		$create_url   = admin_url( 'admin.php?page=' . SequenceWizardPage::PAGE_SLUG );
 		$all_url      = admin_url( 'admin.php?page=' . AllSequencesPage::PAGE_SLUG );
 		$settings_url = admin_url( 'admin.php?page=shseq-settings' );
+
+		$isFa = $this->is_fa();
 		?>
-		<div class="wrap shseq-admin shseq-dashboard" dir="<?php echo $this->is_fa() ? 'rtl' : 'ltr'; ?>">
+		<div class="wrap shseq-admin shseq-dashboard" dir="<?php echo $isFa ? 'rtl' : 'ltr'; ?>">
 
 			<?php /* ── Header ─────────────────────────────────────── */ ?>
 			<header class="shseq-dash-header">
@@ -196,7 +188,7 @@ final class DashboardPage {
 
 				<div class="shseq-stat-card shseq-stat-card--draft" role="listitem">
 					<span class="shseq-stat-card__value"><?php echo (int) $drafts; ?></span>
-					<span class="shseq-stat-card__label"><?php echo esc_html( $this->fa( 'پیش‌نویس', 'Drafts' ) ); ?></span>
+					<span class="shseq-stat-card__label"><?php echo esc_html( $this->fa( 'پیشنویس', 'Drafts' ) ); ?></span>
 				</div>
 
 			</div>
@@ -243,7 +235,7 @@ final class DashboardPage {
 											<th scope="col"><?php echo esc_html( $this->fa( 'وضعیت', 'Status' ) ); ?></th>
 											<th scope="col"><?php echo esc_html( $this->fa( 'فریم‌ها', 'Frames' ) ); ?></th>
 											<th scope="col" class="shseq-col--shortcode"><?php echo esc_html( $this->fa( 'شورتکد', 'Shortcode' ) ); ?></th>
-											<th scope="col" class="shseq-col--pages"><?php echo esc_html( $this->fa( 'صفحات استفاده شده', 'Pages Used' ) ); ?></th>
+											<th scope="col" class="shseq-col--pages"><?php echo esc_html( $this->fa( 'صفحات استفاده‌شده', 'Pages Used' ) ); ?></th>
 											<th scope="col" class="shseq-col--modified"><?php echo esc_html( $this->fa( 'ویرایش‌شده', 'Modified' ) ); ?></th>
 											<th scope="col"><?php echo esc_html( $this->fa( 'عملیات', 'Actions' ) ); ?></th>
 										</tr>
@@ -252,7 +244,6 @@ final class DashboardPage {
 										<?php foreach ( $recent as $seq ) :
 											$frame_count  = FrameManager::count( $seq->ID );
 											$has_frames   = $frame_count > 0;
-											// Read current wizard step from meta
 											$current_step = (int) get_post_meta( $seq->ID, SequenceWizardPage::META_STEP, true );
 											$current_step = $current_step > 0 ? $current_step : 1;
 											$wizard_url   = add_query_arg(
@@ -267,6 +258,13 @@ final class DashboardPage {
 											$row_class    = ! $has_frames ? 'shseq-row--no-frames' : '';
 											$modified_gmt = $seq->post_modified_gmt;
 											$pages_count  = $this->count_pages_using( $seq->ID );
+
+											$status_label = match( $seq->post_status ) {
+												'publish' => $this->fa( 'منتشرشده', 'Published' ),
+												'draft'   => $this->fa( 'پیشنویس',  'Draft' ),
+												'private' => $this->fa( 'خصوصی',    'Private' ),
+												default   => $status_obj ? $status_obj->label : $seq->post_status,
+											};
 										?>
 										<tr
 											class="shseq-seq-row <?php echo esc_attr( $row_class ); ?>"
@@ -276,7 +274,10 @@ final class DashboardPage {
 												<?php if ( ! $has_frames ) : ?>
 													<span
 														class="shseq-warn-icon"
-														title="<?php echo esc_attr( $this->fa( 'بدون فریم — این سکانس در فرانت نمایش داده نخواهد شد', 'No frames — this sequence will not display on the frontend' ) ); ?>"
+														title="<?php echo esc_attr( $this->fa(
+															'بدون فریم — این سکانس در فرانت نمایش داده نخواهد شد',
+															'No frames — this sequence will not display on the frontend'
+														) ); ?>"
 														aria-hidden="true"
 													>⚠</span>
 												<?php endif; ?>
@@ -287,17 +288,7 @@ final class DashboardPage {
 
 											<td>
 												<span class="shseq-status-pill shseq-status-pill--<?php echo esc_attr( $seq->post_status ); ?>">
-													<?php
-													if ( $seq->post_status === 'publish' ) {
-														echo esc_html( $this->fa( 'منتشرشده', 'Published' ) );
-													} elseif ( $seq->post_status === 'draft' ) {
-														echo esc_html( $this->fa( 'پیش‌نویس', 'Draft' ) );
-													} elseif ( $seq->post_status === 'private' ) {
-														echo esc_html( $this->fa( 'خصوصی', 'Private' ) );
-													} else {
-														echo esc_html( $status_obj ? $status_obj->label : $seq->post_status );
-													}
-													?>
+													<?php echo esc_html( $status_label ); ?>
 												</span>
 											</td>
 
@@ -364,10 +355,10 @@ final class DashboardPage {
 													class="shseq-action-icon"
 													target="_blank"
 													rel="noopener noreferrer"
-													title="<?php echo esc_attr( $this->fa( 'پیش‌نمایش', 'Preview' ) ); ?>"
+													title="<?php echo esc_attr( $this->fa( 'پیشنمایش', 'Preview' ) ); ?>"
 												>
 													<span class="dashicons dashicons-visibility" aria-hidden="true"></span>
-													<span class="screen-reader-text"><?php echo esc_html( $this->fa( 'پیش‌نمایش', 'Preview' ) ); ?></span>
+													<span class="screen-reader-text"><?php echo esc_html( $this->fa( 'پیشنمایش', 'Preview' ) ); ?></span>
 												</a>
 												<?php endif; ?>
 											</td>
@@ -376,61 +367,56 @@ final class DashboardPage {
 									</tbody>
 								</table>
 							</div>
-
-							<div id="shseq-no-results" class="shseq-no-results" hidden>
-								<?php echo esc_html( $this->fa( 'سکانسی با این جستجو یافت نشد.', 'No sequences match your search.' ) ); ?>
-							</div>
-
 						</div>
 
 					<?php else : ?>
 
-					<?php /* ── Empty state ────────────────────────── */ ?>
-					<div class="shseq-empty-state">
-						<div class="shseq-empty-state__icon" aria-hidden="true">
-							<span class="dashicons dashicons-images-alt2"></span>
+						<?php /* ── Empty state ──────────────────────── */ ?>
+						<div class="shseq-empty-state">
+							<div class="shseq-empty-state__icon">
+								<span class="dashicons dashicons-images-alt2" aria-hidden="true"></span>
+							</div>
+							<h2><?php echo esc_html( $this->fa( 'هنوز سکانسی وجود ندارد', 'No sequences yet' ) ); ?></h2>
+							<p>
+								<?php echo esc_html( $this->fa(
+									'اولین سکانس اسکرول‌محور خود را بسازید و در صفحات سایت استفاده کنید.',
+									'Create your first scroll-driven hero sequence and embed it in any page.'
+								) ); ?>
+							</p>
+							<div class="shseq-empty-cta">
+								<a href="<?php echo esc_url( $create_url ); ?>" class="button button-primary">
+									<?php echo esc_html( $this->fa( 'شروع کنید', 'Get Started' ) ); ?>
+								</a>
+							</div>
 						</div>
-						<h2><?php echo esc_html( $this->fa( 'هنوز سکانسی ایجاد نشده', 'No sequences yet' ) ); ?></h2>
-						<p>
-							<?php echo esc_html( $this->fa(
-								'یک سکانس مجموعه‌ای از ۲۴ تا ۳۶ فریم WebP است که هنگام اسکرول کاربر انیمیت می‌شوند و یک هیرو سینماتیک بدون فایل ویدیو می‌سازند.',
-								'A sequence is a set of 24–36 WebP frames that animate as the visitor scrolls — creating a cinematic hero section without any video file.'
-							) ); ?>
-						</p>
-						<?php if ( $can_create ) : ?>
-							<a class="button button-primary button-hero shseq-empty-cta" href="<?php echo esc_url( $create_url ); ?>">
-								<?php echo esc_html( $this->fa( 'ساخت اولین سکانس', 'Create your first sequence' ) ); ?>
-							</a>
-						<?php else : ?>
-							<a class="button" href="<?php echo esc_url( $settings_url ); ?>">
-								<?php echo esc_html( $this->fa( 'ارتقا برای ساخت بیشتر', 'Upgrade to create more' ) ); ?>
-							</a>
-						<?php endif; ?>
-					</div>
 
 					<?php endif; ?>
+
 				</main>
 
-				<?php /* ── Sidebar ──────────────────────────────────── */ ?>
-				<aside class="shseq-dash-sidebar" aria-label="<?php echo esc_attr( $this->fa( 'سایدبار داشبورد', 'Dashboard sidebar' ) ); ?>">
+				<?php /* ── Sidebar ──────────────────────────────── */ ?>
+				<aside class="shseq-dash-sidebar">
 
-					<?php /* Usage card */ ?>
+					<?php /* ── Plan usage card ─────────────────── */ ?>
 					<div class="shseq-dash-card shseq-usage-card">
-						<h3 class="shseq-sidebar-card-title"><?php echo esc_html( $this->fa( 'استفاده از پلن', 'Plan Usage' ) ); ?></h3>
+						<h3 class="shseq-sidebar-card-title">
+							<?php echo esc_html( $this->fa( 'مصرف پلن', 'PLAN USAGE' ) ); ?>
+						</h3>
 						<div
 							class="shseq-usage-bar"
 							role="progressbar"
 							aria-valuenow="<?php echo (int) $usage_pct; ?>"
 							aria-valuemin="0"
 							aria-valuemax="100"
+							aria-label="<?php printf( '%d / %d', $total, $max_heroes ); ?>"
 						>
 							<div class="shseq-usage-bar__fill <?php echo $usage_pct >= 100 ? 'is-full' : ( $usage_pct >= 80 ? 'is-warn' : '' ); ?>"
 								style="width:<?php echo (int) $usage_pct; ?>%"></div>
 						</div>
 						<p class="shseq-usage-label">
-							<strong><?php echo (int) $total; ?></strong>
 							<?php printf(
-								esc_html( $this->fa( 'از %d سکانس مجاز', 'of %d sequences used' ) ),
+								esc_html( $this->fa( '%d از %d سکانس استفاده شده', 'of %2$d sequences used %1$d' ) ),
+								$total,
 								$max_heroes
 							); ?>
 						</p>
@@ -441,25 +427,35 @@ final class DashboardPage {
 						<?php endif; ?>
 					</div>
 
-					<?php /* Shortcode card */ ?>
-					<div class="shseq-dash-card shseq-shortcode-card">
-						<h3 class="shseq-sidebar-card-title"><?php echo esc_html( $this->fa( 'شورتکد جایگذاری', 'Embed Shortcode' ) ); ?></h3>
-						<p class="shseq-shortcode-hint">
-							<?php echo esc_html( $this->fa( 'در هر صفحه یا نوشته کپی کنید:', 'Paste into any page or post:' ) ); ?>
+					<?php /* ── Shortcode embed card ───────────── */ ?>
+					<div class="shseq-dash-card shseq-embed-card">
+						<h3 class="shseq-sidebar-card-title">
+							<?php echo esc_html( $this->fa( 'شورتکد جاسازی', 'EMBED SHORTCODE' ) ); ?>
+						</h3>
+						<p class="description">
+							<?php echo esc_html( $this->fa( 'در هر صفحه یا پست قرار دهید:', 'Paste into any page or post:' ) ); ?>
 						</p>
-						<div class="shseq-shortcode-sample">
-							<span class="dashicons dashicons-shortcode" aria-hidden="true"></span>
+						<button
+							type="button"
+							class="button shseq-copy-btn shseq-embed-copy-btn"
+							data-copy='[storyboard_live id="ID"]'
+							aria-label="<?php echo esc_attr( $this->fa( 'کپی شورتکد نمونه', 'Copy example shortcode' ) ); ?>"
+						>
 							<code>[storyboard_live id="ID"]</code>
-						</div>
-						<p class="shseq-shortcode-sub">
-							<?php echo esc_html( $this->fa( 'ID را با شماره سکانس از جدول بالا جایگزین کنید.', 'Replace ID with the number from the table above.' ) ); ?>
+							<span class="dashicons dashicons-clipboard" aria-hidden="true"></span>
+						</button>
+						<p class="description shseq-embed-hint">
+							<?php echo esc_html( $this->fa(
+								'ID را با عدد واقعی از جدول بالا جایگزین کنید.',
+								'Replace ID with the number from the table above.'
+							) ); ?>
 						</p>
 					</div>
 
-					<?php /* Health card — only if issues */ ?>
+					<?php /* ── Health card (only if issues) ─────── */ ?>
 					<?php if ( ! empty( $health_issues ) ) : ?>
-					<div class="shseq-dash-card shseq-health-card" role="alert">
-						<h3 class="shseq-sidebar-card-title shseq-health-card__title">
+					<div class="shseq-dash-card shseq-health-card">
+						<h3 class="shseq-sidebar-card-title shseq-health-title">
 							<span class="dashicons dashicons-warning" aria-hidden="true"></span>
 							<?php echo esc_html( $this->fa( 'هشدارهای سیستم', 'System Warnings' ) ); ?>
 						</h3>
@@ -472,70 +468,64 @@ final class DashboardPage {
 					<?php endif; ?>
 
 				</aside>
-
 			</div>
 
-			<?php /* ── Toast ─────────────────────────────────────── */ ?>
+			<?php /* ── Copy toast ──────────────────────────────── */ ?>
 			<div
-				id="shseq-toast"
-				class="shseq-toast"
+				class="shseq-copy-toast"
+				id="shseq-copy-toast"
 				role="status"
 				aria-live="polite"
 				aria-atomic="true"
 				hidden
-			></div>
+			><?php echo esc_html( $this->fa( 'کپی شد!', 'Copied!' ) ); ?></div>
 
-		</div>
-
-		<script>
-		(function () {
-			'use strict';
-			var isFa = <?php echo $this->is_fa() ? 'true' : 'false'; ?>;
-
-			// Search filter
-			var searchInput = document.getElementById('shseq-table-search');
-			var table       = document.getElementById('shseq-sequences-table');
-			var noResults   = document.getElementById('shseq-no-results');
-			if (searchInput && table) {
-				searchInput.addEventListener('input', function () {
-					var q = this.value.trim().toLowerCase();
-					var rows = table.querySelectorAll('tbody .shseq-seq-row');
-					var visible = 0;
-					rows.forEach(function (r) {
-						var match = !q || (r.dataset.search || '').indexOf(q) !== -1;
-						r.hidden = !match;
-						if (match) visible++;
+			<?php /* ── Dashboard JS ────────────────────────── */ ?>
+			<script>
+			(function() {
+				'use strict';
+				// Copy buttons
+				document.querySelectorAll('.shseq-copy-btn').forEach(function(btn) {
+					btn.addEventListener('click', function() {
+						var text = this.dataset.copy;
+						if (!text) return;
+						var toast = document.getElementById('shseq-copy-toast');
+						navigator.clipboard.writeText(text).then(function() {
+							if (toast) {
+								toast.removeAttribute('hidden');
+								toast.classList.add('is-visible');
+								setTimeout(function() {
+									toast.classList.remove('is-visible');
+									setTimeout(function() { toast.setAttribute('hidden', ''); }, 250);
+								}, 2000);
+							}
+						}).catch(function() {
+							// fallback
+							var ta = document.createElement('textarea');
+							ta.value = text;
+							ta.style.position = 'fixed';
+							ta.style.opacity = '0';
+							document.body.appendChild(ta);
+							ta.select();
+							document.execCommand('copy');
+							document.body.removeChild(ta);
+						});
 					});
-					if (noResults) noResults.hidden = (visible > 0);
 				});
-			}
-
-			// Copy shortcode
-			var toast = document.getElementById('shseq-toast');
-			document.addEventListener('click', function (e) {
-				var btn = e.target.closest('.shseq-copy-btn');
-				if (!btn) return;
-				var text = btn.dataset.copy;
-				if (!text) return;
-				navigator.clipboard.writeText(text).then(function () {
-					showToast(isFa ? 'کپی شد!' : 'Copied!', 'success');
-				}).catch(function () {
-					showToast(isFa ? 'کپی ناموفق — Ctrl+C را فشار دهید' : 'Copy failed — press Ctrl+C', 'error');
-				});
-			});
-
-			function showToast(msg, type) {
-				if (!toast) return;
-				toast.textContent = msg;
-				toast.className = 'shseq-toast is-visible' + (type === 'error' ? ' is-error' : ' is-success');
-				toast.removeAttribute('hidden');
-				setTimeout(function () {
-					toast.classList.remove('is-visible');
-					setTimeout(function () { toast.setAttribute('hidden', ''); }, 300);
-				}, 3000);
-			}
-		}());
-		</script>
+				// Table search filter
+				var searchInput = document.getElementById('shseq-table-search');
+				if (searchInput) {
+					searchInput.addEventListener('input', function() {
+						var q = this.value.toLowerCase().trim();
+						document.querySelectorAll('.shseq-seq-row').forEach(function(row) {
+							var data = (row.dataset.search || '').toLowerCase();
+							row.style.display = (!q || data.includes(q)) ? '' : 'none';
+						});
+					});
+				}
+			})();
+			</script>
+		</div>
 		<?php
 	}
 }
