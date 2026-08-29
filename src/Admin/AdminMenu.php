@@ -38,6 +38,20 @@ final class AdminMenu {
 
 	public function register_hooks(): void {
 		add_action( 'admin_menu', array( $this, 'register' ), 9 );
+		// Remove WP-auto-generated CPT submenus (edit.php, post-new.php) at priority 999
+		add_action( 'admin_menu', array( $this, 'remove_cpt_submenus' ), 999 );
+	}
+
+	/**
+	 * Remove the WordPress-native CPT submenus that appear automatically
+	 * when show_in_menu points to our top-level slug.
+	 * We replace them with our own custom pages.
+	 */
+	public function remove_cpt_submenus(): void {
+		// Remove "All Sequences" (edit.php?post_type=shseq_sequence)
+		remove_submenu_page( self::MENU_SLUG, 'edit.php?post_type=shseq_sequence' );
+		// Remove "Add New" (post-new.php?post_type=shseq_sequence)
+		remove_submenu_page( self::MENU_SLUG, 'post-new.php?post_type=shseq_sequence' );
 	}
 
 	public function register(): void {
