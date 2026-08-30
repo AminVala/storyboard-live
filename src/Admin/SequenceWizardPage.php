@@ -151,6 +151,14 @@ final class SequenceWizardPage {
 			$ver,
 			true
 		);
+		// Hotfix: canvas MutationObserver init, AI error filter, free badge, img meta
+		wp_enqueue_script(
+			'shseq-wizard-hotfix',
+			$url . 'assets/admin/wizard-v3-hotfix.js',
+			array( 'shseq-wizard-overlay' ),
+			$ver,
+			true
+		);
 
 		$post_id = isset( $_GET['post_id'] ) ? (int) $_GET['post_id'] : 0;
 
