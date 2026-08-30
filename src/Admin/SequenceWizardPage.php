@@ -89,6 +89,7 @@ final class SequenceWizardPage {
 		add_action( 'wp_ajax_shseq_wiz_step2_upload',  array( $this, 'ajax_step2_upload'  ) );
 		add_action( 'wp_ajax_shseq_wiz_step2_ai',      array( $this, 'ajax_step2_ai'      ) );
 		add_action( 'wp_ajax_shseq_wiz_step2_status',  array( $this, 'ajax_step2_ai_status') );
+		add_action( 'wp_ajax_shseq_wiz_step2_confirm_frames', array( $this, 'ajax_step2_confirm_frames' ) );
 		add_action( 'wp_ajax_shseq_wiz_step3_extract', array( $this, 'ajax_step3_extract' ) );
 		add_action( 'wp_ajax_shseq_wiz_step3_save',    array( $this, 'ajax_step3_save'    ) );
 		add_action( 'wp_ajax_shseq_wiz_step4_start',   array( $this, 'ajax_step4_start'   ) );
@@ -153,6 +154,27 @@ final class SequenceWizardPage {
 
 		$post_id = isset( $_GET['post_id'] ) ? (int) $_GET['post_id'] : 0;
 
+		// ── Existing data for edit mode ──────────────────────────────────────
+		$existing_mode      = $post_id ? (string) get_post_meta( $post_id, self::META_MODE, true ) : '';
+		$existing_final_id  = $post_id ? (int) get_post_meta( $post_id, self::META_FINAL_IMG, true ) : 0;
+		$existing_final_url = $existing_final_id ? wp_get_attachment_url( $existing_final_id ) : '';
+		$existing_frames_raw= $post_id ? get_post_meta( $post_id, self::META_FRAMES, true ) : '';
+		$existing_frame_ids = array();
+		if ( $existing_frames_raw ) {
+			$decoded = json_decode( $existing_frames_raw, true );
+			if ( is_array( $decoded ) ) {
+				$existing_frame_ids = array_map( 'absint', $decoded );
+			}
+		}
+		$existing_frame_thumbs = array();
+		foreach ( $existing_frame_ids as $fid ) {
+			$existing_frame_thumbs[] = array(
+				'id'    => $fid,
+				'url'   => wp_get_attachment_url( $fid ),
+				'thumb' => wp_get_attachment_image_url( $fid, 'thumbnail' ),
+			);
+		}
+
 		wp_localize_script( 'shseq-wizard-v3', 'shseqWizard', array(
 			'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
 			'isPro'        => LicenseManager::is_pro(),
@@ -175,6 +197,12 @@ final class SequenceWizardPage {
 				'name'    => wp_create_nonce( 'shseq_wiz_check_name' ),
 			),
 			'i18n'         => $this->i18n_strings(),
+			'existingData' => array(
+				'mode'        => $existing_mode,
+				'finalImgId'  => $existing_final_id,
+				'finalImgUrl' => $existing_final_url,
+				'frames'      => $existing_frame_thumbs,
+			),
 		) );
 	}
 
@@ -1001,7 +1029,14 @@ final class SequenceWizardPage {
 			wp_send_json_error( null, 403 );
 		}
 		$post_id    = (int) ( $_POST['post_id'] ?? 0 );
-		$frame_ids  = isset( $_POST['frame_ids'] ) ? array_map( 'absint', (array) $_POST['frame_ids'] ) : array();
+		// frame_ids is sent as JSON string from JS
+		$raw_ids   = isset( $_POST['frame_ids'] ) ? wp_unslash( $_POST['frame_ids'] ) : '[]';
+		$decoded   = json_decode( $raw_ids, true );
+		$frame_ids = is_array( $decoded ) ? array_map( 'absint', $decoded ) : array();
+		if ( empty( $frame_ids ) ) {
+			// Fallback: try frame_ids[] (multi-value POST)
+			$frame_ids = isset( $_POST['frame_ids'] ) ? array_map( 'absint', (array) $_POST['frame_ids'] ) : array();
+		}
 
 		if ( ! $post_id || empty( $frame_ids ) ) {
 			wp_send_json_error( array( 'message' => $this->t( 'no_frames' ) ), 400 );
@@ -1174,7 +1209,10 @@ final class SequenceWizardPage {
 		update_post_meta( $post_id, self::META_OVERLAY, wp_json_encode( $sanitized ) );
 
 		$is_pro    = LicenseManager::is_pro();
-		$next_step = $is_pro ? 4 : 5;
+		// For both Free and Pro, the next step number is 4.
+		// Free: data-step="4" on the publish panel (Free skips frame gen).
+		// Pro:  data-step="4" on the frame gen panel.
+		$next_step = 4;
 		update_post_meta( $post_id, self::META_STEP, $next_step );
 
 		wp_send_json_success( array( 'nextStep' => $next_step ) );
