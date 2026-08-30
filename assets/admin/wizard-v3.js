@@ -137,6 +137,7 @@
 		currentStep = n;
 
 		// Step-specific entry actions
+		if (n === 2) { initStep2(); }
 		if (n === 3) { initStep3(); }
 		if (n === 4 && isPro) { initStep4(); }
 		if (n === 5 || (!isPro && n === 4)) { initStep5(); }
@@ -499,8 +500,8 @@
 				// Free: confirm frames
 				if (!uploadedFrameIds.length) { showError(i18n.no_frames || 'Upload at least one frame.'); return; }
 				setBtn('#shseq-s2-save', true);
-				ajax('shseq_wiz_step2_confirm_frames' || 'shseq_wiz_step2_upload', // handler resolves frames
-					{ nonce: nonces.s2, post_id: postId, 'frame_ids[]': uploadedFrameIds, action: 'shseq_wiz_step2_confirm_frames' },
+				ajax('shseq_wiz_step2_confirm_frames',
+					{ nonce: nonces.s2, post_id: postId, frame_ids: JSON.stringify(uploadedFrameIds) },
 					function () { setBtn('#shseq-s2-save', false); goToStep(3); },
 					function (msg) { setBtn('#shseq-s2-save', false); showError(msg); }
 				);
@@ -510,6 +511,44 @@
 				goToStep(3);
 			}
 		});
+	}
+
+	// ── Step 2: Edit mode restoration ──────────────────────────────────────
+
+	var step2Inited = false;
+
+	function initStep2() {
+		if (step2Inited) return;   // only restore once
+		var existing = cfg.existingData || {};
+		if (!postId || !existing.mode) return;   // new sequence, nothing to restore
+		step2Inited = true;
+
+		if (isPro) {
+			// Restore Pro final image
+			if (existing.finalImgId && existing.finalImgUrl) {
+				finalImageId = existing.finalImgId;
+				genMode = existing.mode || 'upload';
+				if (finalImg) finalImg.src = existing.finalImgUrl;
+				if (finalPreview) finalPreview.removeAttribute('hidden');
+				if (finalDropzone) finalDropzone.setAttribute('hidden', '');
+				enableS2Save();
+			} else if (existing.mode === 'ai') {
+				// AI mode — image may not be visible but allow advancing
+				genMode = 'ai';
+				enableS2Save();
+			}
+		} else {
+			// Restore Free frame grid
+			if (existing.frames && existing.frames.length > 0) {
+				var frames = existing.frames;
+				uploadedFrameIds = frames.map(function(f) { return f.id; });
+				frames.forEach(function(f, idx) {
+					renderFrameThumb(f.id, f.thumb || f.url, idx);
+				});
+				reindexFrames();
+				enableS2Save();
+			}
+		}
 	}
 
 	// ── Step 3: Canvas Overlay Editor ─────────────────────────────────────
