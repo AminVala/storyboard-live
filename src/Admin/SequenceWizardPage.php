@@ -169,7 +169,7 @@ final class SequenceWizardPage {
 		$existing_frames_raw= $post_id ? get_post_meta( $post_id, self::META_FRAMES, true ) : '';
 		$existing_frame_ids = array();
 		if ( $existing_frames_raw ) {
-			$decoded = json_decode( $existing_frames_raw, true );
+			$decoded = ( is_array( $existing_frames_raw ) ? $existing_frames_raw : json_decode( $existing_frames_raw, true ) );
 			if ( is_array( $decoded ) ) {
 				$existing_frame_ids = array_map( 'absint', $decoded );
 			}
