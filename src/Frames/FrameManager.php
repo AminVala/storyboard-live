@@ -30,10 +30,14 @@ final class FrameManager {
 	 */
 	public static function get_frames( $post_id ) {
 		$stored = get_post_meta( $post_id, self::META_KEY, true );
+		// Older wizard versions wrote JSON; accept it without rewriting stored content.
+		if ( is_string( $stored ) ) {
+			$stored = json_decode( $stored, true );
+		}
 		if ( ! is_array( $stored ) ) {
 			return array();
 		}
-		return array_values( array_filter( array_map( 'absint', $stored ) ) );
+		return array_values( array_filter( array_map( 'absint', array_filter( $stored, 'is_numeric' ) ) ) );
 	}
 
 	/**
@@ -137,6 +141,10 @@ final class FrameManager {
 			$width  = $meta ? (int) $meta[1] : 0;
 			$height = $meta ? (int) $meta[2] : 0;
 			$alt    = trim( (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) );
+
+			if ( ! $url ) {
+				continue;
+			}
 
 			$result[] = array(
 				'url'    => esc_url_raw( (string) $url ),

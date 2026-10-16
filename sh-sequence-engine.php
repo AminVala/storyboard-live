@@ -3,7 +3,7 @@
  * Plugin Name: StoryBoard Live — Scroll-Driven Visual Storytelling
  * Plugin URI:  https://wordpress.org/plugins/storyboard-live/
  * Description: Create scroll-driven visual stories from a single confirmed image — with live HTML overlays, cinematic camera animation, and smooth theme-header reveal. No frame exports, no custom JavaScript.
- * Version: 1.0.0
+ * Version: 1.0.1-rc1
  * Author: Amin Akhyar
  * Author URI:  https://github.com/AminVala
  * Text Domain: sh-sequence-engine
@@ -11,7 +11,7 @@
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Requires at least: 6.4
- * Requires PHP: 7.4
+ * Requires PHP: 8.2
  * Tested up to: 6.8
  *
  * @package StoryBoardLive
@@ -19,7 +19,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SHSEQ_VERSION',        '1.0.0' );
+define( 'SHSEQ_VERSION',        '1.0.1-rc1' );
 define( 'SHSEQ_SCHEMA_VERSION', 1 );
 define( 'SHSEQ_FILE',           __FILE__ );
 define( 'SHSEQ_DIR',            plugin_dir_path( __FILE__ ) );

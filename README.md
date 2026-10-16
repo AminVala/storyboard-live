@@ -1,3 +1,5 @@
+> **1.0.1-rc1 audit:** The active runtime is the frame-sequence player. See [the responsive audit](docs/responsive-audit-fa.md) for implemented behavior, regression tests, and remaining gaps in the older roadmap below. Minimum PHP is 8.2.
+
 # StoryBoard Live
 
 > Scroll-driven frame-sequence hero animation for WordPress — no video, no JavaScript bloat.

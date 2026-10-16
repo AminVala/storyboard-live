@@ -1,32 +1,8 @@
 <?php
-/**
- * Frame Sequence Shortcode — Loop 3 Final (v3)
- *
- * Registers [storyboard_live id="123"] and legacy alias [shseq_sequence id="123"].
- *
- * DOM structure (v3):
- *   .shseq-frame-sequence           — outer sentinel (420 vh tall)
- *     .shseq-stage                  — position:sticky, height = vh − header_offset
- *       canvas.shseq-canvas         — frame renderer (cover-fit via JS)
- *       img.shseq-static-fallback   — reduced-motion static image (CSS-controlled)
- *       .shseq-overlays             — content step overlays (inside sticky stage ✓)
- *         .shseq-overlay[data-step]
- *     noscript > img                — no-JS fallback
- *     script.shseq-manifest         — inline JSON for JS engine (class fixed from v1 bug)
- *
- * Fixes vs v1:
- *   - manifest class was "shseq-manifest-data" → JS looked for "shseq-manifest" → never found
- *   - overlays were OUTSIDE .shseq-stage → scrolled away from viewport during animation
- *   - no reduced-motion static image inside the sticky stage
- *   - no CSS custom property for header offset (--shseq-top)
- *
- * @package StoryBoardLive
- */
+/** Accessible, progressively enhanced frame sequence shortcode. */
 
 namespace ShahreHonar\SequenceEngine\Frontend;
 
-use ShahreHonar\SequenceEngine\Admin\ContentStepsMetaBox;
-use ShahreHonar\SequenceEngine\Frames\FrameManager;
 
 /**
  * Handles [storyboard_live] shortcode rendering.
@@ -71,7 +47,7 @@ final class FrameSequenceShortcode {
 			array(
 				'id'     => '0',
 				'class'  => '',
-				'height' => '420vh',
+				'height' => '',
 			),
 			$atts,
 			self::SHORTCODE
@@ -84,6 +60,11 @@ final class FrameSequenceShortcode {
 
 		if ( 'shseq_sequence' !== get_post_type( $post_id ) ) {
 			return $this->debug_comment( 'storyboard_live: post ' . $post_id . ' is not a Sequence' );
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post || ( ( 'publish' !== $post->post_status || post_password_required( $post ) ) && ! current_user_can( 'edit_post', $post_id ) ) ) {
+			return '';
 		}
 
 		// Build manifest — bail silently if no frames yet.
@@ -99,22 +80,17 @@ final class FrameSequenceShortcode {
 		// Enqueue assets on this page (idempotent).
 		$this->assets->enqueue_for_page();
 
-		// Resolve last frame for static fallbacks.
-		$frames   = FrameManager::get_frames( $post_id );
-		$last_att = ! empty( $frames ) ? end( $frames ) : 0;
-		$last_url = $last_att ? (string) wp_get_attachment_image_url( $last_att, 'full' ) : '';
-		$last_alt = '';
-		if ( $last_att ) {
-			$last_alt = trim( (string) get_post_meta( $last_att, '_wp_attachment_image_alt', true ) );
-		}
-		if ( '' === $last_alt ) {
-			$last_alt = (string) get_the_title( $post_id );
-		}
-
-		$steps       = ContentStepsMetaBox::get_steps( $post_id );
+		// Use the same validated frames and normalized content as the player.
+		$last = end( $data['frames'] );
+		$last_url = $last['url'];
+		$last_alt = $last['alt'] ?: (string) get_the_title( $post_id );
+		$steps = $data['steps'];
 		$extra_class = esc_attr( trim( (string) $atts['class'] ) );
-		$height      = esc_attr( (string) $atts['height'] );
-		$title       = esc_attr( (string) get_the_title( $post_id ) );
+		$height = trim( (string) $atts['height'] );
+		if ( ! preg_match( '/^(?:[1-9][0-9]{0,4})(?:\.[0-9]{1,2})?(?:vh|svh|dvh|px)$/D', $height ) ) {
+			$height = '';
+		}
+		$title = (string) get_the_title( $post_id );
 
 		ob_start();
 		?>
@@ -123,19 +99,20 @@ final class FrameSequenceShortcode {
 			id="<?php echo esc_attr( $instance_id ); ?>"
 			data-shseq="true"
 			role="region"
-			aria-label="<?php printf( esc_attr__( '%s — scroll animation', 'sh-sequence-engine' ), $title ); ?>"
-			style="--shseq-height:<?php echo $height; ?>;"
+			aria-label="<?php printf( esc_attr__( '%s — scroll animation', 'sh-sequence-engine' ), esc_attr( $title ) ); ?>"
+			<?php if ( $height ) : ?>style="--shseq-height:<?php echo esc_attr( $height ); ?>;"<?php endif; ?>
 		>
 			<?php /*
 			 * Sticky stage — pinned while user scrolls.
 			 * --shseq-top is set by the JS engine after detecting the theme header + admin bar heights.
 			 * All interactive overlay content lives INSIDE this stage so it stays in the viewport.
 			 */ ?>
-			<div class="shseq-stage" aria-hidden="true">
+			<div class="shseq-stage">
+				<div class="shseq-visual" role="img" aria-label="<?php echo esc_attr( $last_alt ); ?>">
 
 				<canvas
 					class="shseq-canvas"
-					aria-label="<?php echo esc_attr( $last_alt ); ?>"
+					aria-hidden="true"
 				></canvas>
 
 				<?php /* Reduced-motion static fallback — visible via CSS when prefers-reduced-motion: reduce */ ?>
@@ -143,10 +120,12 @@ final class FrameSequenceShortcode {
 					<img
 						class="shseq-static-fallback"
 						src="<?php echo esc_url( $last_url ); ?>"
-						alt="<?php echo esc_attr( $last_alt ); ?>"
+						alt=""
 						loading="eager"
 					>
 				<?php endif; ?>
+
+				</div>
 
 				<?php /* Content step overlays — inside sticky stage (v3 fix) */ ?>
 				<?php if ( ! empty( $steps ) ) : ?>
@@ -156,7 +135,6 @@ final class FrameSequenceShortcode {
 								class="shseq-overlay"
 								data-step="<?php echo (int) $i; ?>"
 								data-scroll="<?php echo (int) ( $step['scroll_pct'] ?? 0 ); ?>"
-								aria-hidden="true"
 							>
 								<?php if ( ! empty( $step['logo_url'] ) ) : ?>
 									<img
@@ -200,24 +178,13 @@ final class FrameSequenceShortcode {
 
 			</div><?php /* end .shseq-stage */ ?>
 
-			<?php /* Noscript fallback — static last frame when JS disabled */ ?>
-			<?php if ( $last_url ) : ?>
-				<noscript>
-					<img
-						class="shseq-noscript-fallback"
-						src="<?php echo esc_url( $last_url ); ?>"
-						alt="<?php echo esc_attr( $last_alt ); ?>"
-					>
-				</noscript>
-			<?php endif; ?>
-
 			<?php /*
 			 * Inline JSON manifest for the JS engine.
 			 * Class "shseq-manifest" must match the querySelector in frame-sequence-engine.js.
 			 * (v1 bug: class was "shseq-manifest-data" → engine never found it)
 			 */ ?>
 			<script type="application/json" class="shseq-manifest">
-				<?php echo wp_json_encode( $data ); ?>
+				<?php echo wp_json_encode( $data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>
 			</script>
 
 		</div>

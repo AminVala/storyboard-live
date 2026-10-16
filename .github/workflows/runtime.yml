@@ -1,0 +1,27 @@
+name: Runtime regression checks
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: PHP contracts and syntax
+        run: |
+          php tests/php-runtime.php
+          find src -name '*.php' -print0 | xargs -0 -n1 php -l
+          php tests/php-runtime.php --fixture > tests/fixture.html
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: responsive-runtime-evidence
+          path: test-results/

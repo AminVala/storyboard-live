@@ -15,6 +15,8 @@ declare( strict_types = 1 );
 
 namespace ShahreHonar\SequenceEngine\Admin;
 
+use ShahreHonar\SequenceEngine\Core\SequenceAccess;
+
 use ShahreHonar\SequenceEngine\Frames\FrameManager;
 use ShahreHonar\SequenceEngine\License\LicenseManager;
 
@@ -59,6 +61,7 @@ final class WizardStep4Override {
 		}
 
 		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+		SequenceAccess::require_ajax( $post_id );
 		if ( ! $post_id || ! get_post( $post_id ) ) {
 			wp_send_json_error( array( 'message' => $this->fa( 'سکانس نامعتبر است.', 'Invalid sequence.' ) ), 400 );
 			return;
@@ -225,6 +228,7 @@ final class WizardStep4Override {
 		}
 
 		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+		SequenceAccess::require_ajax( $post_id );
 		if ( ! $post_id ) {
 			wp_send_json_error( array( 'message' => $this->fa( 'سکانس نامعتبر است.', 'Invalid sequence.' ) ), 400 );
 			return;

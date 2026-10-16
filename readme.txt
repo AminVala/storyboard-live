@@ -3,8 +3,8 @@ Contributors: aminvala
 Tags: scroll animation, hero, frame sequence, parallax, scroll storytelling
 Requires at least: 6.2
 Tested up to: 6.7
-Requires PHP: 8.0
-Stable tag: 1.0.0
+Requires PHP: 8.2
+Stable tag: 1.0.1-rc1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,7 +65,7 @@ Search for **StoryBoard Live** in the Gutenberg inserter. The block exposes the 
 = System Requirements =
 
 * WordPress 6.2 or later
-* PHP 8.0 or later
+* PHP 8.2 or later
 * WebP-capable server (GD or Imagick)
 * For AI generation (Pro): [Action Scheduler](https://wordpress.org/plugins/action-scheduler/) plugin (or WooCommerce)
 

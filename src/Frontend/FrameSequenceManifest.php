@@ -1,16 +1,5 @@
 <?php
-/**
- * Frame Sequence Manifest Builder — Loop 3 Final (v3)
- *
- * Changes from v1:
- *  - scrollLengthVh is now read from SettingsPage::OPT_SCROLL_SPEED setting
- *    instead of being hardcoded to 420.
- *  - Manifest output is object-cached with wp_cache for the duration of the
- *    request to avoid repeated DB lookups when the shortcode appears multiple
- *    times on the same page.
- *
- * @package StoryBoardLive
- */
+/** Runtime manifest; legacy frame and content metadata remain compatible. */
 
 namespace ShahreHonar\SequenceEngine\Frontend;
 
@@ -52,6 +41,24 @@ final class FrameSequenceManifest {
 		}
 
 		$steps = ContentStepsMetaBox::get_steps( $post_id );
+		if ( empty( $steps ) ) {
+			$raw = get_post_meta( $post_id, '_shseq_overlay_data', true );
+			$items = is_array( $raw ) ? $raw : json_decode( (string) $raw, true );
+			$step = array( 'scroll_pct' => 0, 'heading' => '', 'paragraph' => '', 'cta_text' => '', 'cta_url' => '' );
+			foreach ( is_array( $items ) ? $items : array() as $item ) {
+				if ( ! is_array( $item ) || empty( $item['text'] ) ) continue;
+				$type = $item['type'] ?? '';
+				if ( in_array( $type, array( 'title', 'heading' ), true ) && '' === $step['heading'] ) {
+					$step['heading'] = $item['text'];
+				} elseif ( in_array( $type, array( 'cta', 'button' ), true ) && ! empty( $item['url'] ) && '' === $step['cta_text'] ) {
+					$step['cta_text'] = $item['text'];
+					$step['cta_url'] = $item['url'];
+				} else {
+					$step['paragraph'] .= ( $step['paragraph'] ? ' ' : '' ) . $item['text'];
+				}
+			}
+			if ( $step['heading'] || $step['paragraph'] || $step['cta_text'] ) $steps[] = $step;
+		}
 
 		$manifest = array(
 			'schema'         => self::MANIFEST_SCHEMA,
@@ -60,9 +67,7 @@ final class FrameSequenceManifest {
 			'totalFrames'    => count( $frames ),
 			'frames'         => $frames,
 			'steps'          => $this->normalize_steps( $steps ),
-			// Default scroll length in vh units.
-			// JS engine overrides on mobile/tablet based on viewport width.
-			'scrollLengthVh' => 420,
+			'layout'        => 'orientation-adaptive',
 			'motion'         => array(
 				'respectReducedMotion' => true,
 				// JS bails early; CSS shows .shseq-static-fallback instead.
@@ -111,6 +116,7 @@ final class FrameSequenceManifest {
 			);
 		}
 
+		usort( $result, static fn( $a, $b ) => $a['scroll_pct'] <=> $b['scroll_pct'] );
 		return $result;
 	}
 }
