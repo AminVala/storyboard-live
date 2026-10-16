@@ -51,7 +51,16 @@ const server = http.createServer((req, res) => {
       scrollTo(0,scrollY+r.top-top+p*(r.height-stage.getBoundingClientRect().height));
       return Math.round(p*99);
     },pct);
-    await page.waitForFunction(i=>window.__painted===i,target);
+    try {
+      // scrollTo is rounded to physical CSS pixels; exact half-frame targets can round either way.
+      await page.waitForFunction(i=>Math.abs(window.__painted-i)<=1,target,{timeout:10000});
+    } catch(error) {
+      const state=await page.evaluate(()=>({painted:window.__painted,scrollY,wrapper:document.querySelector('[data-shseq]').getBoundingClientRect().toJSON(),stage:document.querySelector('.shseq-stage').getBoundingClientRect().toJSON(),visual:document.querySelector('.shseq-visual').getBoundingClientRect().toJSON(),layout:document.querySelector('[data-shseq]').dataset.layout}));
+      console.error('Seek failed',target,JSON.stringify(state));
+      await page.screenshot({path:'test-results/failure.png'});
+      fs.writeFileSync('test-results/failure.json',JSON.stringify(state,null,2));
+      throw error;
+    }
   }
   try{
     for(const [name,width,height,layout] of [['desktop',1536,960,'desktop'],['phone-portrait',390,844,'portrait'],['phone-landscape',844,390,'landscape'],['tablet-portrait',820,1180,'portrait'],['tablet-landscape',1180,820,'landscape']]){
