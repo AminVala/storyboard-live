@@ -57,6 +57,9 @@ final class Plugin {
 		( new FrameSequenceBlock( $frame_shortcode ) )->register_hooks();
 		( new DemoPlaceholder() )->register_hooks();
 
+		( new AdminBar() )->register_hooks();
+		( new SequencePreview() )->register_hooks();
+
 		// ── Admin only ───────────────────────────────────────────────────
 		if ( ! is_admin() ) {
 			return;
@@ -87,10 +90,8 @@ final class Plugin {
 		( new FrameUploadMetaBox() )->register_hooks();
 
 		( new AdminAssets() )->register_hooks();
-		( new AdminBar() )->register_hooks();
 		( new PluginLinks() )->register_hooks();
 		( new FallbackNotice() )->register_hooks();
-		( new SequencePreview() )->register_hooks();
 		( new SequenceDuplicator() )->register_hooks();
 		( new SettingsPage() )->register_hooks();
 		$templates_page->register_hooks();

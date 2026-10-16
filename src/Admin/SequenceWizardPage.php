@@ -28,6 +28,8 @@ declare( strict_types = 1 );
 
 namespace ShahreHonar\SequenceEngine\Admin;
 
+use ShahreHonar\SequenceEngine\Core\SequenceAccess;
+
 use ShahreHonar\SequenceEngine\Content\SequencePostType;
 use ShahreHonar\SequenceEngine\Frames\FrameManager;
 use ShahreHonar\SequenceEngine\Jobs\FrameGenerationJob;
@@ -161,6 +163,9 @@ final class SequenceWizardPage {
 		);
 
 		$post_id = isset( $_GET['post_id'] ) ? (int) $_GET['post_id'] : 0;
+		if ( $post_id && ! SequenceAccess::can_edit( $post_id ) ) {
+			return;
+		}
 
 		// ── Existing data for edit mode ──────────────────────────────────────
 		$existing_mode      = $post_id ? (string) get_post_meta( $post_id, self::META_MODE, true ) : '';
@@ -671,6 +676,9 @@ final class SequenceWizardPage {
 							<div class="shseq-props-row">
 								<label for="shseq-prop-text"><?php echo esc_html( $this->t( 'text' ) ); ?></label>
 								<input type="text" id="shseq-prop-text" class="shseq-prop-input">
+								<label for="shseq-prop-url"><?php esc_html_e( 'Button URL', 'sh-sequence-engine' ); ?></label>
+								<input type="url" id="shseq-prop-url" class="shseq-prop-input" dir="ltr">
+
 							</div>
 							<div class="shseq-props-row">
 								<label for="shseq-prop-size"><?php echo esc_html( $this->t( 'font_size' ) ); ?></label>
@@ -904,6 +912,7 @@ final class SequenceWizardPage {
 		$name        = sanitize_text_field( wp_unslash( $_POST['name'] ?? '' ) );
 		$template_id = sanitize_key( $_POST['template_id'] ?? 'blank' );
 		$post_id     = (int) ( $_POST['post_id'] ?? 0 );
+		SequenceAccess::require_ajax( $post_id, true );
 
 		// Validate name
 		if ( empty( $name ) ) {
@@ -986,6 +995,7 @@ final class SequenceWizardPage {
 		}
 
 		$post_id = (int) ( $_POST['post_id'] ?? 0 );
+		SequenceAccess::require_ajax( $post_id );
 		if ( ! $post_id || get_post_type( $post_id ) !== SequencePostType::POST_TYPE ) {
 			wp_send_json_error( array( 'message' => $this->t( 'invalid_post' ) ), 400 );
 		}
@@ -1037,6 +1047,7 @@ final class SequenceWizardPage {
 			wp_send_json_error( null, 403 );
 		}
 		$post_id    = (int) ( $_POST['post_id'] ?? 0 );
+		SequenceAccess::require_ajax( $post_id );
 		// frame_ids is sent as JSON string from JS
 		$raw_ids   = isset( $_POST['frame_ids'] ) ? wp_unslash( $_POST['frame_ids'] ) : '[]';
 		$decoded   = json_decode( $raw_ids, true );
@@ -1052,14 +1063,18 @@ final class SequenceWizardPage {
 
 		// Validate ownership of each attachment
 		foreach ( $frame_ids as $fid ) {
-			if ( get_post_type( $fid ) !== 'attachment' ) {
+			if ( get_post_type( $fid ) !== 'attachment' || ! wp_attachment_is_image( $fid ) || ! current_user_can( 'read_post', $fid ) ) {
 				wp_send_json_error( array( 'message' => $this->t( 'invalid_attachment' ) ), 400 );
 			}
 		}
 
+		if ( count( $frame_ids ) > LicenseManager::max_frames() ) {
+			wp_send_json_error( array( 'message' => __( 'Frame limit exceeded for this plan.', 'sh-sequence-engine' ) ), 422 );
+		}
+
 		// Free: last frame is the final image
 		$final_id = end( $frame_ids );
-		update_post_meta( $post_id, self::META_FRAMES,    wp_json_encode( $frame_ids ) );
+		FrameManager::set_frames( $post_id, $frame_ids );
 		update_post_meta( $post_id, self::META_FINAL_IMG, $final_id );
 		update_post_meta( $post_id, self::META_MODE,      'frames' );
 		update_post_meta( $post_id, self::META_STEP,      3 );
@@ -1086,6 +1101,7 @@ final class SequenceWizardPage {
 		}
 
 		$post_id    = (int) ( $_POST['post_id'] ?? 0 );
+		SequenceAccess::require_ajax( $post_id );
 		$raw_prompt = sanitize_textarea_field( wp_unslash( $_POST['prompt'] ?? '' ) );
 		$style      = sanitize_key( $_POST['style'] ?? 'photorealistic' );
 
@@ -1134,6 +1150,7 @@ final class SequenceWizardPage {
 			wp_send_json_error( null, 403 );
 		}
 		$post_id = (int) ( $_POST['post_id'] ?? 0 );
+		SequenceAccess::require_ajax( $post_id );
 		$status  = get_post_meta( $post_id, '_shseq_ai_status', true ) ?: 'generating';
 		$img_id  = (int) get_post_meta( $post_id, self::META_FINAL_IMG, true );
 		$url     = $img_id ? wp_get_attachment_url( $img_id ) : '';
@@ -1155,6 +1172,13 @@ final class SequenceWizardPage {
 		}
 
 		$post_id     = (int) ( $_POST['post_id'] ?? 0 );
+		SequenceAccess::require_ajax( $post_id );
+		$saved = get_post_meta( $post_id, self::META_OVERLAY, true );
+		$saved = is_array( $saved ) ? $saved : json_decode( (string) $saved, true );
+		if ( is_array( $saved ) && ( ! empty( $saved ) || ( $_POST['mode'] ?? '' ) === 'get_overlays_only' ) ) {
+			$final_id = (int) get_post_meta( $post_id, self::META_FINAL_IMG, true );
+			wp_send_json_success( array( 'overlays' => $saved, 'finalImageUrl' => wp_get_attachment_url( $final_id ), 'cleanBgUrl' => wp_get_attachment_url( $final_id ) ) );
+		}
 		$final_img_id = (int) get_post_meta( $post_id, self::META_FINAL_IMG, true );
 
 		if ( ! $final_img_id ) {
@@ -1188,6 +1212,7 @@ final class SequenceWizardPage {
 		}
 
 		$post_id  = (int) ( $_POST['post_id'] ?? 0 );
+		SequenceAccess::require_ajax( $post_id );
 		$overlays = isset( $_POST['overlays'] ) ? wp_unslash( $_POST['overlays'] ) : '[]';
 
 		// Validate JSON
@@ -1204,6 +1229,7 @@ final class SequenceWizardPage {
 				'id'       => sanitize_key( $item['id']       ?? uniqid( 'el_', true ) ),
 				'type'     => sanitize_key( $item['type']     ?? 'heading' ),
 				'text'     => sanitize_text_field( $item['text']     ?? '' ),
+				'url'      => esc_url_raw( $item['url'] ?? '' ),
 				'x'        => min( 100, max( 0, (float) ( $item['x'] ?? 0 ) ) ),
 				'y'        => min( 100, max( 0, (float) ( $item['y'] ?? 0 ) ) ),
 				'w'        => min( 100, max( 5,  (float) ( $item['w'] ?? 30 ) ) ),
@@ -1234,6 +1260,7 @@ final class SequenceWizardPage {
 		}
 
 		$post_id = (int) ( $_POST['post_id'] ?? 0 );
+		SequenceAccess::require_ajax( $post_id );
 		if ( ! $post_id ) {
 			wp_send_json_error( array( 'message' => $this->t( 'invalid_post' ) ), 400 );
 		}
@@ -1266,6 +1293,7 @@ final class SequenceWizardPage {
 			wp_send_json_error( null, 403 );
 		}
 		$post_id = (int) ( $_POST['post_id'] ?? 0 );
+		SequenceAccess::require_ajax( $post_id );
 		$status  = get_post_meta( $post_id, FrameGenerationJob::META_STATUS, true ) ?: 'idle';
 		$error   = get_post_meta( $post_id, FrameGenerationJob::META_ERROR,  true ) ?: '';
 		$count   = FrameManager::count( $post_id );
@@ -1297,6 +1325,7 @@ final class SequenceWizardPage {
 			wp_send_json_error( null, 403 );
 		}
 		$post_id    = (int) ( $_POST['post_id'] ?? 0 );
+		SequenceAccess::require_ajax( $post_id );
 		$target_step= max( 1, (int) ( $_POST['target_step'] ?? 1 ) );
 		if ( $post_id ) {
 			update_post_meta( $post_id, self::META_STEP, $target_step );
@@ -1312,6 +1341,7 @@ final class SequenceWizardPage {
 		}
 
 		$post_id = (int) ( $_POST['post_id'] ?? 0 );
+		SequenceAccess::require_ajax( $post_id );
 		if ( ! $post_id || get_post_type( $post_id ) !== SequencePostType::POST_TYPE ) {
 			wp_send_json_error( array( 'message' => $this->t( 'invalid_post' ) ), 400 );
 		}
@@ -1320,7 +1350,7 @@ final class SequenceWizardPage {
 		$frame_count = FrameManager::count( $post_id );
 		$is_pro      = LicenseManager::is_pro();
 
-		if ( $is_pro && $frame_count < 2 ) {
+		if ( $frame_count < 2 ) {
 			wp_send_json_error( array( 'message' => $this->t( 'not_enough_frames' ) ), 422 );
 		}
 

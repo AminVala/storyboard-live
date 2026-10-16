@@ -1,312 +1,198 @@
-/**
- * StoryBoard Live — Frame Sequence Engine (Loop 3 Final, v3)
- *
- * Critical fixes over v1:
- *  B1  manifest selector: ".shseq-manifest" (v1 was ".shseq-manifest-data" — never matched)
- *  B2  overlays are now inside .shseq-stage in the DOM — no fix needed here in JS
- *  B3  header detection: reads theme header height + admin bar via shseqEngineConfig + DOM scan
- *  B4  canvas never resized after first draw — only set dimensions on first load
- *  B5  scroll math: cached offset calculated once via getBoundingClientRect at init
- *  B6  IntersectionObserver: pause scroll listener when wrapper is off-screen
- *  B7  cover-fit: drawImage uses cover algorithm (no CSS object-fit on canvas)
- *  B8  no layout change on JS load — CSS handles initial state
- *  B9  shseqEngineConfig consumed (scrollSpeed, disableOnMobile, lazyThreshold, adminBarHeight)
- * B10  reduced-motion: CSS shows .shseq-static-fallback; JS bails cleanly
- * B12  admin-bar offset: reads shseqEngineConfig.adminBarHeight + theme header
- * B13  RAF: all draws go through requestAnimationFrame to avoid layout thrashing
- */
-(function () {
-	'use strict';
+/** StoryBoard Live: progressive, bounded, orientation-aware scroll playback. */
+(() => {
+  'use strict';
+  const config = window.shseqEngineConfig || {};
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const instances = new Map();
+  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+  const threshold = Number.isFinite(Number(config.lazyThreshold)) ? Math.max(0, Number(config.lazyThreshold)) : 200;
 
-	// ── Config (from wp_localize_script) ─────────────────────────────────────
-	var cfg = window.shseqEngineConfig || {};
-	var SCROLL_SPEED      = Math.max(1, Math.min(200, parseInt(cfg.scrollSpeed, 10)    || 4));
-	var DISABLE_MOBILE    = !!cfg.disableOnMobile;
-	var LAZY_THRESHOLD    = Math.max(0, parseInt(cfg.lazyThreshold, 10)               || 200);
-	var ADMIN_BAR_HEIGHT  = Math.max(0, parseInt(cfg.adminBarHeight, 10)              || 0);
+  function stickyTop() {
+    const candidates = [...document.querySelectorAll('#wpadminbar, header, #masthead, #site-header, .site-header, .elementor-location-header, .shseq-preview-bar')];
+    const rects = candidates.filter(el => {
+      const style = getComputedStyle(el);
+      return ['fixed', 'sticky'].includes(style.position) && style.display !== 'none' && style.visibility !== 'hidden';
+    }).map(el => el.getBoundingClientRect()).filter(rect => rect.width && rect.height && rect.bottom > 0);
+    let bottom = 0;
+    // Count overlapping/stacked bars once, including the 46px mobile admin bar.
+    rects.sort((a, b) => a.top - b.top).forEach(rect => {
+      if (rect.top <= bottom + 1) bottom = Math.max(bottom, rect.bottom);
+    });
+    return Math.min(bottom, window.innerHeight / 2);
+  }
 
-	// ── Reduced-motion bail ───────────────────────────────────────────────────
-	// CSS already makes .shseq-static-fallback visible; nothing else to do.
-	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-		return;
-	}
+  function init(wrapper) {
+    if (instances.has(wrapper)) return;
+    let manifest;
+    try { manifest = JSON.parse(wrapper.querySelector('.shseq-manifest').textContent); }
+    catch (_) { return; } // Server-rendered image and links remain usable.
+    const frames = (manifest.frames || []).filter(frame => frame && typeof frame.url === 'string' && frame.url);
+    const stage = wrapper.querySelector('.shseq-stage');
+    const visual = wrapper.querySelector('.shseq-visual');
+    const canvas = wrapper.querySelector('.shseq-canvas');
+    const ctx = canvas?.getContext('2d', { alpha: false });
+    if (!frames.length || !stage || !visual || !ctx) return;
+    wrapper.classList.remove('has-frame');
+    const overlays = [...wrapper.querySelectorAll('.shseq-overlay')];
+    const steps = manifest.steps || [];
+    const cache = new Map();
+    const loading = new Map();
+    const failed = new Set();
+    const disposers = [];
+    let queue = [], enabled = false, active = false, destroyed = false;
+    let wanted = -1, painted = -1, raf = 0, top = 0, width = 0, height = 0, ratio = 1;
+    let layout = '', needsPaint = true;
 
-	// ── Mobile bail ───────────────────────────────────────────────────────────
-	if (DISABLE_MOBILE && window.innerWidth < 768) {
-		// Show static fallback on mobile if the option is set.
-		document.querySelectorAll('.shseq-static-fallback').forEach(function (img) {
-			img.classList.add('is-mobile-static');
-		});
-		return;
-	}
-
-	// ── Header offset detection ───────────────────────────────────────────────
-	/**
-	 * Detect the combined height of the fixed/sticky theme header + admin bar.
-	 * Strategy:
-	 *   1. Start with the admin-bar value passed from PHP.
-	 *   2. Scan for fixed/sticky elements that overlap the top of the viewport.
-	 *   3. Use the tallest one (it is the header, not a toast/cookie bar).
-	 * Called once at boot and again on window resize.
-	 *
-	 * @returns {number} pixels
-	 */
-	function detectStickyTop() {
-		var base = ADMIN_BAR_HEIGHT;
-		var max  = 0;
-
-		// Common theme header selectors — extend as needed.
-		var selectors = [
-			'header',
-			'#masthead',
-			'#site-header',
-			'.site-header',
-			'.header-main',
-			'#header',
-			'.navbar',
-			'.nav-bar',
-			'[id*="header"]',
-		];
-
-		selectors.forEach(function (sel) {
-			try {
-				document.querySelectorAll(sel).forEach(function (el) {
-					if (!el) return;
-					var st = window.getComputedStyle(el);
-					if (st.position !== 'fixed' && st.position !== 'sticky') return;
-					// Must overlap the very top of the viewport (top ≤ 0 + adminBar).
-					var rect = el.getBoundingClientRect();
-					if (rect.top > base + 10) return; // too far down, not the site header
-					if (rect.height > max) {
-						max = rect.height;
-					}
-				});
-			} catch (e) { /* ignore invalid selectors in exotic themes */ }
-		});
-
-		return base + max;
-	}
-
-	// ── Cover-fit draw helper ─────────────────────────────────────────────────
-	/**
-	 * Draw an image on canvas with object-fit: cover semantics.
-	 * Canvas `object-fit` CSS property is ignored by browsers — must implement manually.
-	 *
-	 * @param {CanvasRenderingContext2D} ctx
-	 * @param {HTMLImageElement} img
-	 * @param {number} cw Canvas width
-	 * @param {number} ch Canvas height
-	 */
-	function drawCover(ctx, img, cw, ch) {
-		var iw = img.naturalWidth;
-		var ih = img.naturalHeight;
-		if (!iw || !ih) return;
-
-		var scale = Math.max(cw / iw, ch / ih);
-		var sw    = iw * scale;
-		var sh    = ih * scale;
-		var sx    = (cw - sw) / 2;
-		var sy    = (ch - sh) / 2;
-
-		ctx.drawImage(img, sx, sy, sw, sh);
-	}
-
-	// ── Per-instance initialiser ──────────────────────────────────────────────
-	function initSequence(wrapper) {
-
-		// ── 1. Parse manifest ─────────────────────────────────────────────────
-		// Fix B1: selector is now ".shseq-manifest" matching the PHP class.
-		var manifestEl = wrapper.querySelector('script.shseq-manifest[type="application/json"]');
-		if (!manifestEl) {
-			console.warn('[shseq] manifest element not found in', wrapper.id);
-			return;
-		}
-
-		var manifest;
-		try {
-			manifest = JSON.parse(manifestEl.textContent || manifestEl.innerText || '{}');
-		} catch (e) {
-			console.warn('[shseq] manifest parse error', e);
-			return;
-		}
-
-		var frames      = manifest.frames      || [];
-		var steps       = manifest.steps       || [];
-		var totalFrames = manifest.totalFrames || frames.length;
-
-		if (!frames.length) return;
-
-		// ── 2. DOM refs ───────────────────────────────────────────────────────
-		var stage   = wrapper.querySelector('.shseq-stage');
-		var canvas  = wrapper.querySelector('.shseq-canvas');
-		var ctx     = canvas ? canvas.getContext('2d') : null;
-		if (!ctx || !stage) return;
-
-		// ── 3. Dimensions ────────────────────────────────────────────────────
-		var stickyTop = detectStickyTop();   // px, refreshed on resize
-		var stageH    = 0;                   // set once first image loads
-
-		/**
-		 * Resize canvas to match the stage element (avoids per-frame resize = B4 fix).
-		 * Called once at boot and on window resize.
-		 */
-		function resizeCanvas() {
-			stickyTop = detectStickyTop();
-			var availH = window.innerHeight - stickyTop;
-			if (availH < 100) availH = 100; // safety
-
-			// Update CSS custom properties so wrapper and stage track reality.
-			wrapper.style.setProperty('--shseq-top', stickyTop + 'px');
-			stage.style.top    = stickyTop + 'px';
-			stage.style.height = availH + 'px';
-
-			stageH         = availH;
-			canvas.width   = stage.offsetWidth  || window.innerWidth;
-			canvas.height  = stageH;
-
-			// Re-draw current frame after resize.
-			if (currentImage && currentImage.complete) {
-				drawCover(ctx, currentImage, canvas.width, canvas.height);
-			}
-		}
-
-		// ── 4. Pre-load images ────────────────────────────────────────────────
-		var images    = new Array(totalFrames);
-		var loadedSet = new Set();
-		var currentImage = null;
-		var rafId     = null;
-
-		/**
-		 * Load one frame image.
-		 * @param {number} index Frame index.
-		 * @param {Function=} onLoad Called when loaded.
-		 */
-		function loadFrame(index, onLoad) {
-			if (images[index]) {
-				if (onLoad && images[index].complete) onLoad(images[index]);
-				return;
-			}
-			var img = new Image();
-			img.decoding = 'async';
-			img.addEventListener('load', function () {
-				loadedSet.add(index);
-				if (onLoad) onLoad(img);
-			});
-			img.src = frames[index].url;
-			images[index] = img;
-		}
-
-		// Load frame 0 eagerly, then rest in background after paint.
-		loadFrame(0, function (img) {
-			currentImage = img;
-			resizeCanvas();
-			drawCover(ctx, img, canvas.width, canvas.height);
-			// Kick off the rest after first frame is shown.
-			requestAnimationFrame(function () {
-				for (var i = 1; i < totalFrames; i++) {
-					loadFrame(i);
-				}
-			});
-		});
-
-		// ── 5. Scroll math ────────────────────────────────────────────────────
-		var isIntersecting = false;
-
-		/**
-		 * Compute 0–1 scroll progress within the sequence wrapper.
-		 * Fix B5: uses wrapper.offsetTop (layout stable) not getBoundingClientRect.
-		 *
-		 * scrolled = scrollY - wrapperTop
-		 * scrollable = wrapperHeight - viewportHeight
-		 */
-		function getScrollProgress() {
-			var scrolled   = window.scrollY - (wrapper.offsetTop || 0);
-			var wrapperH   = wrapper.offsetHeight;
-			var viewportH  = window.innerHeight;
-			var scrollable = wrapperH - viewportH;
-			if (scrollable <= 0) return 0;
-			return Math.max(0, Math.min(1, scrolled / scrollable));
-		}
-
-		// ── 6. Draw call (RAF gated) ──────────────────────────────────────────
-		var pendingDraw = false;
-
-		function scheduleFrame(pct) {
-			if (pendingDraw) return;
-			pendingDraw = true;
-			rafId = requestAnimationFrame(function () {
-				pendingDraw = false;
-
-				var frameIndex = Math.round(pct * (totalFrames - 1));
-				frameIndex = Math.max(0, Math.min(totalFrames - 1, frameIndex));
-
-				var img = images[frameIndex];
-				if (img && img.complete && img.naturalWidth) {
-					currentImage = img;
-					drawCover(ctx, img, canvas.width, canvas.height);
-				}
-
-				updateOverlays(pct * 100);
-			});
-		}
-
-		// ── 7. Overlay updates ────────────────────────────────────────────────
-		var overlayEls = Array.from(wrapper.querySelectorAll('.shseq-overlay'));
-
-		function updateOverlays(scrollPct) {
-			overlayEls.forEach(function (el, i) {
-				var step       = steps[i];
-				var stepScroll = step ? (step.scroll_pct || 0) : 0;
-				var nextScroll = steps[i + 1] ? steps[i + 1].scroll_pct : 101;
-				var visible    = scrollPct >= stepScroll && scrollPct < nextScroll;
-				el.setAttribute('aria-hidden', visible ? 'false' : 'true');
-				el.classList.toggle('is-visible', visible);
-			});
-		}
-
-		// ── 8. Scroll listener (throttled by RAF) ─────────────────────────────
-		function onScroll() {
-			if (!isIntersecting) return;
-			scheduleFrame(getScrollProgress());
-		}
-
-		window.addEventListener('scroll', onScroll, { passive: true });
-
-		// ── 9. IntersectionObserver — pause off-screen (Fix B6) ───────────────
-		var observer = new IntersectionObserver(
-			function (entries) {
-				entries.forEach(function (entry) {
-					isIntersecting = entry.isIntersecting;
-					if (isIntersecting) {
-						// Draw immediately on re-entry.
-						scheduleFrame(getScrollProgress());
-					}
-				});
-			},
-			{ rootMargin: LAZY_THRESHOLD + 'px 0px ' + LAZY_THRESHOLD + 'px 0px', threshold: 0 }
-		);
-		observer.observe(wrapper);
-
-		// ── 10. ResizeObserver — recalc on layout change ──────────────────────
-		var ro = new ResizeObserver(function () {
-			resizeCanvas();
-			scheduleFrame(getScrollProgress());
-		});
-		ro.observe(wrapper);
-
-		// ── 11. Initial draw ──────────────────────────────────────────────────
-		scheduleFrame(getScrollProgress());
-	}
-
-	// ── Boot all instances ────────────────────────────────────────────────────
-	function boot() {
-		document.querySelectorAll('.shseq-frame-sequence[data-shseq]').forEach(initSequence);
-	}
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', boot);
-	} else {
-		boot();
-	}
-
-}());
+    function listen(target, name, handler, options) {
+      if (!target?.addEventListener) return;
+      target.addEventListener(name, handler, options);
+      disposers.push(() => target.removeEventListener(name, handler, options));
+    }
+    function showOverlays(index) {
+      const pct = frames.length === 1 ? 100 : index / (frames.length - 1) * 100;
+      let chosen = -1;
+      steps.forEach((step, i) => { if (Number(step.scroll_pct || 0) <= pct) chosen = i; });
+      // Do not hide a link while a keyboard user is interacting with its card.
+      const focused = overlays.findIndex(el => el.contains(document.activeElement));
+      if (focused >= 0) chosen = focused;
+      overlays.forEach((el, i) => {
+        const visible = !enabled || i === chosen;
+        el.hidden = !visible;
+        el.inert = !visible;
+        el.setAttribute('aria-hidden', String(!visible));
+      });
+    }
+    function draw(index) {
+      const img = cache.get(index);
+      if (!img || !width || !height) return;
+      const scale = (layout === 'desktop' ? Math.max : Math.min)(width / img.naturalWidth, height / img.naturalHeight);
+      ctx.fillStyle = '#faf9f6';
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, (width - img.naturalWidth * scale) / 2, (height - img.naturalHeight * scale) / 2, img.naturalWidth * scale, img.naturalHeight * scale);
+      painted = index;
+      needsPaint = false;
+      cache.delete(index); cache.set(index, img);
+      wrapper.classList.add('has-frame');
+      showOverlays(index);
+    }
+    function resize() {
+      top = stickyTop();
+      const available = Math.max(120, window.innerHeight - top);
+      layout = window.innerHeight >= window.innerWidth ? 'portrait' : (window.innerWidth <= 1366 ? 'landscape' : 'desktop');
+      wrapper.dataset.layout = layout;
+      wrapper.style.setProperty('--shseq-top', top + 'px');
+      wrapper.style.setProperty('--shseq-stage-height', available + 'px');
+      const speed = clamp(Number(config.scrollSpeed) || 4, 1, 200);
+      wrapper.style.setProperty('--shseq-auto-height', (available + (frames.length - 1) * speed) + 'px');
+      const rect = visual.getBoundingClientRect();
+      width = Math.max(1, rect.width); height = Math.max(1, rect.height);
+      ratio = Math.min(window.devicePixelRatio || 1, 2, 2560 / width, 1920 / height);
+      const cw = Math.round(width * ratio), ch = Math.round(height * ratio);
+      if (canvas.width !== cw || canvas.height !== ch) {
+        canvas.width = cw; canvas.height = ch;
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      }
+      needsPaint = true;
+      schedule();
+    }
+    function trim() {
+      while (cache.size > 8) {
+        const key = [...cache.keys()].find(index => index !== painted && index !== wanted);
+        cache.delete(key);
+      }
+    }
+    function pump() {
+      if (!enabled || !active || destroyed) return;
+      while (loading.size < 2 && queue.length) {
+        const index = queue.shift();
+        if (cache.has(index) || loading.has(index) || failed.has(index)) continue;
+        const img = new Image();
+        img.decoding = 'async';
+        let complete = false;
+        const timer = setTimeout(() => finish(false), 12000);
+        function finish(ok) {
+          if (complete) return;
+          complete = true; clearTimeout(timer);
+          img.onload = img.onerror = null;
+          loading.delete(index);
+          if (ok && enabled && !destroyed) { cache.set(index, img); trim(); schedule(); }
+          else { failed.add(index); img.removeAttribute('src'); }
+          pump();
+        }
+        loading.set(index, () => {
+          complete = true; clearTimeout(timer); img.onload = img.onerror = null; img.removeAttribute('src');
+        });
+        img.onload = () => finish(img.naturalWidth > 0);
+        img.onerror = () => finish(false);
+        img.src = frames[index].url;
+      }
+    }
+    function tick() {
+      raf = 0;
+      if (!enabled || !active || destroyed) return;
+      const currentTop = stickyTop();
+      if (top !== currentTop) resize();
+      const rect = wrapper.getBoundingClientRect();
+      const distance = Math.max(1, rect.height - stage.getBoundingClientRect().height);
+      wanted = Math.round(clamp((top - rect.top) / distance, 0, 1) * (frames.length - 1));
+      // Replace stale queued work after fast scrolling. In-flight work is capped at two.
+      queue = [wanted, wanted + 1, wanted - 1, wanted + 2, wanted - 2].filter(index => index >= 0 && index < frames.length && !cache.has(index) && !loading.has(index) && !failed.has(index));
+      if (cache.has(wanted)) { if (needsPaint || painted !== wanted) draw(wanted); }
+      else if (painted < 0 && cache.size) draw([...cache.keys()].sort((a, b) => Math.abs(a - wanted) - Math.abs(b - wanted))[0]);
+      else if (needsPaint && painted >= 0) draw(painted);
+      // Before the first decoded frame, keep the final-frame poster and its matching content.
+      if (painted < 0) showOverlays(frames.length - 1);
+      pump();
+    }
+    function schedule() { if (enabled && active && !raf) raf = requestAnimationFrame(tick); }
+    function clearImages() {
+      loading.forEach(cancel => cancel()); loading.clear(); cache.clear(); queue = [];
+      wanted = painted = -1;
+      wrapper.classList.remove('has-frame');
+    }
+    function reconcile() {
+      const allow = !reduced.matches && !navigator.connection?.saveData && !(config.disableOnMobile && Math.min(window.innerWidth, window.innerHeight) < 768);
+      if (allow !== enabled) {
+        enabled = allow;
+        wrapper.classList.toggle('is-enhanced', enabled);
+        if (!enabled) clearImages();
+        failed.clear();
+        showOverlays(frames.length - 1);
+      }
+      resize(); schedule();
+    }
+    const io = typeof IntersectionObserver === 'function' ? new IntersectionObserver(entries => {
+      active = entries[0].isIntersecting;
+      if (active) { schedule(); pump(); }
+    }, { rootMargin: threshold + 'px 0px' }) : null;
+    if (io) io.observe(wrapper); else active = true;
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(resize) : null;
+    ro?.observe(visual);
+    listen(window, 'scroll', schedule, { passive: true });
+    listen(window, 'resize', reconcile, { passive: true });
+    listen(window, 'online', () => { failed.clear(); schedule(); });
+    listen(reduced, 'change', reconcile);
+    listen(navigator.connection, 'change', reconcile);
+    listen(wrapper, 'focusout', () => setTimeout(() => { if (enabled) showOverlays(painted < 0 ? frames.length - 1 : painted); }, 0));
+    instances.set(wrapper, () => {
+      destroyed = true; cancelAnimationFrame(raf); clearImages(); io?.disconnect(); ro?.disconnect();
+      disposers.forEach(dispose => dispose()); instances.delete(wrapper);
+    });
+    reconcile();
+  }
+  function boot() {
+    document.querySelectorAll('.shseq-frame-sequence[data-shseq]').forEach(init);
+    // Elementor can replace a widget without a page navigation.
+    const changes = new MutationObserver(records => {
+      instances.forEach((destroy, node) => { if (!node.isConnected) destroy(); });
+      records.forEach(record => record.addedNodes.forEach(node => {
+        if (node.nodeType !== 1) return;
+        if (node.matches('.shseq-frame-sequence[data-shseq]')) init(node);
+        node.querySelectorAll('.shseq-frame-sequence[data-shseq]').forEach(init);
+      }));
+    });
+    changes.observe(document.body, { childList: true, subtree: true });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
+  else boot();
+})();

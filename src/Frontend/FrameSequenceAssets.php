@@ -64,6 +64,8 @@ final class FrameSequenceAssets {
 			return;
 		}
 
+		// Preview renders its shortcode before wp_head/wp_enqueue_scripts.
+		$this->register_assets();
 		wp_enqueue_style( self::STYLE_HANDLE );
 		wp_enqueue_script( self::SCRIPT_HANDLE );
 

@@ -29,6 +29,8 @@
 
 namespace ShahreHonar\SequenceEngine\Jobs;
 
+use ShahreHonar\SequenceEngine\Core\SequenceAccess;
+
 use ShahreHonar\SequenceEngine\AI\OpenAIProvider;
 use ShahreHonar\SequenceEngine\AI\ReplicateProvider;
 use ShahreHonar\SequenceEngine\Admin\GoldenMasterMetaBox;
@@ -89,6 +91,9 @@ final class FrameGenerationJob {
 	 * @param \WP_Post $post    Post object.
 	 */
 	public function maybe_schedule( $post_id, $post ) {
+		if ( ! SequenceAccess::can_edit( (int) $post_id ) ) {
+			return;
+		}
 		if ( wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id ) ) {
 			return;
 		}
@@ -250,6 +255,7 @@ final class FrameGenerationJob {
 		}
 
 		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+		SequenceAccess::require_ajax( $post_id );
 		if ( ! $post_id ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid post ID.', 'sh-sequence-engine' ) ), 400 );
 			return;

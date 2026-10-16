@@ -328,9 +328,13 @@ final class SequenceWizardController
         return new \WP_REST_Response($out, 200);
     }
 
-    public function checkPermission(): bool
+    public function checkPermission(\WP_REST_Request $request ): bool
     {
-        return current_user_can('edit_posts');
+        if ( ! current_user_can('edit_shseq_sequences') ) return false;
+        $id = absint( $request->get_param('sequence_id') );
+        if ( ! $id ) return str_ends_with( $request->get_route(), '/wizard/presets' );
+        if ( ! \ShahreHonar\SequenceEngine\Core\SequenceAccess::can_edit( $id ) ) return false;
+        return ! str_ends_with( $request->get_route(), '/publish' ) || current_user_can('publish_shseq_sequences');
     }
 
     /* ─────────────────────────── Helper ────────────────────────────── */

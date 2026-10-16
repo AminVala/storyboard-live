@@ -304,6 +304,7 @@
         el.setAttribute('aria-label', isFa ? 'متن overlay' : 'Overlay text');
         el.setAttribute('spellcheck', 'false');
         el.dataset.type         = ov.type || 'title';
+        el.dataset.url = ov.url || '';
         el.dataset.baseFontSize = ov.fontSize || 16;
         el.style.cssText = [
             'position:absolute',
@@ -375,6 +376,7 @@
             var txt = el.childNodes[0] ? el.childNodes[0].textContent : el.textContent;
             result.push({
                 type:     el.dataset.type,
+                url:      el.dataset.url || '',
                 text:     txt.trim(),
                 x:        parseFloat(el.style.left)  || 0,
                 y:        parseFloat(el.style.top)   || 0,

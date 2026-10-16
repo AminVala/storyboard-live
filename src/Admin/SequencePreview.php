@@ -87,7 +87,7 @@ final class SequencePreview {
 		/* Verify nonce */
 		$token = isset( $_GET['_shseq_token'] ) ? sanitize_text_field( wp_unslash( $_GET['_shseq_token'] ) ) : '';
 		if ( ! wp_verify_nonce( $token, self::NONCE_ACTION . $post_id ) ) {
-			wp_die( esc_html__( 'Preview link has expired. Go back and generate a fresh preview.', 'sh-sequence-engine' ), 403 );
+			wp_die( esc_html__( 'Preview link has expired. Go back and generate a fresh preview.', 'sh-sequence-engine' ), '', array( 'response' => 403 ) );
 		}
 
 		/* Verify post exists, is the right type, and user can edit it */
@@ -97,7 +97,7 @@ final class SequencePreview {
 			SequencePostType::POST_TYPE !== $post->post_type ||
 			! current_user_can( 'edit_post', $post_id )
 		) {
-			wp_die( esc_html__( 'Preview not available.', 'sh-sequence-engine' ), 403 );
+			wp_die( esc_html__( 'Preview not available.', 'sh-sequence-engine' ), '', array( 'response' => 403 ) );
 		}
 
 		/* ── Build content ───────────────────────────────────────── */
@@ -131,6 +131,7 @@ final class SequencePreview {
 		// Use the active theme's stylesheet so the preview includes real theme CSS.
 		$stylesheet_url = get_stylesheet_uri();
 
+		nocache_headers();
 		header( 'Content-Type: text/html; charset=utf-8' );
 		header( 'X-Robots-Tag: noindex, nofollow' );
 		?>
@@ -197,7 +198,7 @@ final class SequencePreview {
 				<circle cx="24" cy="18" r="3" stroke="currentColor" stroke-width="2"/>
 			</svg>
 			<p style="font-size:16px;font-weight:600;margin:0"><?php echo esc_html__( 'No content to preview yet.', 'sh-sequence-engine' ); ?></p>
-			<p style="font-size:14px;margin:0"><?php echo esc_html__( 'Upload and confirm a Golden Master image to render the sequence.', 'sh-sequence-engine' ); ?></p>
+			<p style="font-size:14px;margin:0"><?php echo esc_html__( 'Add frame images to render the sequence.', 'sh-sequence-engine' ); ?></p>
 			<a href="<?php echo esc_url( $edit_url ); ?>" style="display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:1px solid #e4e7ec;border-radius:8px;color:#2563eb;font-size:14px;font-weight:600;text-decoration:none">
 				<?php echo esc_html__( 'Go to Sequence editor', 'sh-sequence-engine' ); ?>
 			</a>

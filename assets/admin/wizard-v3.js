@@ -562,6 +562,7 @@
 	var redoBtn          = $('#shseq-redo');
 	var propPanel        = $('#shseq-element-props');
 	var propText         = $('#shseq-prop-text');
+	var propUrl = $('#shseq-prop-url');
 	var propSize         = $('#shseq-prop-size');
 	var propColor        = $('#shseq-prop-color');
 	var propAlign        = $('#shseq-prop-align');
@@ -746,6 +747,7 @@
 		if (!item) return;
 		if (propPanel) propPanel.removeAttribute('hidden');
 		if (propText) propText.value = item.text;
+		if (propUrl) { propUrl.value = item.url || ''; propUrl.disabled = item.type !== 'button'; }
 		if (propSize) propSize.value = item.fontSize;
 		if (propColor) propColor.value = item.color;
 		if (propAlign) propAlign.value = item.align;
@@ -758,13 +760,14 @@
 	}
 
 	// Property changes
-	[propText, propSize, propColor, propAlign].forEach(function (inp) {
+	[propText, propUrl, propSize, propColor, propAlign].forEach(function (inp) {
 		if (!inp) return;
 		inp.addEventListener('input', function () {
 			if (!selectedEl) return;
 			var item = overlayById(selectedEl.dataset.id);
 			if (!item) return;
 			var content = selectedEl.querySelector('.shseq-overlay-el__content');
+			if (inp === propUrl) { item.url = inp.value; }
 			if (inp === propText)  { item.text = inp.value; if (content) content.textContent = inp.value; }
 			if (inp === propSize)  { item.fontSize = parseInt(inp.value, 10); if (content) content.style.fontSize = item.fontSize + 'px'; }
 			if (inp === propColor) { item.color = inp.value; if (content) content.style.color = inp.value; }
