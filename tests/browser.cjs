@@ -44,6 +44,8 @@ const server = http.createServer((req, res) => {
     return page;
   }
   async function seek(page,pct){
+    // Let viewport resize events and ResizeObserver geometry settle before measuring the track.
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
     const target=await page.evaluate(p=>{
       const wrapper=document.querySelector('[data-shseq]'),stage=wrapper.querySelector('.shseq-stage');
       const top=parseFloat(getComputedStyle(stage).top)||0;
